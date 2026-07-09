@@ -669,7 +669,7 @@
         </div>
 
         <div class="button-group">
-            <button type="button" onclick="switchDisplayMode(2)" title="Click again to toggle clock faces on nRF52">Switch to Clock Mode</button>
+                        <button type="button" onclick="switchDisplayMode(2)" title="Click again to toggle Face 1 / Face 2 on nRF52">Switch to Clock Mode</button>
             <button type="button" onclick="switchDisplayMode(1)" title="Click to switch to calendar mode">Switch to Calendar Mode</button>
 
             <button type="button" onclick="setri('e4')" title="Click to toggle clock color">Toggle Clock Color</button>
@@ -820,7 +820,6 @@
             Screen Size:
             <select id="screen-size" onchange="updateCanvasSize()">
                 <option value="nrf52_2.13_250x128">nRF52 2.13&quot; (250x128)</option>
-                <option value="nrf52_2.9_296x128">nRF52 2.9&quot; CE (296x128)</option>
                 <option value="nrf52_4.2_400x300">nRF52 4.2&quot; BWR UC8176 (400x300)</option>
                 <option value="nrf52_4.2_400x300_bw1619">nRF52 4.2&quot; BW SSD1619 (400x300)</option>
                 <option value="4.2ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¤ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¼ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¥ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂºÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¾">4.2" Transfer</option>
@@ -2043,23 +2042,12 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         const NRF52_CMD_INIT = 0x01;
         const NRF52_CMD_ACTIVATE = 0xa0;
         const NRF52_IMAGE_CHUNK_SIZE = 128;
-        const DA14585_RXTX_SERVICE_UUID = '00001f10-0000-1000-8000-00805f9b34fb';
-        const DA14585_LEGACY_SERVICE_UUID = '13187b10-eba9-a3ba-044e-83d3217d9a38';
-        const DA14585_DFU_SERVICE_UUID = '0000221f-0000-1000-8000-00805f9b34fb';
-        const SUPPORTED_BLE_SERVICES = [
-            NRF52_SERVICE_UUID,
-            DA14585_RXTX_SERVICE_UUID,
-            DA14585_LEGACY_SERVICE_UUID,
-            DA14585_DFU_SERVICE_UUID
-        ];
         let deviceProtocol = null;
         let nrf52DisplayMode = 1;
         let nrf52ModelId = 2;
         let nrf52ModelDetected = false;
         let nrf52ActivationWaiter = null;
         let nrf52ImageChunkSize = NRF52_IMAGE_CHUNK_SIZE;
-        let manualDisconnect = false;
-        let autoReconnectTimer = null;
         function delay(delayInMs) {
             return new Promise(resolve => {
                 setTimeout(() => {
@@ -2068,10 +2056,6 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             });
         }
         function resetVariables() {
-            if (autoReconnectTimer) {
-                clearTimeout(autoReconnectTimer);
-                autoReconnectTimer = null;
-            }
             gattServer = null;
             epdService = null;
             epdCharacteristic = null;
@@ -2161,13 +2145,12 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         }
         async function uploadNrf52Image(canvas) {
             const screenValue = document.getElementById('screen-size').value;
-            const is290 = screenValue === 'nrf52_2.9_296x128' && canvas.width === 296 && canvas.height === 128;
             const is213 = screenValue === 'nrf52_2.13_250x128' && canvas.width === 250 && canvas.height === 128;
             const is420Bwr = screenValue === 'nrf52_4.2_400x300' && canvas.width === 400 && canvas.height === 300;
             const is420Bw1619 = screenValue === 'nrf52_4.2_400x300_bw1619' && canvas.width === 400 && canvas.height === 300;
             const is420 = is420Bwr || is420Bw1619;
-            if (!is290 && !is213 && !is420) {
-                addLog('Select nRF52 2.9" CE (296x128), nRF52 2.13" (250x128), UC8176 BWR 4.2", or SSD1619 BW 4.2" before uploading.');
+            if (!is213 && !is420) {
+                addLog('Select nRF52 2.13" (250x128), UC8176 BWR 4.2", or SSD1619 BW 4.2" before uploading.');
                 return false;
             }
             if (nrf52ModelDetected && is420Bwr && nrf52ModelId !== 3) {
@@ -2178,17 +2161,17 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
                 addLog(`Connected nRF52 model ${nrf52ModelId} is not SSD1619 BW 4.2" (model 4).`);
                 return false;
             }
-            if (nrf52ModelDetected && (is290 || is213) && (nrf52ModelId === 3 || nrf52ModelId === 4)) {
+            if (nrf52ModelDetected && is213 && (nrf52ModelId === 3 || nrf52ModelId === 4)) {
                 addLog('Connected device is 4.2". Select the matching nRF52 4.2" screen size.');
                 return false;
             }
 
-            // The 2.9"/2.13" firmware stores bytes column-first; 4.2"
+            // The 2.13" firmware stores bytes column-first; 4.2"
             // follows EPD-nRF5 and stores bytes row-first.
             const converter = is420 ? canvas2bytes : canvas2bytes_bw;
             const black = converter(canvas);
             await sendNrf52ImagePlane(black, true);
-            if (is420Bwr || is290 || (!is420Bw1619 && nrf52ModelId === 2)) {
+            if (is420Bwr || (!is420Bw1619 && nrf52ModelId === 2)) {
                 // The BWR converter uses 1 for red pixels, while the
                 // nRF52 red plane expects 0 for red and 1 for non-red pixels.
                 const red = converter(canvas, 'bwr').map(byte => byte ^ 0xff);
@@ -2248,15 +2231,6 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext("2d");
             let width, height;
-            if (sizeSelect.value === "nrf52_2.9_296x128") {
-                canvas.width = 296;
-                canvas.height = 128;
-                ctx.fillStyle = 'white';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                update_image();
-                addLog('Canvas size updated to: 296x128 (nRF52 2.9 CE)');
-                return;
-            }
             if (sizeSelect.value === "nrf52_2.13_250x128") {
                 canvas.width = 250;
                 canvas.height = 128;
@@ -2421,34 +2395,18 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             resetVariables();
             addLog('Disconnected.');
             document.getElementById("connectbutton").innerHTML = 'Scan Devices';
-            if (manualDisconnect || bleDevice == null) {
-                manualDisconnect = false;
-                return;
-            }
-            document.getElementById("connectbutton").innerHTML = 'Reconnecting...';
-            addLog('BLE disconnected; reconnecting automatically...');
-            autoReconnectTimer = setTimeout(async () => {
-                autoReconnectTimer = null;
-                try {
-                    await reConnect();
-                } catch (e) {
-                    await handleError(e);
-                }
-            }, 1000);
         }
         async function preConnect() {
             if (gattServer != null && gattServer.connected) {
-                if (bleDevice != null && bleDevice.gatt.connected) {
-                    manualDisconnect = true;
+                if (bleDevice != null && bleDevice.gatt.connected)
                     bleDevice.gatt.disconnect();
-                }
             } else {
                 reconnectTrys = 0;
                 try {
                     document.getElementById("connectbutton").innerHTML = 'Scanning...';
                     bleDevice = await navigator.bluetooth.requestDevice({
-                        filters: SUPPORTED_BLE_SERVICES.map(service => ({ services: [service] })),
-                        optionalServices: SUPPORTED_BLE_SERVICES
+                        acceptAllDevices: true,
+                        optionalServices: ['0000221f-0000-1000-8000-00805f9b34fb', '00001f10-0000-1000-8000-00805f9b34fb', '13187b10-eba9-a3ba-044e-83d3217d9a38', NRF52_SERVICE_UUID]
                     });
                     bleDevice.addEventListener('gattserverdisconnected', disconnect);
                 } catch (e) {
@@ -2464,7 +2422,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             }
         }
         async function connectRXTX() {
-            rxtxService = await gattServer.getPrimaryService(DA14585_RXTX_SERVICE_UUID);
+            rxtxService = await gattServer.getPrimaryService('00001f10-0000-1000-8000-00805f9b34fb');
             addLog('> rxtxService Serial service found');
             rxtxCharacteristic = await rxtxService.getCharacteristic('00001f1f-0000-1000-8000-00805f9b34fb');
             addLog('> rxtxCharacteristic Serial service connected');
@@ -2480,7 +2438,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             const sizeSelect = document.getElementById('screen-size');
             const target = nrf52ModelId === 3
                 ? 'nrf52_4.2_400x300'
-                : (nrf52ModelId === 4 ? 'nrf52_4.2_400x300_bw1619' : sizeSelect.value);
+                : (nrf52ModelId === 4 ? 'nrf52_4.2_400x300_bw1619' : 'nrf52_2.13_250x128');
             if (sizeSelect.value !== target) {
                 sizeSelect.value = target;
                 updateCanvasSize();
@@ -2547,7 +2505,8 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
                 }
             }
 
-            addLog('> nRF52 connected; display init skipped to avoid full refresh.');
+            await sendCommand(new Uint8Array([NRF52_CMD_INIT]));
+            addLog('> nRF52 display initialization complete');
             return true;
         }
         function handleNrf52Notification(event) {
@@ -2599,14 +2558,12 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             await epdCharacteristic.startNotifications();
             epdCharacteristic.addEventListener('characteristicvaluechanged', handleNrf52Notification);
             setDetectedProtocol(PROTOCOL_NRF52);
-            addLog('> nRF52 connected; no display command sent on connect.');
+            await initializeNrf52Device();
         }
         async function reConnect() {
             reconnectTrys = 0;
-            if (bleDevice != null && bleDevice.gatt.connected) {
-                manualDisconnect = true;
+            if (bleDevice != null && bleDevice.gatt.connected)
                 bleDevice.gatt.disconnect();
-            }
             resetVariables();
             addLog("Reconnect");
             await delay(300);
@@ -2630,7 +2587,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
                     await connectRXTX();
                     setDetectedProtocol(PROTOCOL_DA14585);
                     try {
-                        epdService = await gattServer.getPrimaryService(DA14585_LEGACY_SERVICE_UUID);
+                        epdService = await gattServer.getPrimaryService('13187b10-eba9-a3ba-044e-83d3217d9a38');
                         addLog('> epdService Available service found');
                         epdCharacteristic = await epdService.getCharacteristic('4b646063-6264-f3a7-8941-e65356ea82fe');
                         addLog('> epdCharacteristic Service connected');
@@ -2829,6 +2786,9 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             }, 1000);
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext("2d");
+            const initialSizeSelect = document.getElementById('screen-size');
+            // Default this package to the nRF52 4.2" BW SSD1619 target.
+            if (initialSizeSelect.value === 'nrf52_2.13_250x128') initialSizeSelect.selectedIndex = 2;
             updateCanvasSize();
             ctx.fillStyle = 'white';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
