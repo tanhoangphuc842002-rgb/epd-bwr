@@ -2183,6 +2183,9 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
                 return false;
             }
 
+            await sendCommand(new Uint8Array([NRF52_CMD_INIT]));
+            await delay(100);
+
             // The 2.9"/2.13" firmware stores bytes column-first; 4.2"
             // follows EPD-nRF5 and stores bytes row-first.
             const converter = is420 ? canvas2bytes : canvas2bytes_bw;
@@ -2599,7 +2602,8 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             await epdCharacteristic.startNotifications();
             epdCharacteristic.addEventListener('characteristicvaluechanged', handleNrf52Notification);
             setDetectedProtocol(PROTOCOL_NRF52);
-            addLog('> nRF52 connected; no display command sent on connect.');
+            await sendCommand(new Uint8Array([NRF52_CMD_INIT]));
+            addLog('> nRF52 connected; display initialized.');
         }
         async function reConnect() {
             reconnectTrys = 0;
