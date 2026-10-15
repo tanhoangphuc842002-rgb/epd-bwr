@@ -1349,6 +1349,8 @@
             <label for="ble-scan-filter">Bộ lọc:</label>
             <select id="ble-scan-filter" style="width:auto; margin:0; max-width:100%;">
                 <option value="supported">Đồng hồ hỗ trợ</option>
+                <option value="nrf">NRF_EPD</option>
+                <option value="dlg">DLG-CLOCK</option>
                 <option value="all">Tất cả thiết bị</option>
             </select>
             <button type="button" onclick="document.getElementById('log').innerHTML = '';">Clear Logs</button>
@@ -2893,7 +2895,6 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         const DA14585_RXTX_SERVICE_UUID = '00001f10-0000-1000-8000-00805f9b34fb';
         const DA14585_LEGACY_SERVICE_UUID = '13187b10-eba9-a3ba-044e-83d3217d9a38';
         const DA14585_DFU_SERVICE_UUID = '0000221f-0000-1000-8000-00805f9b34fb';
-        const DA14585_ADVERTISED_SERVICE_UUID = '0000ff00-0000-1000-8000-00805f9b34fb';
         const SUPPORTED_BLE_SERVICES = [
             NRF52_SERVICE_UUID,
             NRF52_DFU_SERVICE_UUID,
@@ -2910,20 +2911,22 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             }
         }
         function getBleScanOptions() {
-            const allDevices = document.getElementById('ble-scan-filter').value === 'all';
+            const mode = document.getElementById('ble-scan-filter').value;
             const optionalServices = SUPPORTED_BLE_SERVICES.slice();
-            if (allDevices) return { acceptAllDevices: true, optionalServices };
-            // iOS bridges can discover services without reliably exposing names.
-            // Separate entries are OR conditions, not a requirement for every service.
-            const filters = optionalServices.map(service => ({ services: [service] }));
+            if (mode === 'all') return { acceptAllDevices: true, optionalServices };
+            if (mode === 'nrf' || mode === 'dlg') {
+                return {
+                    filters: [{ namePrefix: mode === 'dlg' ? 'DLG-CLOCK' : 'NRF_EPD' }],
+                    optionalServices
+                };
+            }
             const ios = /iPad|iPhone|iPod|Bluefy/i.test(navigator.userAgent || '') ||
                 (/Mac/i.test(navigator.platform || '') && navigator.maxTouchPoints > 1);
-            if (ios) {
-                // DLG-CLOCK advertises FF00, not its connected RXTX/EPD UUIDs.
-                filters.push({ services: [DA14585_ADVERTISED_SERVICE_UUID] });
-            } else {
-                filters.push({ namePrefix: 'NRF_EPD' }, { namePrefix: 'DLG-CLOCK' });
-            }
+            // iOS service-filter scanning missed DLG-CLOCK in real-device tests.
+            // Keep its chooser name-only; optionalServices grants GATT access.
+            const names = [{ namePrefix: 'NRF_EPD' }, { namePrefix: 'DLG-CLOCK' }];
+            const filters = ios ? names :
+                optionalServices.map(service => ({ services: [service] })).concat(names);
             return { filters, optionalServices };
         }
         let deviceProtocol = null;
@@ -4818,7 +4821,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
                     document.getElementById("connectbutton").textContent = t('Scan Devices');
                     addLog(t('Scan cancelled or failed: ') + (e.name ? e.name + ': ' : '') + (e.message || String(e)));
                     const filter = document.getElementById('ble-scan-filter');
-                    if (filter.value === 'supported') {
+                    if (filter.value !== 'all') {
                         if (e.name === 'TypeError' || e.name === 'NotSupportedError') filter.value = 'all';
                         addLog('Nếu không thấy đồng hồ, chọn bộ lọc “Tất cả thiết bị” rồi bấm quét lại.');
                     }
