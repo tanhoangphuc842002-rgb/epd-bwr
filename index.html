@@ -1345,7 +1345,12 @@
        
         <div class="button-group">
             <button id="connectbutton" type="button" onclick="preConnect();">Scan Devices</button>
-            <button type="button" onclick="reConnect();">Reconnect</button>
+            <button id="reconnectbutton" type="button" onclick="reConnect();">Reconnect</button>
+            <label for="ble-scan-filter">Bộ lọc:</label>
+            <select id="ble-scan-filter" style="width:auto; margin:0; max-width:100%;">
+                <option value="supported">Đồng hồ hỗ trợ</option>
+                <option value="all">Tất cả thiết bị</option>
+            </select>
             <button type="button" onclick="document.getElementById('log').innerHTML = '';">Clear Logs</button>
             <span id="device-protocol">Device: not connected</span>
         </div>
@@ -2895,6 +2900,28 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             DA14585_LEGACY_SERVICE_UUID,
             DA14585_DFU_SERVICE_UUID
         ];
+        let bleConnectionBusy = false;
+        function setBleConnectionBusy(busy) {
+            bleConnectionBusy = busy;
+            for (const id of ['connectbutton', 'reconnectbutton', 'ble-scan-filter']) {
+                const element = document.getElementById(id);
+                if (element) element.disabled = busy;
+            }
+        }
+        function getBleScanOptions() {
+            const allDevices = document.getElementById('ble-scan-filter').value === 'all';
+            const optionalServices = SUPPORTED_BLE_SERVICES.slice();
+            if (allDevices) return { acceptAllDevices: true, optionalServices };
+            // iOS bridges can discover services without reliably exposing names.
+            // Separate entries are OR conditions, not a requirement for every service.
+            const filters = optionalServices.map(service => ({ services: [service] }));
+            const ios = /iPad|iPhone|iPod|Bluefy/i.test(navigator.userAgent || '') ||
+                (/Mac/i.test(navigator.platform || '') && navigator.maxTouchPoints > 1);
+            if (!ios) {
+                filters.push({ namePrefix: 'NRF_EPD' }, { namePrefix: 'DLG-CLOCK' });
+            }
+            return { filters, optionalServices };
+        }
         let deviceProtocol = null;
         let nrf52DisplayMode = 1;
         let nrf52ModelId = 2;
@@ -4753,31 +4780,44 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
                 buttons.forEach(button => button.disabled = false);
             }
         }
-        function disconnect() {
+        function disconnect(event) {
+            if (event && event.target && event.target !== bleDevice) return;
             resetVariables();
             addLog(t('Disconnected.'));
             document.getElementById("connectbutton").textContent = t('Scan Devices');
         }
         async function preConnect() {
-            if (gattServer != null && gattServer.connected) {
-                if (bleDevice != null && bleDevice.gatt.connected) {
-                    bleDevice.gatt.disconnect();
+            if (bleConnectionBusy) return;
+            setBleConnectionBusy(true);
+            try {
+                if (gattServer != null && gattServer.connected) {
+                    if (bleDevice != null && bleDevice.gatt.connected) {
+                        bleDevice.gatt.disconnect();
+                    }
+                    return;
                 }
-            } else {
                 if (!navigator.bluetooth || typeof navigator.bluetooth.requestDevice !== 'function') {
                     addLog('Trình duyệt chưa có Web Bluetooth. Trên iPhone hãy mở trang bằng Bluefy; trên máy tính/Android dùng Chrome hoặc Edge.');
                     return;
                 }
                 try {
                     document.getElementById("connectbutton").textContent = t('Scanning...');
-                    bleDevice = await navigator.bluetooth.requestDevice({
-                        acceptAllDevices: true,
-                        optionalServices: SUPPORTED_BLE_SERVICES
-                    });
+                    // Keep the chooser inside the original click gesture (Bluefy/iOS).
+                    const selectedDevice = await navigator.bluetooth.requestDevice(getBleScanOptions());
+                    if (!selectedDevice || !selectedDevice.gatt) {
+                        throw new Error('Không nhận được thiết bị Bluetooth. Hãy bấm quét lại.');
+                    }
+                    bleDevice = selectedDevice;
+                    bleDevice.removeEventListener('gattserverdisconnected', disconnect);
                     bleDevice.addEventListener('gattserverdisconnected', disconnect);
                 } catch (e) {
                     document.getElementById("connectbutton").textContent = t('Scan Devices');
                     addLog(t('Scan cancelled or failed: ') + (e.name ? e.name + ': ' : '') + (e.message || String(e)));
+                    const filter = document.getElementById('ble-scan-filter');
+                    if (filter.value === 'supported') {
+                        if (e.name === 'TypeError' || e.name === 'NotSupportedError') filter.value = 'all';
+                        addLog('Nếu không thấy đồng hồ, chọn bộ lọc “Tất cả thiết bị” rồi bấm quét lại.');
+                    }
                     return;
                 }
                 try {
@@ -4785,6 +4825,8 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
                 } catch (e) {
                     await handleError(e);
                 }
+            } finally {
+                setBleConnectionBusy(false);
             }
         }
         async function connectRXTX() {
@@ -5139,19 +5181,27 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             addLog('> nRF52 connected; display initialized.');
         }
         async function reConnect() {
-            if (bleDevice != null && bleDevice.gatt.connected) {
-                bleDevice.gatt.disconnect();
-            }
-            resetVariables();
-            addLog("Reconnect");
-            await delay(300);
+            if (bleConnectionBusy) return;
+            if (!bleDevice || !bleDevice.gatt) return preConnect();
+            setBleConnectionBusy(true);
             try {
-                await connect();
-            } catch (e) {
-                await handleError(e);
+                if (bleDevice.gatt.connected) {
+                    bleDevice.gatt.disconnect();
+                }
+                resetVariables();
+                addLog("Reconnect");
+                await delay(300);
+                try {
+                    await connect();
+                } catch (e) {
+                    await handleError(e);
+                }
+            } finally {
+                setBleConnectionBusy(false);
             }
         }
         async function connect() {
+            if (!bleDevice || !bleDevice.gatt) throw new Error('Hãy quét và chọn đồng hồ trước.');
             if (epdCharacteristic == null) {
                 document.getElementById("connectbutton").textContent = t('Connecting...');
                 addLog(t("Connecting: ") + bleDevice.name);
