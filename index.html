@@ -2893,6 +2893,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         const DA14585_RXTX_SERVICE_UUID = '00001f10-0000-1000-8000-00805f9b34fb';
         const DA14585_LEGACY_SERVICE_UUID = '13187b10-eba9-a3ba-044e-83d3217d9a38';
         const DA14585_DFU_SERVICE_UUID = '0000221f-0000-1000-8000-00805f9b34fb';
+        const DA14585_ADVERTISED_SERVICE_UUID = '0000ff00-0000-1000-8000-00805f9b34fb';
         const SUPPORTED_BLE_SERVICES = [
             NRF52_SERVICE_UUID,
             NRF52_DFU_SERVICE_UUID,
@@ -2917,7 +2918,10 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             const filters = optionalServices.map(service => ({ services: [service] }));
             const ios = /iPad|iPhone|iPod|Bluefy/i.test(navigator.userAgent || '') ||
                 (/Mac/i.test(navigator.platform || '') && navigator.maxTouchPoints > 1);
-            if (!ios) {
+            if (ios) {
+                // DLG-CLOCK advertises FF00, not its connected RXTX/EPD UUIDs.
+                filters.push({ services: [DA14585_ADVERTISED_SERVICE_UUID] });
+            } else {
                 filters.push({ namePrefix: 'NRF_EPD' }, { namePrefix: 'DLG-CLOCK' });
             }
             return { filters, optionalServices };
