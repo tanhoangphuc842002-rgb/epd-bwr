@@ -1693,28 +1693,26 @@
             <h3>Cập nhật đồng hồ</h3>
             <p>Kết nối đồng hồ rồi kiểm tra bản cập nhật. Trang sẽ chọn gói phù hợp cho các đồng hồ được hỗ trợ.</p>
             <button id="auto-update-check" type="button">Kiểm tra bản cập nhật</button>
-            <p id="auto-update-status" role="status" aria-live="polite">Hỗ trợ bản tự động cho đồng hồ 2.13 và 2.9 CE/no CE tương thích. Đồng hồ đời cũ hoặc loại khác dùng file được cung cấp ở bên dưới.</p>
+            <p id="auto-update-status" role="status" aria-live="polite">Web tự chọn bản cập nhật cho đồng hồ tương thích. Nếu không có bản tự động, hãy dùng file được cung cấp ở bên dưới.</p>
         </div>
         <div class="dfu-card" id="vn-setup-controls" style="margin-bottom:20px">
-            <h3>Cài dữ liệu cho đồng hồ</h3>
-            <p>Nếu đồng hồ hiện NO DATA hoặc chưa có dữ liệu tiếng Việt, hãy cài một lần tại đây. Đồng hồ đã có dữ liệu hợp lệ có thể dùng ngay.</p>
-            <ol>
-                <li>Bấm Đi tới kết nối, rồi chọn đồng hồ ở thẻ Cài đặt màn hình E-Paper.</li>
-                <li>Bấm <strong>Cài dữ liệu cho đồng hồ</strong> và làm theo hướng dẫn.</li>
-                <li>Chờ báo hoàn tất. Đồng hồ hỗ trợ NO DATA sẽ tự mở giao diện bình thường; sau đó bạn cài giờ và sử dụng.</li>
-            </ol>
-            <p>Không cần chọn file font. Trang web đã có sẵn dữ liệu để cài cho đồng hồ tương thích.</p>
-            <div class="dfu-warning">Web tự kiểm tra trước khi cài. Nếu có dữ liệu cũ, hãy lưu bản sao lưu khi được yêu cầu. Không tháo pin hoặc ngắt kết nối trong khi cài.</div>
+            <h3>Cài đặt đồng hồ</h3>
+            <p>Kết nối đồng hồ rồi bấm Cài đặt đồng hồ. Web tự chọn đúng bộ dữ liệu cho thiết bị của bạn.</p>
+            <p>Font tiếng Việt và các ngày nhắc được cài trong một lần trên đồng hồ có hỗ trợ. Nếu đã có dữ liệu mới nhất, web không tải lại. Ảnh và nội dung cá nhân được giữ nguyên.</p>
+            <div class="dfu-warning">Giữ đồng hồ ở gần, không tháo pin hoặc ngắt kết nối khi đang cài. Lưu bản sao lưu nếu web yêu cầu.</div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;margin:16px 0">
-                <button id="vn-go-connect" type="button">Đi tới kết nối</button>
+                <button id="vn-go-connect" type="button">Kết nối đồng hồ</button>
+                <button id="vn-install" type="button">Cài đặt đồng hồ</button>
                 <button id="vn-setup-check" type="button">Kiểm tra dữ liệu</button>
-                <button id="vn-install" type="button">Cài dữ liệu cho đồng hồ</button>
-                <button id="vn-reinstall" type="button">Cài lại dữ liệu</button>
-                <button id="vn-recover" type="button">Hủy phiên lỗi và cài lại</button>
             </div>
             <progress id="vn-setup-progress" max="100" value="0" style="width:100%"></progress>
-            <p id="vn-setup-status" role="status" aria-live="polite">Kết nối đồng hồ rồi bấm Cài dữ liệu cho đồng hồ. Không cần chọn file font.</p>
+            <p id="vn-setup-status" role="status" aria-live="polite">Kết nối đồng hồ để bắt đầu. Không cần chọn file font hoặc sự kiện.</p>
             <button id="vn-go-todo" type="button">Mở mục Việc cần làm</button>
+            <details style="margin-top:12px"><summary>Trợ giúp cài đặt</summary>
+                <p>Nếu lần cài trước bị ngắt, hãy kết nối lại rồi chọn Thử lại. Nội dung đã lưu thành công trước đó không bị xóa.</p>
+                <button id="vn-recover" type="button">Thử lại lần cài bị ngắt</button>
+                <button id="vn-reinstall" type="button">Cài lại bộ dữ liệu</button>
+            </details>
         </div>
         <div class="dfu-card">
             <h3>Cập nhật phần mềm đồng hồ</h3>
@@ -1977,7 +1975,7 @@
             <p id="photo-daily-note" hidden>Chọn giờ bên cạnh từng ảnh đã lưu; để trống để không dùng ảnh đó trong lịch. Không đặt hai ảnh trùng giờ. Qua nửa đêm vẫn giữ ảnh cuối cho tới giờ đổi tiếp theo.</p>
             <div id="photo-slots"></div></div><div class="album-step"><h4>3. Bắt đầu trình chiếu</h4><p>Nên chọn từ 30 phút trở lên để hạn chế hao pin. Mỗi lần đổi ảnh dùng làm mới toàn màn. Hẹn giờ nghỉ màn hình vẫn được ưu tiên; trong giờ nghỉ không đổi ảnh.</p>
             <button id="photo-schedule-save" type="button">Lưu và bắt đầu</button>
-            <button id="photo-stop" type="button">Dừng tự đổi ảnh</button>
+            <button id="photo-stop" type="button">Tắt tự đổi ảnh</button>
             </div><progress id="photo-progress" max="100" value="0" style="width:100%"></progress>
             <p id="photo-status" role="status" aria-live="polite">Kết nối đồng hồ rồi bấm Xem ảnh đã lưu để bắt đầu.</p>
         </section>
@@ -3065,12 +3063,12 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             // 2.13 CE v19.2 reports panel profile 0x21 and app version 0x2B.
             if (nrf52PanelProfile === 0x21) return nrf52FirmwareVersion >= 0x2B;
             // The compatible 2.9 release reports model 2 and app version 0x22.
-            return (nrf52FirmwareVersion >= 0x22 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148].includes(nrf52FirmwareVersion);
+            return (nrf52FirmwareVersion >= 0x22 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158].includes(nrf52FirmwareVersion);
         }
         function nrf52WeekStartAckSupported() {
             return nrf52ModelDetected && nrf52ModelId === 2 &&
                 nrf52PanelProfile !== 0x21 &&
-                ((nrf52FirmwareVersion >= 0x23 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148].includes(nrf52FirmwareVersion));
+                ((nrf52FirmwareVersion >= 0x23 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158].includes(nrf52FirmwareVersion));
         }
         function waitForNrf52WeekStartAck(weekStart, timeoutMs = 8000) {
             if (nrf52WeekStartAckWaiter) {
@@ -3199,7 +3197,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         }
         async function sendNrf52Mode(mode) {
             const previousMode = nrf52DisplayMode;
-            const nativeCalendar = ([141,142,143,144,149,150].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21) || ([145,146,147,148].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29);
+            const nativeCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21) || ([145,146,147,148,157,158].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29);
             const actualMode = mode & (nativeCalendar ? 0x3f : 0x7f);
             // Save the calendar layout before SET_TIME triggers a redraw. The
             // firmware writes flash only when the value actually changes.
@@ -3218,7 +3216,9 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             await sendCommand(packet);
             nrf52DisplayMode = nativeCalendar && actualMode === 1 && !(mode & 0x40)
                 ? (previousMode === 1 ? 9 : previousMode === 9 ? (nrf52PanelProfile === 0x29 ? 5 : 7) : 1)
-                : (actualMode === 2 && previousMode === 2) ? 3 : actualMode;
+                : actualMode === 2 && ((nrf52PanelProfile === 0x29 && [157,158].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x21 && [151,152,153,154,155,156].includes(nrf52FirmwareVersion)))
+                    ? (previousMode === 2 ? 3 : previousMode === 3 ? 4 : previousMode === 4 ? (nrf52PanelProfile === 0x29 ? 10 : 5) : 2)
+                    : (actualMode === 2 && previousMode === 2) ? 3 : actualMode;
             addLog(`nRF52 mode ${nrf52DisplayMode} command sent`);
         }
         async function switchDisplayMode(mode) {
@@ -3282,6 +3282,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             }
         }
         async function uploadNrf52Image(canvas) {
+            if (window.PhotoAlbumBeforeDirectUpload && !await window.PhotoAlbumBeforeDirectUpload()) return false;
             const screenValue = document.getElementById('screen-size').value;
             const is290 = screenValue === 'nrf52_2.9_296x128' && canvas.width === 296 && canvas.height === 128;
             const is213 = screenValue === 'nrf52_2.13_250x128' && canvas.width === 250 && canvas.height === 128;
@@ -4370,7 +4371,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         async function setTime() {
             if (window.countdownOperationBusy) return;
             if (deviceProtocol === PROTOCOL_NRF52) {
-                const keepCalendar = ([141,142,143,144,149,150].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21 && [1,7,9].includes(nrf52DisplayMode)) || ([145,146,147,148].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29 && [1,5,9].includes(nrf52DisplayMode));
+                const keepCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21 && [1,7,9].includes(nrf52DisplayMode)) || ([145,146,147,148,157,158].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29 && [1,5,9].includes(nrf52DisplayMode));
                 await sendNrf52Mode(nrf52DisplayMode | (keepCalendar ? 0x40 : 0));
                 return;
             }
@@ -6704,6 +6705,9 @@ function toggleSwitch(e) {
 <script src="vn-font-data.js"></script>
 <script src="vn-todo.js"></script>
 <script src="photo-album.js"></script>
+<script src="event-clock-data.js"></script>
+<script src="event-clock-290-data.js"></script>
+<!-- Unified clock setup is part of the normal settings panel. -->
 
 </body>
 </html>

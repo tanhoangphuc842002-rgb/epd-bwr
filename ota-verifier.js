@@ -21,7 +21,7 @@
   const signed=proto(one(packet,2)),cmd=proto(one(signed,1)),raw=one(cmd,2),init=proto(raw);
   if(one(signed,2)!==0||one(cmd,1)!==1||one(init,2)!==52||one(init,4)!==0)throw new Error('Gói không đúng loại cập nhật ứng dụng đồng hồ.');
   const ver=one(init,1),descriptor=one(init,100),hash=proto(one(init,8));
-  if(descriptor.length!==20||new TextDecoder().decode(descriptor.slice(0,4))!=='DHE1')throw new Error('Gói chưa được mã hóa theo định dạng thử nghiệm.');
+  if(descriptor.length!==20||new TextDecoder().decode(descriptor.slice(0,4))!=='DHE1')throw new Error('Gói cập nhật không đúng định dạng được hỗ trợ.');
   const view=new DataView(descriptor.buffer,descriptor.byteOffset,descriptor.byteLength);
   if(![0x0211,0x0212,0x0291,0x0292].includes(meta.model_id)||view.getUint16(4,true)!==meta.model_id||view.getUint16(6,true)!==1||meta.key_id!==1||ver!==meta.application_version||one(init,7)!==image.imageData.byteLength||one(hash,1)!==3||one(hash,2).length!==32)throw new Error('Thông tin model/phiên bản của gói không khớp.');
   const sig=one(signed,3);if(sig.length!==64)throw new Error('Chữ ký cập nhật không hợp lệ.');

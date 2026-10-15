@@ -1,9 +1,45 @@
 {
   "schema": 1,
   "products": [
-    {"id":"ce213","label":"CE 2.13","model":529,"version":143,"release":"v20.11","url":"updates/DH_CE_213_v20.11_CALENDAR_NAME_UP3_OTA143_encrypted.zip","sha256":"4f8439a80606990d0a5bf26c28749e4101cfe033279c7c89e8c55684ae9a190d","resource_profile":33},
-    {"id":"noce213","label":"no CE 2.13","model":530,"version":144,"release":"v19.4","url":"updates/DH_no_CE_213_v19.4_CALENDAR_NAME_UP3_OTA144_encrypted.zip","sha256":"e52d8414a410efed5306b031ff6fb4b193291d4919d1779eaf5d85e2118335b9","resource_profile":33},
-    {"id":"ce290","label":"CE 2.9","model":657,"version":145,"release":"v19.2","url":"updates/DH_290_CE_v19.2_CALENDAR_INFO_OTA145_encrypted.zip","sha256":"021806a8378be96e216e22e73ab4918a647c0d7cdfdf964fed19a0fb00177462","resource_profile":41},
-    {"id":"noce290","label":"no CE 2.9","model":658,"version":146,"release":"v7.2","url":"updates/DH_290_no_CE_v7.2_CALENDAR_INFO_OTA146_encrypted.zip","sha256":"324bf0b9b8f9306b2bf93c0977adf1a92f0672bde9ff55a742aff7bbe9f9d22c","resource_profile":41}
+    {
+      "id": "ce213",
+      "label": "Đồng hồ 2.13 inch",
+      "model": 529,
+      "version": 155,
+      "release": "v20.12.2",
+      "url": "updates/DH_CE_213_v20.12.2_EVENT_ONE_LINE_TEST_OTA155_encrypted.zip",
+      "sha256": "0e377952886bc03b3517f26f40cab5c0ea8879efc0616b7709ca58973e656c64",
+      "resource_profile": 33
+    },
+    {
+      "id": "noce213",
+      "label": "Đồng hồ 2.13 inch",
+      "model": 530,
+      "version": 156,
+      "release": "v19.5.2",
+      "url": "updates/DH_no_CE_213_v19.5.2_EVENT_ONE_LINE_TEST_OTA156_encrypted.zip",
+      "sha256": "0737be483d6284590eb070012821ebe1c11c7322344f023878978c83247509e2",
+      "resource_profile": 33
+    },
+    {
+      "id": "ce290",
+      "label": "Đồng hồ 2.9 inch",
+      "model": 657,
+      "version": 157,
+      "release": "v19.3",
+      "url": "updates/DH_290_CE_v19.3_EVENT_ONE_LINE_TEST_OTA157_encrypted.zip",
+      "sha256": "9fe9d5912dc04231b794e7006af8853de00c5a51d057ca4f07d2ba67f8d780c2",
+      "resource_profile": 41
+    },
+    {
+      "id": "noce290",
+      "label": "Đồng hồ 2.9 inch",
+      "model": 658,
+      "version": 158,
+      "release": "v7.3",
+      "url": "updates/DH_290_no_CE_v7.3_EVENT_ONE_LINE_TEST_OTA158_encrypted.zip",
+      "sha256": "22b7a635e3b665a19bdb12c04dd021755b7c2af858d9f75fcfb2eab0ed1feae5",
+      "resource_profile": 41
+    }
   ]
 }

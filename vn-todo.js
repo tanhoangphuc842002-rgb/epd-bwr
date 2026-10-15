@@ -1,4 +1,4 @@
-/* Trial: separate capability-gated protocol; legacy countdown/DFU stay intact. */
+/* Capability-gated resource setup; legacy countdown and DFU remain intact. */
 (() => {
 'use strict';
 const $=id=>document.getElementById(id), enc=new TextEncoder(), dec=new TextDecoder('utf-8',{fatal:true});
@@ -7,12 +7,12 @@ let packetSeq=0, pending=null, work=false, cap=null, bound=null, backupDevice=nu
 const fonts=[];
 function resourceProfile(){
  if(typeof deviceProtocol==='undefined'||deviceProtocol!==PROTOCOL_NRF52||!nrf52ModelDetected||nrf52ModelId!==2||typeof nrf52PanelProfile==='undefined')return 0;
- if(nrf52PanelProfile===0x21&&[127,128,129,130,131,132,137,138,139,140,141,142,143,144,149,150].includes(nrf52FirmwareVersion))return 0x21;
- if(nrf52PanelProfile===0x29&&[133,135,136,145,146,147,148].includes(nrf52FirmwareVersion))return 0x29;
+ if(nrf52PanelProfile===0x21&&[127,128,129,130,131,132,137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156].includes(nrf52FirmwareVersion))return 0x21;
+ if(nrf52PanelProfile===0x29&&[133,135,136,145,146,147,148,157,158].includes(nrf52FirmwareVersion))return 0x29;
  return 0;
 }
 function todoWidth(){return resourceProfile()===0x29?194:148;}
-function noDataSetup(){return ([135,136,145,146,147,148].includes(nrf52FirmwareVersion)&&resourceProfile()===0x29)||([137,138,139,140,141,142,143,144,149,150].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21);}
+function noDataSetup(){return ([135,136,145,146,147,148,157,158].includes(nrf52FirmwareVersion)&&resourceProfile()===0x29)||([137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21);}
 function titleWidth(){return resourceProfile()===0x29?228:184;}
 function u32(n){const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,n,true);return b;}
 function crc32(b){let c=0xffffffff;for(const v of b){c^=v;for(let i=0;i<8;i++)c=(c>>>1)^((c&1)?0xedb88320:0);}return (c^0xffffffff)>>>0;}
@@ -66,7 +66,7 @@ function render(){try{selectFont();const b=draft(),canvas=$('vn-preview'),w=todo
  $('vn-status').textContent='Nội dung vừa vùng hiển thị. Chưa lưu thay đổi.';
  }catch(e){status(e.message);}}
 function status(s){$('vn-status').textContent=s;}
-function setupStatus(s){$('vn-setup-status').textContent=s;if(typeof addLog==='function')addLog('Dữ liệu tiếng Việt: '+s);}
+function setupStatus(s){$('vn-setup-status').textContent=s;if(typeof addLog==='function')addLog('Cài đặt đồng hồ: '+s);}
 function progress(value){$(setupWork?'vn-setup-progress':'vn-progress').value=value;progressCallback?.(value);}
 function deviceKey(){return typeof bleDevice!=='undefined'&&bleDevice?.id?bleDevice.id:bound;}
 function connection(){if(!resourceProfile()||!epdCharacteristic||!gattServer?.connected)throw Error('Hãy kết nối đồng hồ hỗ trợ tiếng Việt và việc cần làm. Đồng hồ này hiện chưa hỗ trợ chức năng đó.');
@@ -92,7 +92,7 @@ async function request(op,body=[]) {
 }
 async function probe(){cap=await request(0);if(cap.length!==14||![1,2,3].includes(cap[6])||cap[9]<14)throw Error('Thiết bị chưa hỗ trợ giao thức này.');return cap;}
 function unpackRead(d,limit){
- if(d.length<10)throw Error('Gói đọc nhanh thiếu dữ liệu.');
+ if(d.length<8)throw Error('Gói đọc nhanh thiếu dữ liệu.');
  const wireLength=d[6]|d[7]<<8,length=wireLength&0x7fff;if(!length||length>limit)throw Error('Độ dài đọc nhanh không hợp lệ.');
  if(wireLength&0x8000){if(d.length!==8+length)throw Error('Gói đọc nhanh thiếu byte gốc.');return d.slice(8);}
  const bytes=new Uint8Array(length);let at=8,pos=0;
@@ -113,7 +113,7 @@ function setBusy(v){work=v;for(const el of document.querySelectorAll('#vn-contro
 async function action(fn,setup=false){if(work)return;
  if(window.EpdDfuBusy?.()||window.EpdDesigner?.busy||window.countdownOperationBusy){(setup?setupStatus:status)('Đang có thao tác khác. Chờ hoàn tất rồi thử lại.');return;}
  setupWork=setup;setBusy(true);try{await fn();}catch(e){(setup?setupStatus:status)('Chưa hoàn tất: '+e.message);if(!setup&&typeof addLog==='function')addLog('Việc cần làm: '+e.message);}finally{setBusy(false);setupWork=false;}}
-async function loadConfig(){const r=await probe();if(!r[7]){status('Chưa cài dữ liệu. Bấm Đi tới Cài dữ liệu tiếng Việt, rồi bấm Cài dữ liệu tiếng Việt.');return;}
+async function loadConfig(){const r=await probe();if(!r[7]){status('Chưa cài dữ liệu. Bấm Đi tới Cài đặt đồng hồ, rồi bấm Cài đặt đồng hồ.');return;}
  const base=new DataView(r.buffer,r.byteOffset).getUint32(10,true),b=await read(base+16,512);
  $('vn-enable').checked=!!b[1];$('vn-title').value=dec.decode(b.slice(4,4+b[3]));
  for(let i=0;i<4;i++){const at=80+i*100;$(`vn-text-${i}`).value=i<b[2]?dec.decode(b.slice(at+2,at+2+b[at+1])):'';$(`vn-done-${i}`).checked=!!(b[at]&1);$(`vn-red-${i}`).checked=!!(b[at]&2);}
@@ -133,8 +133,8 @@ async function fontMatches(){
  return crc32(await read(base+16+512,defaultBytes.length-512))===crc32(defaultBytes.subarray(512));
 }
 async function uploadConfig(bytes,deferRedraw=false,preserveCalendar=true){
- if(!await fontMatches())throw Error('Cần cài dữ liệu tiếng Việt ở mục Cập nhật phần mềm trước.');
- if(preserveCalendar&&[139,140,141,142,143,144].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21){
+ if(!await fontMatches())throw Error('Cần cài đặt đồng hồ ở mục Cập nhật phần mềm trước.');
+ if(preserveCalendar&&[139,140,141,142,143,144,149,150,151,152,153,154,155,156].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21){
   const base=new DataView(cap.buffer,cap.byteOffset).getUint32(10,true);
   bytes.set(await read(base+16+480,32),480);
  }
@@ -149,7 +149,7 @@ async function uploadConfig(bytes,deferRedraw=false,preserveCalendar=true){
 }
 function download(b,name){const url=URL.createObjectURL(new Blob([b],{type:'application/octet-stream'})),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);}
 function navigate(tab){document.querySelector('.tab-button[data-tab="'+tab+'"]')?.click();}
-function requireReady(){if(!cap[7])throw Error('Chưa cài dữ liệu tiếng Việt. Mở Cập nhật phần mềm → Cài dữ liệu tiếng Việt trước.');}
+function requireReady(){if(!cap[7])throw Error('Chưa cài đặt đồng hồ. Mở Cập nhật phần mềm → Cài đặt đồng hồ trước.');}
 async function verifyInstalled(bytes){
  const r=await probe();requireReady();
  const base=new DataView(r.buffer,r.byteOffset).getUint32(10,true),header=await read(base,16),v=new DataView(header.buffer);
@@ -191,11 +191,11 @@ async function install(force=false){
    await makeBackup();
   } else download(backup.bytes,backup.name);
   if(!confirm('Bạn đã thấy và lưu file '+backup.name+' (512 KB) trên máy chưa? Chọn OK chỉ khi đã lưu được. Nếu chưa có file, chọn Hủy rồi bấm Tải lại bản sao lưu vừa đọc.')){
-   setupStatus('Đã dừng trước khi ghi. Bấm Cài dữ liệu tiếng Việt lần nữa để tải lại bản sao lưu và tiếp tục.');return;
+   setupStatus('Đã dừng trước khi ghi. Bấm Cài đặt đồng hồ lần nữa để tải lại bản sao lưu và tiếp tục.');return;
   }
   backupDevice=deviceKey();
  }
- if(!confirm('Cài dữ liệu tiếng Việt vào đồng hồ? Dữ liệu có sẵn trong vùng cài đặt có thể bị thay thế. Hãy giữ file sao lưu để phục hồi khi cần.')){setupStatus('Đã hủy; chưa ghi dữ liệu.');return;}
+ if(!confirm('Cài đặt đồng hồ vào đồng hồ? Dữ liệu có sẵn trong vùng cài đặt có thể bị thay thế. Hãy giữ file sao lưu để phục hồi khi cần.')){setupStatus('Đã hủy; chưa ghi dữ liệu.');return;}
  await probe();
  if(installKey!==deviceKey())throw Error('Thiết bị đã thay đổi. Kết nối lại đúng đồng hồ rồi cài dữ liệu.');
  if(!force&&cap[7]&&await fontMatches()){if(noDataSetup())await request(10);setupStatus('Dữ liệu đã sẵn sàng. Không cần cài lại.');return;}
@@ -216,8 +216,8 @@ $('vn-check').onclick=()=>action(loadConfig);
 $('vn-go-setup').onclick=()=>navigate('tab-dfu');
 $('vn-go-connect').onclick=()=>navigate('tab-settings');
 $('vn-go-todo').onclick=()=>navigate('tab-vn-todo');
-$('vn-setup-check').onclick=()=>action(async()=>{await probe();setupStatus(cap[8]?'Đồng hồ đang có phiên cài dữ liệu chưa hoàn tất. Bấm Hủy phiên lỗi và cài lại.':cap[7]?'Dữ liệu đã sẵn sàng. Mở Việc cần làm để nhập và lưu danh sách.':'Bộ nhớ ngoài đã nhận diện, chưa cài font. Bấm Cài dữ liệu tiếng Việt để bắt đầu.');},true);
-$('vn-install').onclick=()=>action(()=>install(false),true);
+$('vn-setup-check').onclick=()=>action(async()=>{await probe();if(cap[8])throw Error('Có lần cài đặt chưa hoàn tất. Mở Trợ giúp cài đặt để thử lại.');setupStatus(!cap[7]?'Chưa cài đặt. Bấm Cài đặt đồng hồ để bắt đầu.':eventSupport()&&!await bundleMatches(clockBundle())?'Có dữ liệu mới. Bấm Cài đặt đồng hồ để cập nhật.':'Dữ liệu đã sẵn sàng. Bạn có thể sử dụng đồng hồ.');},true);
+$('vn-install').onclick=()=>action(()=>installUnified(false),true);
 $('vn-recover').onclick=()=>action(async()=>{
  connection();const key=deviceKey();
  if(!confirm('Hủy phiên cài dữ liệu chưa hoàn tất và thử cài lại trên đồng hồ đang kết nối? Bản dữ liệu đã lưu thành công trước đó không bị xóa. Giữ kết nối và nguồn ổn định.'))return;
@@ -230,11 +230,11 @@ $('vn-recover').onclick=()=>action(async()=>{
   if(cap[8])throw Error('Chưa hủy được phiên cũ. Kết nối lại rồi thử phục hồi lần nữa.');
  }
  // A commit may have succeeded even when its notification was lost.
- await install(false);
+ await installUnified(false);
 },true);
 $('vn-reinstall').onclick=()=>action(async()=>{
  if(!confirm('Cài lại dữ liệu tiếng Việt? Nội dung đang lưu được giữ lại. Không tháo pin trong khi cài.'))return;
- await install(true);
+ await installUnified(true);
 },true);
 $('vn-save').onclick=()=>action(async()=>{const bytes=draft();await probe();
  requireReady();
@@ -286,5 +286,51 @@ window.startVNCountdown=async(date,title)=>{
  }catch(e){window.updateCountdownStatus?.(e.message,true);status(e.message);if(typeof addLog==='function')addLog('Đếm ngược tiếng Việt: '+e.message);}
  finally{setBusy(false);}
 };
+function eventSupport(){const p=resourceProfile();return (p===0x21&&[151,152,153,154,155,156].includes(nrf52FirmwareVersion))||(p===0x29&&[157,158].includes(nrf52FirmwareVersion));}
+function clockBundle(){
+ const b=Uint8Array.from((resourceProfile()===0x29?window.EventClock290Bytes:window.EventClockBytes)||[]),at=defaultBytes.length;
+ if(b.length<at+8||b.length>61440)throw Error('Bộ cài đặt chưa đầy đủ. Hãy tải lại trang.');
+ const v=new DataView(b.buffer),count=v.getUint16(at+4,true);
+ if(v.getUint32(at,true)!==0x314e5645||v.getUint16(at+6,true)!==80||!count||count>256||b.length!==at+8+count*80||crc32(b.subarray(512,at))!==crc32(defaultBytes.subarray(512)))throw Error('Bộ cài đặt không hợp lệ. Chưa gửi dữ liệu.');
+ return b;
+}
+function bankAddress(){const a=new DataView(cap.buffer,cap.byteOffset).getUint32(10,true);if(a!==0x60000&&a!==0x70000)throw Error('Chưa xác nhận được vùng dữ liệu của đồng hồ.');return a;}
+async function bundleMatches(bytes){
+ if(!cap[7])return false;const base=bankAddress(),h=await read(base,16),v=new DataView(h.buffer);
+ if(v.getUint32(0,true)!==0x31544e56||v.getUint32(8,true)!==bytes.length)return false;
+ const expected=crc32(bytes.subarray(512));
+ if(cap[6]>=3){const n=bytes.length-512,r=await request(8,[...u32(base+528),n&255,n>>8]);if(r.length!==10)throw Error('Chưa nhận đủ kết quả kiểm tra.');return new DataView(r.buffer,r.byteOffset).getUint32(6,true)===expected;}
+ return crc32(await read(base+528,bytes.length-512))===expected;
+}
+async function installUnified(force=false){
+ connection();if(!eventSupport())return install(force);
+ await probe();if(cap[8])throw Error('Có lần cài đặt chưa hoàn tất. Mở phần Trợ giúp cài đặt để thử lại.');
+ const bytes=clockBundle(),key=deviceKey();
+ if(!force&&await bundleMatches(bytes)){await request(10);setupStatus('Đồng hồ đã có đầy đủ dữ liệu mới nhất. Bạn có thể sử dụng ngay.');return;}
+ let old=null,base=0,header=null,blank=false;
+ if(cap[7]){
+  base=bankAddress();header=await read(base,16);const v=new DataView(header.buffer),size=v.getUint32(8,true);
+  if(v.getUint32(0,true)!==0x31544e56||size<544||size>61440)throw Error('Dữ liệu cũ chưa hợp lệ. Chưa ghi dữ liệu mới.');
+  setupStatus('Đang sao lưu nội dung hiện có. Ảnh trong album không bị thay đổi.');old=await read(base+16,size);
+  if(crc32(old)!==v.getUint32(12,true)||deviceKey()!==key)throw Error('Chưa kiểm tra được dữ liệu cũ. Chưa ghi dữ liệu mới.');
+  const saved=new Uint8Array(16+size);saved.set(header);saved.set(old,16);const name='dong-ho-sao-luu-'+Date.now()+'.bin';download(saved,name);
+  if(!confirm('Đã tải bản sao lưu '+name+'. Hãy giữ file này. Tiếp tục cập nhật dữ liệu đồng hồ? Nội dung cá nhân và ảnh đã lưu được giữ nguyên.')){setupStatus('Đã hủy, dữ liệu đồng hồ chưa thay đổi.');return;}
+ }else{
+  const r=await request(11);if(r.length!==7||r[6]>1)throw Error('Chưa xác nhận được vùng cài đặt.');blank=r[6]===1;
+  if(!blank){
+   if(!confirm('Đồng hồ có dữ liệu chưa nhận diện được. Web sẽ tải bản sao lưu trước khi cài đặt. Tiếp tục?'))return;
+   await makeBackup();if(!confirm('Bạn đã lưu file '+backup.name+' trên máy chưa? Chỉ tiếp tục khi đã giữ được bản sao lưu.')){setupStatus('Đã dừng trước khi ghi dữ liệu.');return;}
+  }else if(!confirm('Cài đặt dữ liệu cho đồng hồ? Giữ kết nối và không tháo pin cho đến khi hoàn tất.'))return;
+ }
+ await probe();if(key!==deviceKey()||cap[8])throw Error('Kết nối hoặc trạng thái đã thay đổi. Hãy kiểm tra rồi thử lại.');
+ if(old){if(!cap[7]||bankAddress()!==base||crc32(await read(base,16))!==crc32(header))throw Error('Dữ liệu đã thay đổi. Chưa ghi bản mới.');bytes.set(old.subarray(0,512));}
+ else if(cap[7])throw Error('Đồng hồ đã có dữ liệu mới. Bấm cài đặt lại để kiểm tra trước.');
+ else if(blank){const r=await request(11);if(r.length!==7||r[6]!==1)throw Error('Vùng cài đặt đã thay đổi. Chưa ghi dữ liệu.');}
+ setupStatus('Đang cài đặt font tiếng Việt và các ngày nhắc. Không ngắt kết nối.');
+ await uploadBytes(bytes);setupStatus('Đang kiểm tra dữ liệu đã cài…');await verifyInstalled(bytes);await request(10);await loadConfig();
+ setupStatus('Cài đặt hoàn tất. Hãy cài giờ; bấm Chế độ đồng hồ để chọn mặt hiển thị các ngày sắp tới.');
+}
+
+
 window.VNTrial={width,crc32,draft,fonts,request,unpackRead,resourceProfile};render();
 })();

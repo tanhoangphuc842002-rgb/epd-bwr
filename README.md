@@ -1,15 +1,11 @@
-# Điều khiển đồng hồ — v61.21
+# Điều khiển đồng hồ mực điện tử
 
-Kết nối đồng hồ trước khi sử dụng các mục trên trang.
+Mở trang bằng trình duyệt hỗ trợ Bluetooth và kết nối đồng hồ. Đặt giờ hiện tại trong mục Cài đặt màn hình E-Paper.
 
-**Lịch:** đồng hồ 2.13 và 2.9 đã cập nhật bản hỗ trợ sẽ có ba mặt lịch: lịch tháng có cột thông tin, lịch dương và lịch âm. Bấm Chế độ lịch lần nữa để đổi mặt. Trang không cần tải mẫu lịch riêng.
+Trong mục Cập nhật phần mềm, bấm Cài đặt đồng hồ để cài font tiếng Việt và các ngày nhắc trên thiết bị có hỗ trợ. Không cần chọn file tài nguyên. Giữ kết nối và nguồn ổn định; lưu bản sao lưu nếu được yêu cầu.
 
-**Cập nhật:** bấm Kiểm tra bản cập nhật. Nếu có gói phù hợp, bấm Bắt đầu cập nhật bên dưới. Khi được yêu cầu chọn lại thiết bị, bấm nút lần nữa và chọn DFUTAG. Sau khi đồng hồ khởi động, kết nối lại để kiểm tra. Với đồng hồ chưa có bản tự động, chọn file ZIP do người bán cung cấp.
+Bấm Chế độ đồng hồ nhiều lần để đổi mặt hiển thị. Mặt nhắc sự kiện sẽ hiện ngày gần nhất và số ngày còn lại. Có thể dùng riêng bộ đếm ngược, danh sách việc cần làm, ảnh hoặc album tùy khả năng của đồng hồ.
 
-**Dữ liệu:** nếu màn hiện NO DATA, bấm Cài dữ liệu cho đồng hồ. Nếu đang dùng bình thường và đã có dữ liệu tiếng Việt, không cần cài lại.
+Khi album đang tự đổi ảnh, hãy bấm Tắt tự đổi ảnh trước khi tải một ảnh trực tiếp lên màn hình. Thay ảnh trong một ô album không làm mất các ô khác.
 
-Giữ nguồn và kết nối ổn định trong khi cập nhật. Không dùng file của loại đồng hồ khác. Website cần HTTPS để dùng Bluetooth và tải gói tự động.
-
-Khi đưa website lên GitHub, giữ nguyên cấu trúc các tệp và thư mục `updates`.
-
-Trang tự chọn bản cập nhật cho 2.13 CE/no CE và 2.9 CE/no CE tương thích. Các đồng hồ khác, kể cả 7.5, tiếp tục dùng mục chọn file cập nhật riêng. Nếu chưa nhận diện đúng loại đồng hồ, trang không tự chọn gói.
+Kiểm tra bản cập nhật để chọn phần mềm phù hợp cho các đồng hồ được hỗ trợ. Nếu được cung cấp file riêng, chọn file ZIP đó và làm theo hướng dẫn cập nhật. Không dùng file của loại đồng hồ khác. Khi cần chọn bootloader, chọn DFUTAG. Không tháo pin hoặc đóng trang trong khi cập nhật.
