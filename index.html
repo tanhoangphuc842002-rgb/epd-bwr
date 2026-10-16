@@ -1374,6 +1374,7 @@
             <button type="button" onclick="switchDisplayMode(1)" title="Click to switch to calendar mode">Switch to Calendar Mode</button>
         </div>
 
+        <p>Bấm Chế độ đồng hồ lần nữa để chuyển sang mặt đồng hồ tiếp theo.</p>
         <p>Bấm Chế độ lịch lần nữa để chuyển sang mặt lịch tiếp theo.</p>
         <section class="sleep-panel" aria-labelledby="sleep-panel-title">
             <h3 id="sleep-panel-title">Screen sleep schedule</h3>
@@ -3097,12 +3098,12 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             // 2.13 CE v19.2 reports panel profile 0x21 and app version 0x2B.
             if (nrf52PanelProfile === 0x21) return nrf52FirmwareVersion >= 0x2B;
             // The compatible 2.9 release reports model 2 and app version 0x22.
-            return (nrf52FirmwareVersion >= 0x22 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158].includes(nrf52FirmwareVersion);
+            return (nrf52FirmwareVersion >= 0x22 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173].includes(nrf52FirmwareVersion);
         }
         function nrf52WeekStartAckSupported() {
             return nrf52ModelDetected && nrf52ModelId === 2 &&
                 nrf52PanelProfile !== 0x21 &&
-                ((nrf52FirmwareVersion >= 0x23 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158].includes(nrf52FirmwareVersion));
+                ((nrf52FirmwareVersion >= 0x23 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173].includes(nrf52FirmwareVersion));
         }
         function waitForNrf52WeekStartAck(weekStart, timeoutMs = 8000) {
             if (nrf52WeekStartAckWaiter) {
@@ -3231,7 +3232,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         }
         async function sendNrf52Mode(mode) {
             const previousMode = nrf52DisplayMode;
-            const nativeCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21) || ([145,146,147,148,157,158].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29);
+            const nativeCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21) || ([145,146,147,148,157,158,167,168,170,171,172,173].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29);
             const actualMode = mode & (nativeCalendar ? 0x3f : 0x7f);
             // Save the calendar layout before SET_TIME triggers a redraw. The
             // firmware writes flash only when the value actually changes.
@@ -3250,8 +3251,8 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             await sendCommand(packet);
             nrf52DisplayMode = nativeCalendar && actualMode === 1 && !(mode & 0x40)
                 ? (previousMode === 1 ? 9 : previousMode === 9 ? (nrf52PanelProfile === 0x29 ? 5 : 7) : 1)
-                : actualMode === 2 && ((nrf52PanelProfile === 0x29 && [157,158].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x21 && [151,152,153,154,155,156].includes(nrf52FirmwareVersion)))
-                    ? (previousMode === 2 ? 3 : previousMode === 3 ? 4 : previousMode === 4 ? (nrf52PanelProfile === 0x29 ? 10 : 5) : 2)
+                : actualMode === 2 && ((nrf52PanelProfile === 0x29 && [157,158,167,168,170,171,172,173].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x21 && [151,152,153,154,155,156,159,160,161,162,163,164,165,166].includes(nrf52FirmwareVersion)))
+                    ? (previousMode === 2 ? 3 : previousMode === 3 ? 4 : previousMode === 4 ? (nrf52PanelProfile === 0x29 ? 10 : 5) : previousMode === 10 && nrf52PanelProfile === 0x29 && [167,168,170,171,172,173].includes(nrf52FirmwareVersion) ? 11 : previousMode === 5 && nrf52PanelProfile === 0x21 && [159,160,161,162,163,164,165,166].includes(nrf52FirmwareVersion) ? 10 : 2)
                     : (actualMode === 2 && previousMode === 2) ? 3 : actualMode;
             addLog(`nRF52 mode ${nrf52DisplayMode} command sent`);
         }
@@ -4405,7 +4406,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         async function setTime() {
             if (window.countdownOperationBusy) return;
             if (deviceProtocol === PROTOCOL_NRF52) {
-                const keepCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21 && [1,7,9].includes(nrf52DisplayMode)) || ([145,146,147,148,157,158].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29 && [1,5,9].includes(nrf52DisplayMode));
+                const keepCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21 && [1,7,9].includes(nrf52DisplayMode)) || ([145,146,147,148,157,158,167,168,170,171,172,173].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29 && [1,5,9].includes(nrf52DisplayMode));
                 await sendNrf52Mode(nrf52DisplayMode | (keepCalendar ? 0x40 : 0));
                 return;
             }
@@ -6754,14 +6755,19 @@ function toggleSwitch(e) {
 <script src="secure-dfu.js"></script>
 <script src="ota-verifier.js"></script>
 <script src="ota-dual-update.js"></script>
-<script src="ota-auto-update.js"></script>
+<script src="ota-auto-update.js?v=61.28"></script>
 <script src="countdown-nrf52.js"></script>
 <script src="countdown-da14585.js"></script>
-<script src="led-effects.js"></script>
+<script src="led-effects.js?v=61.28"></script>
 <script src="ble-write-queue.js"></script>
 <script src="vn-font-data.js"></script>
-<script src="vn-todo.js"></script>
-<script src="photo-album.js"></script>
+<script src="face5-font-data.js"></script>
+    <script src="face5-sans-centered-data.js"></script>
+    <script src="face23-sans22-data.js"></script>
+    <script src="face4-sans36-data.js"></script>
+    <script src="sans290-data.js"></script><script src="sans290-classic-data.js"></script><script src="sans290-bold42-data.js"></script>
+    <script src="vn-todo.js?v=61.28"></script>
+<script src="photo-album.js?v=61.28"></script>
 <script src="event-clock-data.js"></script>
 <script src="event-clock-290-data.js"></script>
 <!-- Unified clock setup is part of the normal settings panel. -->

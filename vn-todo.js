@@ -7,12 +7,12 @@ let packetSeq=0, pending=null, work=false, cap=null, bound=null, backupDevice=nu
 const fonts=[];
 function resourceProfile(){
  if(typeof deviceProtocol==='undefined'||deviceProtocol!==PROTOCOL_NRF52||!nrf52ModelDetected||nrf52ModelId!==2||typeof nrf52PanelProfile==='undefined')return 0;
- if(nrf52PanelProfile===0x21&&[127,128,129,130,131,132,137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156].includes(nrf52FirmwareVersion))return 0x21;
- if(nrf52PanelProfile===0x29&&[133,135,136,145,146,147,148,157,158].includes(nrf52FirmwareVersion))return 0x29;
+ if(nrf52PanelProfile===0x21&&[127,128,129,130,131,132,137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166].includes(nrf52FirmwareVersion))return 0x21;
+ if(nrf52PanelProfile===0x29&&[133,135,136,145,146,147,148,157,158,167,168,170,171,172,173].includes(nrf52FirmwareVersion))return 0x29;
  return 0;
 }
-function todoWidth(){return resourceProfile()===0x29?194:148;}
-function noDataSetup(){return ([135,136,145,146,147,148,157,158].includes(nrf52FirmwareVersion)&&resourceProfile()===0x29)||([137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21);}
+function todoWidth(){return resourceProfile()===0x29?([167,168].includes(nrf52FirmwareVersion)?140:194):148;}
+function noDataSetup(){return ([135,136,145,146,147,148,157,158,167,168,170,171,172,173].includes(nrf52FirmwareVersion)&&resourceProfile()===0x29)||([137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21);}
 function titleWidth(){return resourceProfile()===0x29?228:184;}
 function u32(n){const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,n,true);return b;}
 function crc32(b){let c=0xffffffff;for(const v of b){c^=v;for(let i=0;i<8;i++)c=(c>>>1)^((c&1)?0xedb88320:0);}return (c^0xffffffff)>>>0;}
@@ -134,7 +134,7 @@ async function fontMatches(){
 }
 async function uploadConfig(bytes,deferRedraw=false,preserveCalendar=true){
  if(!await fontMatches())throw Error('Cần cài đặt đồng hồ ở mục Cập nhật phần mềm trước.');
- if(preserveCalendar&&[139,140,141,142,143,144,149,150,151,152,153,154,155,156].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21){
+ if(preserveCalendar&&[139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21){
   const base=new DataView(cap.buffer,cap.byteOffset).getUint32(10,true);
   bytes.set(await read(base+16+480,32),480);
  }
@@ -286,12 +286,19 @@ window.startVNCountdown=async(date,title)=>{
  }catch(e){window.updateCountdownStatus?.(e.message,true);status(e.message);if(typeof addLog==='function')addLog('Đếm ngược tiếng Việt: '+e.message);}
  finally{setBusy(false);}
 };
-function eventSupport(){const p=resourceProfile();return (p===0x21&&[151,152,153,154,155,156].includes(nrf52FirmwareVersion))||(p===0x29&&[157,158].includes(nrf52FirmwareVersion));}
+function eventSupport(){const p=resourceProfile();return (p===0x21&&[151,152,153,154,155,156,159,160,161,162,163,164,165,166].includes(nrf52FirmwareVersion))||(p===0x29&&[157,158,167,168,170,171,172,173].includes(nrf52FirmwareVersion));}
 function clockBundle(){
- const b=Uint8Array.from((resourceProfile()===0x29?window.EventClock290Bytes:window.EventClockBytes)||[]),at=defaultBytes.length;
- if(b.length<at+8||b.length>61440)throw Error('Bộ cài đặt chưa đầy đủ. Hãy tải lại trang.');
- const v=new DataView(b.buffer),count=v.getUint16(at+4,true);
- if(v.getUint32(at,true)!==0x314e5645||v.getUint16(at+6,true)!==80||!count||count>256||b.length!==at+8+count*80||crc32(b.subarray(512,at))!==crc32(defaultBytes.subarray(512)))throw Error('Bộ cài đặt không hợp lệ. Chưa gửi dữ liệu.');
+ const modern=resourceProfile()===0x21&&[159,160,161,162,163,164,165,166].includes(nrf52FirmwareVersion);
+ const b=Uint8Array.from((resourceProfile()===0x29&&[172,173].includes(nrf52FirmwareVersion)?window.Sans290Bold42Bytes:resourceProfile()===0x29&&[170,171].includes(nrf52FirmwareVersion)?window.Sans290ClassicBytes:resourceProfile()===0x29&&[167,168].includes(nrf52FirmwareVersion)?window.Sans290Bytes:[165,166].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21?window.Face4SansBytes:[163,164].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21?window.Face23SansBytes:[161,162].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21?window.Face5SansBytes:modern?window.Face5ClockBytes:resourceProfile()===0x29?window.EventClock290Bytes:window.EventClockBytes)||[]),prefix=defaultBytes.length;
+ if(b.length<prefix+8||b.length>61440)throw Error('Bộ cài đặt chưa đầy đủ. Hãy tải lại trang.');
+ const v=new DataView(b.buffer);let at=prefix;
+ if(crc32(b.subarray(512,prefix))!==crc32(defaultBytes.subarray(512)))throw Error('Bộ font không khớp. Chưa gửi dữ liệu.');
+ if(modern||(resourceProfile()===0x29&&[167,168,170,171,172,173].includes(nrf52FirmwareVersion)))for(let slot=2;slot<(modern?4:7);slot++){
+  if(at+16>b.length||v.getUint8(at)!==slot)throw Error('Thiếu font cho Face 5.');
+  const bytes=v.getUint32(at+4,true);if(bytes<16||bytes>b.length-at)throw Error('Font Face 5 chưa hợp lệ.');at+=bytes;
+ }
+ if(at+8>b.length)throw Error('Thiếu dữ liệu sự kiện.');const count=v.getUint16(at+4,true);
+ if(v.getUint32(at,true)!==0x314e5645||v.getUint16(at+6,true)!==80||!count||count>256||b.length!==at+8+count*80)throw Error('Bộ cài đặt không hợp lệ. Chưa gửi dữ liệu.');
  return b;
 }
 function bankAddress(){const a=new DataView(cap.buffer,cap.byteOffset).getUint32(10,true);if(a!==0x60000&&a!==0x70000)throw Error('Chưa xác nhận được vùng dữ liệu của đồng hồ.');return a;}
@@ -328,7 +335,7 @@ async function installUnified(force=false){
  else if(blank){const r=await request(11);if(r.length!==7||r[6]!==1)throw Error('Vùng cài đặt đã thay đổi. Chưa ghi dữ liệu.');}
  setupStatus('Đang cài đặt font tiếng Việt và các ngày nhắc. Không ngắt kết nối.');
  await uploadBytes(bytes);setupStatus('Đang kiểm tra dữ liệu đã cài…');await verifyInstalled(bytes);await request(10);await loadConfig();
- setupStatus('Cài đặt hoàn tất. Hãy cài giờ; bấm Chế độ đồng hồ để chọn mặt hiển thị các ngày sắp tới.');
+ setupStatus([159,160,161,162,163,164,165,166].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21?'Cài đặt hoàn tất. Hãy cài giờ; bấm Chế độ đồng hồ nhiều lần để đến mặt thứ 5: giờ lớn và ngày lớn.':'Cài đặt hoàn tất. Hãy cài giờ; bấm Chế độ đồng hồ để chọn mặt hiển thị các ngày sắp tới.');
 }
 
 
