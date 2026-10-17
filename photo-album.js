@@ -5,7 +5,7 @@ const $=id=>document.getElementById(id),T=window.VNTransport;
 let busy=false,mask=0,consentKey=null;
 const u32=n=>{const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,n,true);return b;};
 function say(s){$('photo-status').textContent=s;if(typeof addLog==='function')addLog('Album ảnh: '+s);}
-function supported(){return window.VNCountdownSupport?.()&&gattServer?.connected&&((nrf52PanelProfile===0x21&&[128,129,130,131,132,137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175].includes(nrf52FirmwareVersion))||(nrf52PanelProfile===0x29&&[135,136,145,146,147,148,157,158,167,168,170,171,172,173,176,177].includes(nrf52FirmwareVersion)));}
+function supported(){return window.VNCountdownSupport?.()&&gattServer?.connected&&((nrf52PanelProfile===0x21&&[128,129,130,131,132,137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186].includes(nrf52FirmwareVersion))||(nrf52PanelProfile===0x29&&[135,136,145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188].includes(nrf52FirmwareVersion)));}
 function geometry(){return nrf52PanelProfile===0x29?{width:296,photo:0x30000,span:0x6000,step:0x3000,schedule:0x2e000}:{width:250,photo:0x40000,span:0x4000,step:0x2000,schedule:0x3e000};}
 function assertConnection(){if(!supported())throw Error('Đồng hồ này chưa hỗ trợ lưu nhiều ảnh. Bạn vẫn có thể dùng mục tải ảnh thông thường.');}
 function controls(v){busy=v;for(const x of document.querySelectorAll('#photo-album-controls button,#photo-album-controls input,#photo-album-controls select'))x.disabled=v;}

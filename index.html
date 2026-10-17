@@ -1333,6 +1333,7 @@
             <button class="tab-button" data-tab="tab-image">Image Transfer</button>
             <button id="clock-image-tab-button" class="tab-button" data-tab="tab-clock-image">Đồng hồ và ảnh</button>
             <button class="tab-button" data-tab="tab-vn-todo">Việc cần làm</button>
+            <button class="tab-button" data-tab="tab-date-marks" style="min-width:200px">Đánh dấu ngày tháng</button>
             <button id="dfu-tab-button" class="tab-button" data-tab="tab-dfu">Cập nhật phần mềm</button>
             <button class="tab-button" data-tab="tab-led-effects">Đèn / hiệu ứng</button>
         </div>
@@ -1673,6 +1674,28 @@
         </div>
     </div>
 
+    <div id="tab-date-marks" class="tab-content">
+      <section id="date-mark-controls" style="max-width:800px;margin:auto;padding:16px">
+        <h2>Đánh dấu ngày tháng</h2>
+        <p>Chọn tối đa 3 ngày và nhập nội dung ngắn. Đồng hồ lật sẽ hiển thị chấm đỏ dưới ngày trên lịch và nội dung bên cạnh giờ.</p>
+        <p>Các mục được sắp theo ngày. Một, hai hoặc ba chấm giúp bạn đối chiếu ngày trên lịch với nội dung. Khi không có mục nào trong tháng, đồng hồ và lịch vẫn hiển thị bình thường.</p>
+        <button type="button" id="date-mark-read">Đọc từ đồng hồ</button>
+        <div id="date-mark-rows">
+          <fieldset style="margin:12px 0"><legend>Mục 1</legend><label>Ngày đánh dấu <input type="date" id="date-mark-date-0" min="2000-01-01" max="2099-12-31"></label><label>Nội dung <input id="date-mark-text-0" maxlength="71" placeholder="Ví dụ: Sinh nhật mẹ"></label><button type="button" id="date-mark-remove-0">Xóa mục 1</button></fieldset>
+          <fieldset style="margin:12px 0"><legend>Mục 2</legend><label>Ngày đánh dấu <input type="date" id="date-mark-date-1" min="2000-01-01" max="2099-12-31"></label><label>Nội dung <input id="date-mark-text-1" maxlength="71" placeholder="Để trống nếu không dùng"></label><button type="button" id="date-mark-remove-1">Xóa mục 2</button></fieldset>
+          <fieldset style="margin:12px 0"><legend>Mục 3</legend><label>Ngày đánh dấu <input type="date" id="date-mark-date-2" min="2000-01-01" max="2099-12-31"></label><label>Nội dung <input id="date-mark-text-2" maxlength="71" placeholder="Để trống nếu không dùng"></label><button type="button" id="date-mark-remove-2">Xóa mục 3</button></fieldset>
+        </div>
+        <p>Nội dung cần vừa một dòng. Bấm Xóa mục để bỏ nhanh cả ngày lẫn nội dung, rồi bấm Lưu để cập nhật đồng hồ. Mỗi ngày dùng một mục; nếu trùng ngày, hãy gộp nội dung.</p>
+        <button type="button" id="date-mark-save">Lưu và xem trên đồng hồ</button>
+        <button type="button" id="date-mark-open">Mở đồng hồ lật</button>
+        <button type="button" id="date-mark-clear" style="background:#a52a2a">Xóa tất cả ngày đã lưu</button>
+        <button type="button" id="date-mark-recover" style="background:#53616f">Dừng truyền / khôi phục</button>
+        <p>Nếu lưu bị lỗi: bấm Dừng truyền / khôi phục. Khi mất kết nối, bấm Kết nối lại rồi khôi phục trước khi lưu lại. Nội dung đang nhập được giữ nguyên.</p>
+        <progress id="date-mark-progress" max="100" value="0" style="width:100%"></progress>
+        <p id="date-mark-status" role="status" aria-live="polite">Kết nối đồng hồ hỗ trợ để đọc hoặc lưu ngày đánh dấu.</p>
+      </section>
+    </div>
+
     <div id="tab-vn-todo" class="tab-content">
       <style>
         #vn-controls input[type=checkbox] {width:18px;height:18px;min-height:0;margin:0 6px 0 0;display:inline-block;vertical-align:middle;flex:none}
@@ -1715,7 +1738,7 @@
             </div>
             <progress id="vn-setup-progress" max="100" value="0" style="width:100%"></progress>
             <p id="vn-setup-status" role="status" aria-live="polite">Kết nối đồng hồ để bắt đầu. Không cần chọn file font hoặc sự kiện.</p>
-            <button id="vn-go-todo" type="button">Mở mục Việc cần làm</button>
+            <!-- Mở Việc cần làm từ thẻ riêng ở đầu trang. -->
             <details style="margin-top:12px"><summary>Trợ giúp cài đặt</summary>
                 <p>Nếu lần cài trước bị ngắt, hãy kết nối lại rồi chọn Thử lại. Nội dung đã lưu thành công trước đó không bị xóa.</p>
                 <button id="vn-recover" type="button">Thử lại lần cài bị ngắt</button>
@@ -3098,12 +3121,12 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             // 2.13 CE v19.2 reports panel profile 0x21 and app version 0x2B.
             if (nrf52PanelProfile === 0x21) return nrf52FirmwareVersion >= 0x2B;
             // The compatible 2.9 release reports model 2 and app version 0x22.
-            return (nrf52FirmwareVersion >= 0x22 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177].includes(nrf52FirmwareVersion);
+            return (nrf52FirmwareVersion >= 0x22 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188].includes(nrf52FirmwareVersion);
         }
         function nrf52WeekStartAckSupported() {
             return nrf52ModelDetected && nrf52ModelId === 2 &&
                 nrf52PanelProfile !== 0x21 &&
-                ((nrf52FirmwareVersion >= 0x23 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177].includes(nrf52FirmwareVersion));
+                ((nrf52FirmwareVersion >= 0x23 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188].includes(nrf52FirmwareVersion));
         }
         function waitForNrf52WeekStartAck(weekStart, timeoutMs = 8000) {
             if (nrf52WeekStartAckWaiter) {
@@ -3232,7 +3255,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         }
         async function sendNrf52Mode(mode) {
             const previousMode = nrf52DisplayMode;
-            const nativeCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29);
+            const nativeCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29);
             const actualMode = mode & (nativeCalendar ? 0x3f : 0x7f);
             // Save the calendar layout before SET_TIME triggers a redraw. The
             // firmware writes flash only when the value actually changes.
@@ -3251,8 +3274,8 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             await sendCommand(packet);
             nrf52DisplayMode = nativeCalendar && actualMode === 1 && !(mode & 0x40)
                 ? (previousMode === 1 ? 9 : previousMode === 9 ? (nrf52PanelProfile === 0x29 ? 5 : 7) : 1)
-                : actualMode === 2 && ((nrf52PanelProfile === 0x29 && [157,158,167,168,170,171,172,173,176,177].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x21 && [151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175].includes(nrf52FirmwareVersion)))
-                    ? (previousMode === 2 ? 3 : previousMode === 3 ? 4 : previousMode === 4 ? (nrf52PanelProfile === 0x29 ? 10 : 5) : previousMode === 10 && nrf52PanelProfile === 0x29 && [167,168,170,171,172,173,176,177].includes(nrf52FirmwareVersion) ? 11 : previousMode === 5 && nrf52PanelProfile === 0x21 && [159,160,161,162,163,164,165,166,174,175].includes(nrf52FirmwareVersion) ? 10 : 2)
+                : actualMode === 2 && ((nrf52PanelProfile === 0x29 && [157,158,167,168,170,171,172,173,176,177,183,184,187,188].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x21 && [151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186].includes(nrf52FirmwareVersion)))
+                    ? (previousMode === 2 ? 3 : previousMode === 3 ? 4 : previousMode === 4 ? (nrf52PanelProfile === 0x29 ? 10 : 5) : previousMode === 11 && nrf52PanelProfile === 0x29 && [183,184,187,188].includes(nrf52FirmwareVersion) ? 12 : previousMode === 10 && nrf52PanelProfile === 0x29 && [167,168,170,171,172,173,176,177,183,184,187,188].includes(nrf52FirmwareVersion) ? 11 : previousMode === 10 && nrf52PanelProfile === 0x21 && [178,179,180,181,182,185,186].includes(nrf52FirmwareVersion) ? 11 : previousMode === 5 && nrf52PanelProfile === 0x21 && [159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186].includes(nrf52FirmwareVersion) ? 10 : 2)
                     : (actualMode === 2 && previousMode === 2) ? 3 : actualMode;
             addLog(`nRF52 mode ${nrf52DisplayMode} command sent`);
         }
@@ -4406,7 +4429,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         async function setTime() {
             if (window.countdownOperationBusy) return;
             if (deviceProtocol === PROTOCOL_NRF52) {
-                const keepCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21 && [1,7,9].includes(nrf52DisplayMode)) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29 && [1,5,9].includes(nrf52DisplayMode));
+                const keepCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21 && [1,7,9].includes(nrf52DisplayMode)) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29 && [1,5,9].includes(nrf52DisplayMode));
                 await sendNrf52Mode(nrf52DisplayMode | (keepCalendar ? 0x40 : 0));
                 return;
             }
@@ -6755,19 +6778,19 @@ function toggleSwitch(e) {
 <script src="secure-dfu.js"></script>
 <script src="ota-verifier.js"></script>
 <script src="ota-dual-update.js"></script>
-<script src="ota-auto-update.js?v=61.29"></script>
+<script src="ota-auto-update.js?v=61.34"></script>
 <script src="countdown-nrf52.js"></script>
 <script src="countdown-da14585.js"></script>
-<script src="led-effects.js?v=61.29"></script>
+<script src="led-effects.js?v=61.34"></script>
 <script src="ble-write-queue.js"></script>
 <script src="vn-font-data.js"></script>
 <script src="face5-font-data.js"></script>
     <script src="face5-sans-centered-data.js"></script>
     <script src="face23-sans22-data.js"></script>
-    <script src="face4-sans36-data.js"></script>
+    <script src="face4-sans36-data.js"></script><script src="face6-flip-data.js"></script><script src="face6-dark-top-data.js"></script><script src="face6-290-data.js"></script>
     <script src="sans290-data.js"></script><script src="sans290-classic-data.js"></script><script src="sans290-bold42-data.js"></script>
-    <script src="vn-todo.js?v=61.29"></script>
-<script src="photo-album.js?v=61.29"></script>
+    <script src="vn-operation.js?v=61.34"></script><script src="vn-todo.js?v=61.34"></script><script src="date-marks.js?v=61.34"></script>
+<script src="photo-album.js?v=61.34"></script>
 <script src="event-clock-data.js"></script>
 <script src="event-clock-290-data.js"></script>
 <!-- Unified clock setup is part of the normal settings panel. -->

@@ -2,8 +2,8 @@
 (() => {
     'use strict';
     const $ = id => document.getElementById(id);
-    const storedVersions = [0x3D,0x41,0x42,0x43,127,128,129,130,131,132,135,136,137,138,139,140,141,142,143,144,145,146,147,148,157,158,167,168,170,171,172,173,176,177,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175];
-const identities = {58:0x10,60:0x10,61:0x10,65:0x20,66:0x40,67:0x80,127:0x20,128:0x20,129:0x20,130:0x20,131:0x20,132:0x40,135:0x10,136:0x80,137:0x20,138:0x40,139:0x20,140:0x40,141:0x20,142:0x40,143:0x20,144:0x40,145:0x10,146:0x80,147:0x10,148:0x80,157:0x10,158:0x80,167:0x10,168:0x80,170:0x10,171:0x80,172:0x10,173:0x80,176:0x10,177:0x80,149:0x20,150:0x40,151:0x20,152:0x40,153:0x20,154:0x40,155:0x20,156:0x40,159:0x20,160:0x40,161:0x20,162:0x40,163:0x20,164:0x40,165:0x20,166:0x40,174:0x20,175:0x40};
+    const storedVersions = [0x3D,0x41,0x42,0x43,127,128,129,130,131,132,135,136,137,138,139,140,141,142,143,144,145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186];
+const identities = {58:0x10,60:0x10,61:0x10,65:0x20,66:0x40,67:0x80,127:0x20,128:0x20,129:0x20,130:0x20,131:0x20,132:0x40,135:0x10,136:0x80,137:0x20,138:0x40,139:0x20,140:0x40,141:0x20,142:0x40,143:0x20,144:0x40,145:0x10,146:0x80,147:0x10,148:0x80,157:0x10,158:0x80,167:0x10,168:0x80,170:0x10,171:0x80,172:0x10,173:0x80,176:0x10,177:0x80,149:0x20,150:0x40,151:0x20,152:0x40,153:0x20,154:0x40,155:0x20,156:0x40,159:0x20,160:0x40,161:0x20,162:0x40,163:0x20,164:0x40,165:0x20,166:0x40,174:0x20,175:0x40,178:0x20,179:0x20,180:0x20,181:0x20,182:0x40,183:0x10,184:0x80,185:0x20,186:0x40,187:0x10,188:0x80};
     const modelNames = {61:'CE 2.9',65:'CE 2.13',66:'no CE 2.13',67:'no CE 2.9'};
     const buttons = Array.from(document.querySelectorAll('[data-led-mode]'));
     let channel = null, waiter = null, ready = false, busy = false, epoch = 0, features = 0;
@@ -81,10 +81,10 @@ const identities = {58:0x10,60:0x10,61:0x10,65:0x20,66:0x40,67:0x80,127:0x20,128
             typeof epdCharacteristic === 'undefined' || !epdCharacteristic ||
             typeof bleDevice === 'undefined' || !bleDevice?.gatt?.connected)
             throw new Error('Hãy kết nối đồng hồ ở thẻ cài đặt trước.');
-        const supported213 = nrf52ModelId === 2 && nrf52PanelProfile === 0x21 && [0x34,0x36,0x38,0x41,0x42,127,128,129,130,131,132,137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175].includes(nrf52FirmwareVersion);
+        const supported213 = nrf52ModelId === 2 && nrf52PanelProfile === 0x21 && [0x34,0x36,0x38,0x41,0x42,127,128,129,130,131,132,137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186].includes(nrf52FirmwareVersion);
         const supported290 = typeof nrf52ModelId !== 'undefined' && nrf52ModelId === 2 &&
-            nrf52PanelProfile !== 0x21 && [0x3A,0x3C,0x3D,0x43,135,136,145,146,147,148,157,158,167,168,170,171,172,173,176,177].includes(nrf52FirmwareVersion) &&
-            (![135,136,145,146,147,148,157,158,167,168,170,171,172,173,176,177].includes(nrf52FirmwareVersion) || nrf52PanelProfile===0x29);
+            nrf52PanelProfile !== 0x21 && [0x3A,0x3C,0x3D,0x43,135,136,145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188].includes(nrf52FirmwareVersion) &&
+            (![135,136,145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188].includes(nrf52FirmwareVersion) || nrf52PanelProfile===0x29);
         if (!supported213 && !supported290)
             throw new Error('Đồng hồ đang kết nối chưa hỗ trợ điều khiển đèn. Các chức năng khác vẫn dùng bình thường.');
         if ((typeof clockImageUploadBusy !== 'undefined' && clockImageUploadBusy) || window.countdownOperationBusy || window.VNDataBusy?.())
@@ -143,10 +143,10 @@ const identities = {58:0x10,60:0x10,61:0x10,65:0x20,66:0x40,67:0x80,127:0x20,128
         const ownEpoch = epoch;
         try {
             if (!ready) throw new Error('Bấm kiểm tra hỗ trợ trước.');
-            if (mode === 5 && (!(features & 1) || ![0x36,0x38,0x3A,0x3C,0x3D,0x41,0x42,0x43,127,128,129,130,131,132,135,136,137,138,139,140,141,142,143,144,145,146,147,148,157,158,167,168,170,171,172,173,176,177,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175].includes(nrf52FirmwareVersion)))
+            if (mode === 5 && (!(features & 1) || ![0x36,0x38,0x3A,0x3C,0x3D,0x41,0x42,0x43,127,128,129,130,131,132,135,136,137,138,139,140,141,142,143,144,145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186].includes(nrf52FirmwareVersion)))
                 throw new Error('Đồng hồ chưa hỗ trợ tự chỉnh màu đèn.');
             const selection = mode === 5 ? readCustom(true) : null;
-            if (selection?.triple && (!(features & 2) || ![0x38,0x3A,0x3C,0x3D,0x41,0x42,0x43,127,128,129,130,131,132,135,136,137,138,139,140,141,142,143,144,145,146,147,148,157,158,167,168,170,171,172,173,176,177,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175].includes(nrf52FirmwareVersion)))
+            if (selection?.triple && (!(features & 2) || ![0x38,0x3A,0x3C,0x3D,0x41,0x42,0x43,127,128,129,130,131,132,135,136,137,138,139,140,141,142,143,144,145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186].includes(nrf52FirmwareVersion)))
                 throw new Error('Đồng hồ chưa hỗ trợ 3 nhóm màu. Hãy chọn một nhóm hoặc luân phiên A → B.');
             const seconds = selection ? selection.seconds : mode >= 3 ? Number($('led-duration').value) : 0;
             await exchange(mode, seconds, selection?.parameters);
