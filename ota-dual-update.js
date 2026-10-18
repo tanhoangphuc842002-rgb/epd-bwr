@@ -40,7 +40,7 @@
     if(offset===data.byteLength){try{await this.sendControl([4]);}catch(e){if(!alreadyExecuted(e))throw e;}return;}
    }else{
     if(offset>data.byteLength)throw Error('Thông tin vùng nạp không hợp lệ.');
-    if(offset&&!matches)throw Error('CRC của phiên trước không khớp file đã chọn. Kết nối lại đúng file hoặc liên hệ hỗ trợ.');
+    if(offset&&!matches)throw Error('Dữ liệu của lần cập nhật trước không khớp file đang chọn. Hãy chọn lại đúng file hoặc liên hệ hỗ trợ.');
    }
    this.progress=n=>this.dispatchEvent('progress',{object:kind,totalBytes:data.byteLength,currentBytes:n});
    this.progress(offset);await this.transferObject(data,create,max,offset);
@@ -64,8 +64,8 @@
      await this.transferData(data.slice(resume?offset:begin,end),resume?offset:begin);
      const ack=await this.sendControl([3]);
      if(ack.byteLength!==8||ack.getUint32(0,true)!==end||!this.checkCrc(data.slice(0,end),ack.getInt32(4,true))){
-      if(attempt===2)throw Error('CRC không khớp sau 3 lần thử. Đã dừng; kết nối lại và thử cùng file.');
-      log('Đang truyền lại vùng dữ liệu chưa khớp CRC.');continue;
+      if(attempt===2)throw Error('Kiểm tra dữ liệu chưa đạt sau nhiều lần thử. Đã dừng cập nhật; hãy kết nối lại và thử cùng file.');
+      log('Đang gửi lại phần dữ liệu chưa được xác nhận.');continue;
      }
      await this.sendControl([4]);success=true;break;
     }

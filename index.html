@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Kết nối và cài đặt đồng hồ mực điện tử: giờ, lịch, ảnh, ngày đánh dấu và cập nhật phần mềm.">
     <title>Thẻ mực điện tử - Điều khiển Bluetooth</title>
     <style>
         /* Base style reset */
@@ -42,7 +44,8 @@
         }
 
         .tab-button {
-            flex: 1;
+            flex: 0 0 auto;
+            width: auto;
             padding: 15px 20px;
             text-align: center;
           
@@ -1367,7 +1370,7 @@
                 <option value="1" selected>Thứ 2</option>
                 <option value="0">Chủ Nhật</option>
             </select>
-            <span id="week-start-status">Áp dụng khi cài giờ hoặc chuyển mode.</span>
+            <span id="week-start-status">Áp dụng khi cài giờ hoặc chuyển chế độ.</span>
         </div>
 
         <div class="button-group">
@@ -1375,7 +1378,19 @@
             <button type="button" onclick="switchDisplayMode(1)" title="Click to switch to calendar mode">Switch to Calendar Mode</button>
         </div>
 
-        <p>Bấm Chế độ đồng hồ lần nữa để chuyển sang mặt đồng hồ tiếp theo.</p>
+        <section id="clock-face-panel" style="padding:16px;border:1px solid #d6dfd7;border-radius:10px;margin:16px 0" aria-labelledby="clock-face-title">
+            <h3 id="clock-face-title">Chọn giao diện đồng hồ</h3>
+            <p id="clock-face-availability" role="status" aria-live="polite">Kết nối đồng hồ để xem những giao diện phù hợp.</p>
+            <div id="clock-face-controls" hidden>
+                <label for="clock-face-select">Giao diện muốn dùng</label>
+                <select id="clock-face-select" style="max-width:480px;width:100%"></select>
+                <div><img id="clock-face-preview" alt="Hình minh họa giao diện đã chọn" width="592" height="256" style="max-width:100%;height:auto;border:1px solid #ddd;margin:12px 0;background:white"></div>
+                <p id="clock-face-description"></p>
+                <button id="clock-face-apply" type="button">Hiển thị trên đồng hồ</button>
+                <p id="clock-face-status" role="status" aria-live="polite"></p>
+            </div>
+        </section>
+        <p>Bạn vẫn có thể bấm Chế độ đồng hồ để chuyển lần lượt các giao diện.</p>
         <p>Bấm Chế độ lịch lần nữa để chuyển sang mặt lịch tiếp theo.</p>
         <section class="sleep-panel" aria-labelledby="sleep-panel-title">
             <h3 id="sleep-panel-title">Screen sleep schedule</h3>
@@ -1704,9 +1719,9 @@
       </style>
       <div style="max-width:860px;margin:auto;padding:16px" id="vn-controls">
         <h2>Việc cần làm</h2>
-        <p>Nhập danh sách, đánh dấu việc quan trọng hoặc đã xong, rồi bấm Lưu và mở danh sách. Đồng hồ bên phải vẫn chạy bình thường.</p>
+        <p>Nhập danh sách, đánh dấu việc quan trọng hoặc đã xong, rồi bấm Lưu và mở danh sách. Giờ vẫn chạy ở bên phải. Muốn hiện lịch tháng trở lại, bỏ chọn Hiện danh sách bên cạnh đồng hồ rồi lưu lại.</p>
         <button id="vn-check">Kiểm tra / Đọc lại nội dung</button>
-        <button id="vn-go-setup" type="button">Đi tới Cài dữ liệu tiếng Việt</button>
+        <button id="vn-go-setup" type="button">Đi tới Cài đặt đồng hồ</button>
         <label><input type="checkbox" id="vn-enable"> Hiện danh sách bên cạnh đồng hồ (bỏ chọn để hiện lịch tháng)</label>
         <p>Nhập tối đa 4 việc, mỗi việc 28 ký tự. Việc quan trọng hiển thị đỏ, việc đã xong có dấu tích.</p>
         <div id="vn-items"></div>
@@ -1728,8 +1743,8 @@
         </div>
         <div class="dfu-card" id="vn-setup-controls" style="margin-bottom:20px">
             <h3>Cài đặt đồng hồ</h3>
-            <p>Kết nối đồng hồ rồi bấm Cài đặt đồng hồ. Web tự chọn đúng bộ dữ liệu cho thiết bị của bạn.</p>
-            <p>Font tiếng Việt và các ngày nhắc được cài trong một lần trên đồng hồ có hỗ trợ. Nếu đã có dữ liệu mới nhất, web không tải lại. Ảnh và nội dung cá nhân được giữ nguyên.</p>
+            <p>Dùng khi cài lần đầu, khi màn hình báo thiếu dữ liệu hoặc khi được hướng dẫn cập nhật dữ liệu. Kết nối đồng hồ rồi bấm Cài đặt đồng hồ; web sẽ tự chọn dữ liệu phù hợp.</p>
+            <p>Cài chữ tiếng Việt, các giao diện và ngày nhắc trong một lần trên đồng hồ có hỗ trợ. Nếu đã có dữ liệu mới nhất, web không tải lại. Ảnh và nội dung cá nhân được giữ nguyên.</p>
             <div class="dfu-warning">Giữ đồng hồ ở gần, không tháo pin hoặc ngắt kết nối khi đang cài. Lưu bản sao lưu nếu web yêu cầu.</div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;margin:16px 0">
                 <button id="vn-go-connect" type="button">Kết nối đồng hồ</button>
@@ -1737,7 +1752,7 @@
                 <button id="vn-setup-check" type="button">Kiểm tra dữ liệu</button>
             </div>
             <progress id="vn-setup-progress" max="100" value="0" style="width:100%"></progress>
-            <p id="vn-setup-status" role="status" aria-live="polite">Kết nối đồng hồ để bắt đầu. Không cần chọn file font hoặc sự kiện.</p>
+            <p id="vn-setup-status" role="status" aria-live="polite">Kết nối đồng hồ để bắt đầu. Web sẽ tự chọn dữ liệu phù hợp, không cần chọn file riêng.</p>
             <!-- Mở Việc cần làm từ thẻ riêng ở đầu trang. -->
             <details style="margin-top:12px"><summary>Trợ giúp cài đặt</summary>
                 <p>Nếu lần cài trước bị ngắt, hãy kết nối lại rồi chọn Thử lại. Nội dung đã lưu thành công trước đó không bị xóa.</p>
@@ -1754,7 +1769,7 @@
             </div>
 
             <div class="dfu-warning">
-                Chỉ dùng file cập nhật đúng cho đồng hồ của bạn, không chọn file mã nguồn hoặc file của loại đồng hồ khác. Nên để pin trên 40%; không tháo pin, đóng trang hoặc ngắt Bluetooth khi đang cập nhật.
+                Chỉ dùng file cập nhật đúng cho đồng hồ của bạn, không chọn file mã nguồn hoặc file của loại đồng hồ khác. Nên dùng pin còn đủ điện; không tháo pin, đóng trang hoặc ngắt Bluetooth khi đang cập nhật.
             </div>
 
             <div class="dfu-file-row">
@@ -2038,9 +2053,9 @@
         <div class="led-card">
             <h3>Đèn báo tự động</h3>
             <ul>
-                <li><strong>Xanh lá:</strong> nháy 100 ms khi cài giờ, lưu xong lịch ngủ/thức hoặc bộ đếm ngược, và hoàn tất lệnh refresh ảnh.</li>
-                <li><strong>Đỏ:</strong> khi đếm ngược chuyển từ còn ngày sang 0 ngày, nháy 2 lần; lặp mỗi phút, tối đa 5 phút. Nếu hết lúc đang ngủ, chờ thức rồi mới bắt đầu báo.</li>
-                <li><strong>Màu đèn báo:</strong> chọn bên dưới để dùng cho khởi động, kết nối và chuyển mode. Khi hiệu ứng kết thúc, đèn trở về trạng thái bình thường.</li>
+                <li><strong>Xanh lá:</strong> nháy ngắn khi cài giờ, lưu xong lịch ngủ/thức hoặc bộ đếm ngược, và làm mới ảnh thành công.</li>
+                <li><strong>Đỏ:</strong> nháy khi bộ đếm ngược về 0 ngày. Đèn báo trong thời gian giới hạn, không sáng liên tục. Nếu đồng hồ đang nghỉ màn hình, đèn sẽ báo sau khi thức.</li>
+                <li><strong>Màu đèn báo:</strong> chọn bên dưới để dùng cho khởi động, kết nối và chuyển chế độ. Khi hiệu ứng kết thúc, đèn trở về trạng thái bình thường.</li>
             </ul>
             <div class="led-actions">
                 <button id="led-probe" type="button">Kiểm tra hỗ trợ đèn</button>
@@ -2050,7 +2065,7 @@
         </div>
         <div class="led-card" id="led-boot-card">
             <h3>Màu đèn báo</h3>
-            <p>Chọn màu đèn khi khởi động, kết nối Bluetooth và chuyển mode/refresh. Sau khi lưu thành công, tháo pin rồi lắp lại vẫn giữ màu đã chọn. Báo thành công, hết đếm ngược và hiệu ứng A/B/C giữ màu riêng.</p>
+            <p>Chọn màu đèn khi khởi động, kết nối Bluetooth và chuyển chế độ hoặc làm mới màn hình. Sau khi lưu thành công, tháo pin rồi lắp lại vẫn giữ màu đã chọn. Báo thành công, hết đếm ngược và hiệu ứng A/B/C giữ màu riêng.</p>
             <div class="led-fields"><label for="led-boot-color">Màu: </label>
                 <select id="led-boot-color" disabled><option value="18" selected>Xanh nước biển</option><option value="17">Xanh lá</option><option value="16">Đỏ</option></select>
             </div>
@@ -3121,12 +3136,12 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             // 2.13 CE v19.2 reports panel profile 0x21 and app version 0x2B.
             if (nrf52PanelProfile === 0x21) return nrf52FirmwareVersion >= 0x2B;
             // The compatible 2.9 release reports model 2 and app version 0x22.
-            return (nrf52FirmwareVersion >= 0x22 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188].includes(nrf52FirmwareVersion);
+            return (nrf52FirmwareVersion >= 0x22 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196].includes(nrf52FirmwareVersion);
         }
         function nrf52WeekStartAckSupported() {
             return nrf52ModelDetected && nrf52ModelId === 2 &&
                 nrf52PanelProfile !== 0x21 &&
-                ((nrf52FirmwareVersion >= 0x23 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188].includes(nrf52FirmwareVersion));
+                ((nrf52FirmwareVersion >= 0x23 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196].includes(nrf52FirmwareVersion));
         }
         function waitForNrf52WeekStartAck(weekStart, timeoutMs = 8000) {
             if (nrf52WeekStartAckWaiter) {
@@ -3255,7 +3270,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         }
         async function sendNrf52Mode(mode) {
             const previousMode = nrf52DisplayMode;
-            const nativeCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29);
+            const nativeCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29);
             const actualMode = mode & (nativeCalendar ? 0x3f : 0x7f);
             // Save the calendar layout before SET_TIME triggers a redraw. The
             // firmware writes flash only when the value actually changes.
@@ -3274,8 +3289,8 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             await sendCommand(packet);
             nrf52DisplayMode = nativeCalendar && actualMode === 1 && !(mode & 0x40)
                 ? (previousMode === 1 ? 9 : previousMode === 9 ? (nrf52PanelProfile === 0x29 ? 5 : 7) : 1)
-                : actualMode === 2 && ((nrf52PanelProfile === 0x29 && [157,158,167,168,170,171,172,173,176,177,183,184,187,188].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x21 && [151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186].includes(nrf52FirmwareVersion)))
-                    ? (previousMode === 2 ? 3 : previousMode === 3 ? 4 : previousMode === 4 ? (nrf52PanelProfile === 0x29 ? 10 : 5) : previousMode === 11 && nrf52PanelProfile === 0x29 && [183,184,187,188].includes(nrf52FirmwareVersion) ? 12 : previousMode === 10 && nrf52PanelProfile === 0x29 && [167,168,170,171,172,173,176,177,183,184,187,188].includes(nrf52FirmwareVersion) ? 11 : previousMode === 10 && nrf52PanelProfile === 0x21 && [178,179,180,181,182,185,186].includes(nrf52FirmwareVersion) ? 11 : previousMode === 5 && nrf52PanelProfile === 0x21 && [159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186].includes(nrf52FirmwareVersion) ? 10 : 2)
+                : actualMode === 2 && ((nrf52PanelProfile === 0x29 && [157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x21 && [151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198].includes(nrf52FirmwareVersion)))
+                    ? (previousMode === 2 ? 3 : previousMode === 3 ? 4 : previousMode === 4 ? (nrf52PanelProfile === 0x29 ? 10 : 5) : previousMode === 11 && nrf52PanelProfile === 0x29 && [183,184,187,188,191,192,195,196].includes(nrf52FirmwareVersion) ? 12 : previousMode === 10 && nrf52PanelProfile === 0x29 && [167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196].includes(nrf52FirmwareVersion) ? 11 : previousMode === 10 && nrf52PanelProfile === 0x21 && [178,179,180,181,182,185,186,189,190,193,194,197,198].includes(nrf52FirmwareVersion) ? 11 : previousMode === 5 && nrf52PanelProfile === 0x21 && [159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198].includes(nrf52FirmwareVersion) ? 10 : 2)
                     : (actualMode === 2 && previousMode === 2) ? 3 : actualMode;
             addLog(`nRF52 mode ${nrf52DisplayMode} command sent`);
         }
@@ -4429,7 +4444,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         async function setTime() {
             if (window.countdownOperationBusy) return;
             if (deviceProtocol === PROTOCOL_NRF52) {
-                const keepCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21 && [1,7,9].includes(nrf52DisplayMode)) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29 && [1,5,9].includes(nrf52DisplayMode));
+                const keepCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21 && [1,7,9].includes(nrf52DisplayMode)) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29 && [1,5,9].includes(nrf52DisplayMode));
                 await sendNrf52Mode(nrf52DisplayMode | (keepCalendar ? 0x40 : 0));
                 return;
             }
@@ -6532,7 +6547,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
                 sanitizeInputValue();
                 textInput.placeholder = maxLen===24?'Tối đa 24 ký tự tiếng Việt':'Tối đa 16 ký tự';
                 if (sizeHint) {
-                    sizeHint.textContent = maxLen===24?'Nhập tiếng Việt tối đa 24 ký tự, nội dung phải vừa một dòng. Cần cài font ở mục Việc cần làm lần đầu.':'Bộ đếm ngược hỗ trợ tối đa 16 ký tự không dấu.';
+                    sizeHint.textContent = maxLen===24?'Nhập tiếng Việt tối đa 24 ký tự, nội dung phải vừa một dòng. Nếu chưa cài dữ liệu, vào Cập nhật phần mềm → Cài đặt đồng hồ trước.':'Bộ đếm ngược hỗ trợ tối đa 16 ký tự không dấu.';
                 }
             }
 
@@ -6777,20 +6792,21 @@ function toggleSwitch(e) {
 <script src="secure-dfu-package.js"></script>
 <script src="secure-dfu.js"></script>
 <script src="ota-verifier.js"></script>
-<script src="ota-dual-update.js"></script>
-<script src="ota-auto-update.js?v=61.34"></script>
+<script src="ota-dual-update.js?v=61.38"></script>
+<script src="ota-auto-update.js?v=61.38"></script>
 <script src="countdown-nrf52.js"></script>
 <script src="countdown-da14585.js"></script>
-<script src="led-effects.js?v=61.34"></script>
+<script src="led-effects.js?v=61.38"></script>
 <script src="ble-write-queue.js"></script>
 <script src="vn-font-data.js"></script>
 <script src="face5-font-data.js"></script>
     <script src="face5-sans-centered-data.js"></script>
     <script src="face23-sans22-data.js"></script>
-    <script src="face4-sans36-data.js"></script><script src="face6-flip-data.js"></script><script src="face6-dark-top-data.js"></script><script src="face6-290-data.js"></script>
+    <script src="face4-sans36-data.js"></script><script src="face6-flip-data.js"></script><script src="face6-dark-top-data.js"></script><script src="face6-freesans-white-data.js"></script><script src="face6-white-213-data.js"></script><script src="face1-retro-213-data.js"></script><script src="face1-retro-290-data.js"></script><script src="face6-white-290-data.js"></script><script src="face6-290-data.js"></script>
     <script src="sans290-data.js"></script><script src="sans290-classic-data.js"></script><script src="sans290-bold42-data.js"></script>
-    <script src="vn-operation.js?v=61.34"></script><script src="vn-todo.js?v=61.34"></script><script src="date-marks.js?v=61.34"></script>
-<script src="photo-album.js?v=61.34"></script>
+    <script src="vn-operation.js?v=61.38"></script><script src="vn-todo.js?v=61.38"></script><script src="date-marks.js?v=61.38"></script>
+<script src="photo-album.js?v=61.38"></script>
+<script src="clock-face-picker.js?v=61.38"></script>
 <script src="event-clock-data.js"></script>
 <script src="event-clock-290-data.js"></script>
 <!-- Unified clock setup is part of the normal settings panel. -->

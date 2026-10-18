@@ -1,11 +1,20 @@
-# Điều khiển đồng hồ mực điện tử
+# Hướng dẫn dùng đồng hồ mực điện tử
 
-Mở trang bằng trình duyệt hỗ trợ Bluetooth và kết nối đồng hồ. Đặt giờ hiện tại trong mục Cài đặt màn hình E-Paper.
+Mở trang bằng trình duyệt có hỗ trợ Bluetooth. Kết nối đồng hồ trong thẻ Cài đặt màn hình rồi bấm Cài giờ để đồng bộ ngày giờ hiện tại.
 
-Trong mục Cập nhật phần mềm, bấm Cài đặt đồng hồ để cài font tiếng Việt và các ngày nhắc trên thiết bị có hỗ trợ. Không cần chọn file tài nguyên. Giữ kết nối và nguồn ổn định; lưu bản sao lưu nếu được yêu cầu.
+## Bắt đầu sử dụng
 
-Bấm Chế độ đồng hồ nhiều lần để đổi mặt hiển thị. Mặt nhắc sự kiện sẽ hiện ngày gần nhất và số ngày còn lại. Có thể dùng riêng bộ đếm ngược, danh sách việc cần làm, ảnh hoặc album tùy khả năng của đồng hồ.
+- Cài lần đầu hoặc màn hình báo thiếu dữ liệu: vào Cập nhật phần mềm → Cài đặt đồng hồ. Web tự chọn dữ liệu phù hợp. Nếu đã có dữ liệu mới nhất thì không cần cài lại.
+- Chọn giao diện ở mục Chọn giao diện đồng hồ trên thiết bị có hỗ trợ. Các đồng hồ khác vẫn dùng nút chuyển chế độ đồng hồ hoặc lịch.
+- Việc cần làm: nhập danh sách rồi lưu. Muốn trở về lịch tháng bên cạnh đồng hồ, bỏ chọn Hiện danh sách bên cạnh đồng hồ và lưu lại.
+- Bộ đếm ngược: nhập nội dung, chọn ngày rồi bấm Bắt đầu đếm ngược. Số ký tự và chữ tiếng Việt phụ thuộc khả năng của đồng hồ.
+- Album ảnh: chọn ảnh, lưu vào từng ô, chọn cách đổi ảnh và bấm Lưu và bắt đầu. Tắt tự đổi ảnh trước khi tải một ảnh trực tiếp lên màn hình.
+- Đánh dấu ngày tháng, hẹn giờ nghỉ màn hình và đèn chỉ hoạt động trên đồng hồ có hỗ trợ.
 
-Khi album đang tự đổi ảnh, hãy bấm Tắt tự đổi ảnh trước khi tải một ảnh trực tiếp lên màn hình. Thay ảnh trong một ô album không làm mất các ô khác.
+## Cập nhật và khôi phục
 
-Kiểm tra bản cập nhật để chọn phần mềm phù hợp cho các đồng hồ được hỗ trợ. Nếu được cung cấp file riêng, chọn file ZIP đó và làm theo hướng dẫn cập nhật. Không dùng file của loại đồng hồ khác. Khi cần chọn bootloader, chọn DFUTAG. Không tháo pin hoặc đóng trang trong khi cập nhật.
+Kết nối rồi bấm Kiểm tra bản cập nhật, hoặc chọn file ZIP được cung cấp đúng cho đồng hồ. Bấm Bắt đầu cập nhật; khi được yêu cầu chọn lại, bấm nút lần nữa và chọn DFUTAG. Giữ đồng hồ ở gần, dùng pin còn đủ điện và không đóng trang trong khi cập nhật.
+
+Nếu cài dữ liệu bị ngắt, kết nối lại rồi mở Trợ giúp cài đặt → Thử lại lần cài bị ngắt. Giữ các file sao lưu được yêu cầu tải về. Với ngày đánh dấu, dùng Dừng truyền / khôi phục rồi lưu lại.
+
+Trang sẽ báo nếu đồng hồ không hỗ trợ một chức năng. Không chọn file cập nhật của loại đồng hồ khác.

@@ -3,7 +3,7 @@
 'use strict';
 const $=id=>document.getElementById(id),T=window.VNTransport,enc=new TextEncoder(),dec=new TextDecoder('utf-8',{fatal:true});
 let busy=false,serial=0;
-function supported(){return typeof deviceProtocol!=='undefined'&&deviceProtocol===PROTOCOL_NRF52&&nrf52ModelDetected&&nrf52ModelId===2&&((nrf52PanelProfile===0x21&&[180,181,182,185,186].includes(nrf52FirmwareVersion))||(nrf52PanelProfile===0x29&&[183,184,187,188].includes(nrf52FirmwareVersion)));}
+function supported(){return typeof deviceProtocol!=='undefined'&&deviceProtocol===PROTOCOL_NRF52&&nrf52ModelDetected&&nrf52ModelId===2&&((nrf52PanelProfile===0x21&&[180,181,182,185,186,189,190,193,194,197,198].includes(nrf52FirmwareVersion))||(nrf52PanelProfile===0x29&&[183,184,187,188,191,192,195,196].includes(nrf52FirmwareVersion)));}
 const u32=n=>{const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,n,true);return b;};
 const clockMode=()=>nrf52PanelProfile===0x29?12:11;
 function status(s){$('date-mark-status').textContent=s;if(typeof addLog==='function')addLog('Đánh dấu ngày tháng: '+s);}
