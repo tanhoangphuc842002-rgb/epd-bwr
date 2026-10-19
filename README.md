@@ -10,6 +10,9 @@ Mở trang bằng trình duyệt có hỗ trợ Bluetooth. Kết nối đồng h
 - Bộ đếm ngược: nhập nội dung, chọn ngày rồi bấm Bắt đầu đếm ngược. Số ký tự và chữ tiếng Việt phụ thuộc khả năng của đồng hồ.
 - Album ảnh: chọn ảnh, lưu vào từng ô, chọn cách đổi ảnh và bấm Lưu và bắt đầu. Tắt tự đổi ảnh trước khi tải một ảnh trực tiếp lên màn hình.
 - Đánh dấu ngày tháng, hẹn giờ nghỉ màn hình và đèn chỉ hoạt động trên đồng hồ có hỗ trợ.
+- Danh ngôn: bấm 100 câu có sẵn rồi xác nhận để dùng bộ mặc định. Bấm Câu riêng của tôi để mở ô nhập; mỗi dòng một câu, tối đa 50 câu, rồi Lưu và hiển thị câu riêng một lần. Bỏ thay đổi sẽ không sửa nội dung trên đồng hồ.
+- Kết hợp cả hai chỉ chọn được khi đồng hồ đã có cả bộ mặc định và ít nhất một câu riêng được lưu. Câu mới gõ nhưng chưa lưu không bật được lựa chọn này.
+- Dừng khi đang lưu: web giữ các câu đang nhập. Kết nối lại rồi chọn bộ câu muốn dùng; web tự kết thúc lần truyền dở và dùng bản đã lưu hợp lệ. Không cần vào phần cập nhật để cài lại dữ liệu chỉ vì dừng truyền.
 
 ## Cập nhật và khôi phục
 

@@ -1390,6 +1390,40 @@
                 <p id="clock-face-status" role="status" aria-live="polite"></p>
             </div>
         </section>
+        <section id="calendar-face-panel" style="padding:16px;border:1px solid #d6dfd7;border-radius:10px;margin:16px 0" aria-labelledby="calendar-face-title">
+            <h3 id="calendar-face-title">Chọn giao diện lịch</h3>
+            <p id="calendar-face-availability" role="status" aria-live="polite">Kết nối đồng hồ để xem những giao diện lịch phù hợp.</p>
+            <div id="calendar-face-controls" hidden>
+                <label for="calendar-face-select">Giao diện lịch muốn dùng</label>
+                <select id="calendar-face-select" style="max-width:480px;width:100%"></select>
+                <div><img id="calendar-face-preview" alt="Hình minh họa giao diện lịch đã chọn" width="592" height="256" style="max-width:100%;height:auto;border:1px solid #ddd;margin:12px 0;background:white"></div>
+                <p id="calendar-face-description"></p>
+                <button id="calendar-face-apply" type="button">Hiển thị lịch trên đồng hồ</button>
+                <p id="calendar-face-status" role="status" aria-live="polite"></p>
+            </div>
+        </section>
+      <section style="max-width:860px;margin:16px auto;padding:16px;border:1px solid #ccd7d3;border-radius:10px" id="daily-quote-section">
+        <h2>Danh ngôn mỗi ngày</h2>
+        <p id="daily-quote-availability" role="status">Kết nối đồng hồ có hỗ trợ để sử dụng danh ngôn mỗi ngày.</p>
+        <div id="daily-quote-controls" hidden>
+          <p>Chọn bộ câu có sẵn, hoặc nhập nhiều câu riêng rồi lưu một lần.</p>
+          <label><input type="checkbox" id="daily-quote-enable" checked style="width:auto"> Hiển thị danh ngôn dưới giờ</label>
+          <div class="quote-source-choices"><button type="button" id="daily-quote-built-in" aria-pressed="false">100 câu có sẵn</button><button type="button" id="daily-quote-personal" aria-pressed="false">Câu riêng của tôi</button><button type="button" id="daily-quote-mixed" aria-pressed="false" disabled>Kết hợp cả hai</button></div>
+          <p id="daily-quote-current" role="status">Kết nối để đọc lựa chọn đang dùng.</p>
+          <p id="daily-quote-mixed-hint">Lưu ít nhất một câu riêng để dùng Kết hợp cả hai.</p>
+          <div id="daily-quote-editor" hidden>
+            <label for="daily-quote-bulk">Các câu của tôi — mỗi dòng một câu, tối đa 50 câu</label>
+            <textarea id="daily-quote-bulk" rows="7" placeholder="Hôm nay sống tốt, ngày mai thêm vui.&#10;Mỗi ngày một niềm vui." style="width:100%;box-sizing:border-box;min-height:140px;resize:vertical;font-size:16px"></textarea>
+            <p id="daily-quote-count">0 / 50 câu riêng</p>
+            <canvas id="daily-quote-preview" width="168" height="38" style="width:min(100%,336px);image-rendering:pixelated;border:1px solid #ddd" aria-label="Xem trước câu đầu tiên"></canvas><p id="daily-quote-fit">Mỗi câu tự chia tối đa hai dòng trên đồng hồ.</p>
+            <button type="button" id="daily-quote-save">Lưu và hiển thị câu riêng</button><button type="button" id="daily-quote-discard">Bỏ thay đổi</button>
+          </div>
+          <button type="button" id="daily-quote-recover" hidden>Dừng lưu</button>
+          <progress id="daily-quote-progress" max="100" value="0" style="width:100%"></progress><p id="daily-quote-status" role="status" aria-live="polite">Chọn nội dung muốn hiển thị.</p>
+        </div>
+      </section>
+      <style>#daily-quote-controls label{display:block;margin:10px 0 4px}#daily-quote-controls input[type=checkbox]{min-height:0;display:inline-block}#daily-quote-controls button{margin:5px 0}.quote-source-choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}.quote-source-choices button[aria-pressed=true]{outline:3px solid #235c32;outline-offset:1px}.quote-source-choices button:disabled{background:#c5cbd0;color:#42494d;cursor:not-allowed}#daily-quote-editor{padding:12px;border:1px solid #d4dfd9;border-radius:8px;background:#f6faf7}</style>
+
         <p>Bạn vẫn có thể bấm Chế độ đồng hồ để chuyển lần lượt các giao diện.</p>
         <p>Bấm Chế độ lịch lần nữa để chuyển sang mặt lịch tiếp theo.</p>
         <section class="sleep-panel" aria-labelledby="sleep-panel-title">
@@ -2292,9 +2326,9 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         function applyBayerDithering(ctx, width, height, threshold, diffusion = 1.0, isColor = false) {
             const bayerThresholdMap = [
                 [15, 135, 45, 165],
-                [195, 75, 225, 105],
+                [195,75,225,105,207,211,215],
                 [60, 180, 30, 150],
-                [240, 120, 210, 90]
+                [240,120,210,90,214,218]
             ];
             const imageData = ctx.getImageData(0, 0, width, height);
             const data = imageData.data;
@@ -2523,9 +2557,9 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         function applyBWRBayerDithering(ctx, width, height, threshold, diffusion = 1.0) {
             const bayerThresholdMap = [
                 [15, 135, 45, 165],
-                [195, 75, 225, 105],
+                [195,75,225,105,207,211,215],
                 [60, 180, 30, 150],
-                [240, 120, 210, 90]
+                [240,120,210,90,214,218]
             ];
             const imageData = ctx.getImageData(0, 0, width, height);
             const data = imageData.data;
@@ -3136,12 +3170,12 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             // 2.13 CE v19.2 reports panel profile 0x21 and app version 0x2B.
             if (nrf52PanelProfile === 0x21) return nrf52FirmwareVersion >= 0x2B;
             // The compatible 2.9 release reports model 2 and app version 0x22.
-            return (nrf52FirmwareVersion >= 0x22 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196].includes(nrf52FirmwareVersion);
+            return (nrf52FirmwareVersion >= 0x22 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216].includes(nrf52FirmwareVersion);
         }
         function nrf52WeekStartAckSupported() {
             return nrf52ModelDetected && nrf52ModelId === 2 &&
                 nrf52PanelProfile !== 0x21 &&
-                ((nrf52FirmwareVersion >= 0x23 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196].includes(nrf52FirmwareVersion));
+                ((nrf52FirmwareVersion >= 0x23 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216].includes(nrf52FirmwareVersion));
         }
         function waitForNrf52WeekStartAck(weekStart, timeoutMs = 8000) {
             if (nrf52WeekStartAckWaiter) {
@@ -3270,7 +3304,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         }
         async function sendNrf52Mode(mode) {
             const previousMode = nrf52DisplayMode;
-            const nativeCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29);
+            const nativeCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29);
             const actualMode = mode & (nativeCalendar ? 0x3f : 0x7f);
             // Save the calendar layout before SET_TIME triggers a redraw. The
             // firmware writes flash only when the value actually changes.
@@ -3289,8 +3323,12 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             await sendCommand(packet);
             nrf52DisplayMode = nativeCalendar && actualMode === 1 && !(mode & 0x40)
                 ? (previousMode === 1 ? 9 : previousMode === 9 ? (nrf52PanelProfile === 0x29 ? 5 : 7) : 1)
-                : actualMode === 2 && ((nrf52PanelProfile === 0x29 && [157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x21 && [151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198].includes(nrf52FirmwareVersion)))
-                    ? (previousMode === 2 ? 3 : previousMode === 3 ? 4 : previousMode === 4 ? (nrf52PanelProfile === 0x29 ? 10 : 5) : previousMode === 11 && nrf52PanelProfile === 0x29 && [183,184,187,188,191,192,195,196].includes(nrf52FirmwareVersion) ? 12 : previousMode === 10 && nrf52PanelProfile === 0x29 && [167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196].includes(nrf52FirmwareVersion) ? 11 : previousMode === 10 && nrf52PanelProfile === 0x21 && [178,179,180,181,182,185,186,189,190,193,194,197,198].includes(nrf52FirmwareVersion) ? 11 : previousMode === 5 && nrf52PanelProfile === 0x21 && [159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198].includes(nrf52FirmwareVersion) ? 10 : 2)
+                : actualMode === 2 && ((nrf52PanelProfile === 0x21 && [209,210,213,214,217,218].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x29 && [211,212,215,216].includes(nrf52FirmwareVersion)))
+                    ? ((mode & 0x40) ? 2 : ((nrf52PanelProfile === 0x29 ? [2,3,4,10,11,12,13,2] : [2,3,4,5,10,11,12,2])[(nrf52PanelProfile === 0x29 ? [2,3,4,10,11,12,13] : [2,3,4,5,10,11,12]).indexOf(previousMode)+1] || 2))
+                : actualMode === 2 && ((nrf52PanelProfile === 0x21 && [205,206,209,210,213,214,217,218].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x29 && [207,208,211,212,215,216].includes(nrf52FirmwareVersion)))
+                    ? ((mode & 0x40) ? 2 : ((nrf52PanelProfile === 0x29 ? [2,3,4,10,11,12,13,2] : [2,3,4,5,10,11,12,2])[(nrf52PanelProfile === 0x29 ? [2,3,4,10,11,12,13] : [2,3,4,5,10,11,12]).indexOf(previousMode)+1] || 2))
+                : actualMode === 2 && ((nrf52PanelProfile === 0x29 && [157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x21 && [151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218].includes(nrf52FirmwareVersion)))
+                    ? (previousMode === 2 ? 3 : previousMode === 3 ? 4 : previousMode === 4 ? (nrf52PanelProfile === 0x29 ? 10 : 5) : previousMode === 11 && nrf52PanelProfile === 0x29 && [183,184,187,188,191,192,195,196,207,208,211,212,215,216].includes(nrf52FirmwareVersion) ? 12 : previousMode === 10 && nrf52PanelProfile === 0x29 && [167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216].includes(nrf52FirmwareVersion) ? 11 : previousMode === 10 && nrf52PanelProfile === 0x21 && [178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218].includes(nrf52FirmwareVersion) ? 11 : previousMode === 5 && nrf52PanelProfile === 0x21 && [159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218].includes(nrf52FirmwareVersion) ? 10 : 2)
                     : (actualMode === 2 && previousMode === 2) ? 3 : actualMode;
             addLog(`nRF52 mode ${nrf52DisplayMode} command sent`);
         }
@@ -4444,7 +4482,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         async function setTime() {
             if (window.countdownOperationBusy) return;
             if (deviceProtocol === PROTOCOL_NRF52) {
-                const keepCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21 && [1,7,9].includes(nrf52DisplayMode)) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29 && [1,5,9].includes(nrf52DisplayMode));
+                const keepCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21 && [1,7,9].includes(nrf52DisplayMode)) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29 && [1,5,9].includes(nrf52DisplayMode));
                 await sendNrf52Mode(nrf52DisplayMode | (keepCalendar ? 0x40 : 0));
                 return;
             }
@@ -6792,23 +6830,24 @@ function toggleSwitch(e) {
 <script src="secure-dfu-package.js"></script>
 <script src="secure-dfu.js"></script>
 <script src="ota-verifier.js"></script>
-<script src="ota-dual-update.js?v=61.38"></script>
-<script src="ota-auto-update.js?v=61.38"></script>
+<script src="ota-dual-update.js?v=61.39"></script>
+<script src="ota-auto-update.js?v=61.46.1"></script>
 <script src="countdown-nrf52.js"></script>
 <script src="countdown-da14585.js"></script>
-<script src="led-effects.js?v=61.38"></script>
+<script src="led-effects.js?v=61.46.1"></script>
 <script src="ble-write-queue.js"></script>
 <script src="vn-font-data.js"></script>
 <script src="face5-font-data.js"></script>
     <script src="face5-sans-centered-data.js"></script>
     <script src="face23-sans22-data.js"></script>
-    <script src="face4-sans36-data.js"></script><script src="face6-flip-data.js"></script><script src="face6-dark-top-data.js"></script><script src="face6-freesans-white-data.js"></script><script src="face6-white-213-data.js"></script><script src="face1-retro-213-data.js"></script><script src="face1-retro-290-data.js"></script><script src="face6-white-290-data.js"></script><script src="face6-290-data.js"></script>
-    <script src="sans290-data.js"></script><script src="sans290-classic-data.js"></script><script src="sans290-bold42-data.js"></script>
-    <script src="vn-operation.js?v=61.38"></script><script src="vn-todo.js?v=61.38"></script><script src="date-marks.js?v=61.38"></script>
-<script src="photo-album.js?v=61.38"></script>
-<script src="clock-face-picker.js?v=61.38"></script>
+    <script src="face4-sans36-data.js"></script><script src="face6-flip-data.js"></script><script src="face6-dark-top-data.js"></script><script src="face6-freesans-white-data.js"></script><script src="face6-white-213-data.js"></script><script src="face1-retro-213-data.js"></script><script src="face1-retro-290-data.js?v=61.39"></script><script src="face6-white-290-data.js?v=61.39"></script><script src="face6-290-data.js?v=61.39"></script>
+    <script src="sans290-data.js?v=61.39"></script><script src="sans290-classic-data.js?v=61.39"></script><script src="sans290-bold42-data.js?v=61.39"></script>
+    <script src="vn-operation.js?v=61.39"></script><script src="vn-todo.js?v=61.46.1"></script><script src="date-marks.js?v=61.46.1"></script><script src="daily-quotes-data.js?v=61.39"></script><script src="calendar-month-213-data.js?v=61.46"></script><script src="calendar-month-290-data.js?v=61.46"></script><script src="outline-213-data.js?v=61.45"></script><script src="outline-290-data.js?v=61.45"></script><script src="serif-213-data.js?v=61.43"></script><script src="serif-290-data.js?v=61.43"></script><script src="daily-quotes.js?v=61.46.1"></script><script src="daily-quote-panel.js?v=61.46.1"></script>
+<script src="photo-album.js?v=61.46.1"></script>
+<script src="clock-face-picker.js?v=61.46.1"></script>
+<script src="calendar-face-picker.js?v=61.46.1"></script>
 <script src="event-clock-data.js"></script>
-<script src="event-clock-290-data.js"></script>
+<script src="event-clock-290-data.js?v=61.39"></script>
 <!-- Unified clock setup is part of the normal settings panel. -->
 
 </body>
