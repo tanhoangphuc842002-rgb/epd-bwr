@@ -16,6 +16,10 @@ Mở trang bằng trình duyệt có hỗ trợ Bluetooth. Kết nối đồng h
 
 ## Cập nhật và khôi phục
 
+Nếu sau khi thay pin màn hình hiện NO DATA: kết nối đồng hồ, vào Cập nhật phần mềm và bấm Khôi phục đồng hồ. Trang thử đọc lại bộ nhớ trước, không tự xóa dữ liệu. Nếu phần mềm còn cũ, trang sẽ chuẩn bị bản cập nhật phù hợp; hãy hoàn tất cập nhật rồi kết nối lại và bấm Khôi phục đồng hồ.
+
+Nếu tài nguyên không còn hợp lệ, web hỏi trước khi sao lưu và cài lại. Nội dung nằm trong vùng đã hỏng có thể không khôi phục được; ảnh album không bị tự xóa. Nếu vẫn không liên lạc được với bộ nhớ, trang dừng lại và hướng dẫn gửi nhật ký cho nơi bán. Web không sửa được lỗi phần cứng hoặc thiết bị không còn Bluetooth/DFU.
+
 Kết nối rồi bấm Kiểm tra bản cập nhật, hoặc chọn file ZIP được cung cấp đúng cho đồng hồ. Bấm Bắt đầu cập nhật; khi được yêu cầu chọn lại, bấm nút lần nữa và chọn DFUTAG. Giữ đồng hồ ở gần, dùng pin còn đủ điện và không đóng trang trong khi cập nhật.
 
 Nếu cài dữ liệu bị ngắt, kết nối lại rồi mở Trợ giúp cài đặt → Thử lại lần cài bị ngắt. Giữ các file sao lưu được yêu cầu tải về. Với ngày đánh dấu, dùng Dừng truyền / khôi phục rồi lưu lại.

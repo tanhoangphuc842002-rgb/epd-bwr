@@ -18,12 +18,12 @@ function onTransportDisconnect(event){
 function bindTransportDevice(){if(boundDevice===bleDevice)return;boundDevice?.removeEventListener?.('gattserverdisconnected',onTransportDisconnect);boundDevice=bleDevice;boundDevice?.addEventListener?.('gattserverdisconnected',onTransportDisconnect);}
 function resourceProfile(){
  if(typeof deviceProtocol==='undefined'||deviceProtocol!==PROTOCOL_NRF52||!nrf52ModelDetected||nrf52ModelId!==2||typeof nrf52PanelProfile==='undefined')return 0;
- if(nrf52PanelProfile===0x21&&[127,128,129,130,131,132,137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218].includes(nrf52FirmwareVersion))return 0x21;
- if(nrf52PanelProfile===0x29&&[133,135,136,145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216].includes(nrf52FirmwareVersion))return 0x29;
+ if(nrf52PanelProfile===0x21&&[127,128,129,130,131,132,137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220].includes(nrf52FirmwareVersion))return 0x21;
+ if(nrf52PanelProfile===0x29&&[133,135,136,145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222].includes(nrf52FirmwareVersion))return 0x29;
  return 0;
 }
 function todoWidth(){return resourceProfile()===0x29?([167,168].includes(nrf52FirmwareVersion)?140:194):148;}
-function noDataSetup(){return ([135,136,145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216].includes(nrf52FirmwareVersion)&&resourceProfile()===0x29)||([137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21);}
+function noDataSetup(){return ([135,136,145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222].includes(nrf52FirmwareVersion)&&resourceProfile()===0x29)||([137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21);}
 function titleWidth(){return resourceProfile()===0x29?228:184;}
 function u32(n){const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,n,true);return b;}
 function crc32(b){let c=0xffffffff;for(const v of b){c^=v;for(let i=0;i<8;i++)c=(c>>>1)^((c&1)?0xedb88320:0);}return (c^0xffffffff)>>>0;}
@@ -102,7 +102,7 @@ async function request(op,body=[]) {
  });
  return operation.wait(job,token);
 }
-async function probe(){cap=await request(0);if(cap.length!==14||![1,2,3,4].includes(cap[6])||cap[9]<14)throw Error('Đồng hồ chưa hỗ trợ chức năng này. Chưa gửi thay đổi.');return cap;}
+async function probe(){cap=await request(0);if(cap.length!==14||![1,2,3,4,5].includes(cap[6])||cap[9]<14)throw Error('Đồng hồ chưa hỗ trợ chức năng này. Chưa gửi thay đổi.');return cap;}
 function unpackRead(d,limit){
  if(d.length<8)throw Error('Chưa đọc đủ dữ liệu. Hãy kết nối lại rồi thử lại.');
  const wireLength=d[6]|d[7]<<8,length=wireLength&0x7fff;if(!length||length>limit)throw Error('Dữ liệu nhận được chưa đầy đủ. Hãy thử lại.');
@@ -150,7 +150,7 @@ async function fontMatches(){
 }
 async function uploadConfig(bytes,deferRedraw=false,preserveCalendar=true){
  if(!await fontMatches())throw Error('Cần cài đặt đồng hồ ở mục Cập nhật phần mềm trước.');
- if(preserveCalendar&&[139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21){
+ if(preserveCalendar&&[139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21){
   const base=new DataView(cap.buffer,cap.byteOffset).getUint32(10,true);
   bytes.set(await read(base+16+480,32),480);
  }
@@ -234,6 +234,38 @@ $('vn-go-connect').onclick=()=>navigate('tab-settings');
 /* Task navigation stays in its own tab. */
 $('vn-setup-check').onclick=()=>action(async()=>{await probe();if(cap[8])throw Error('Có lần cài đặt chưa hoàn tất. Mở Trợ giúp cài đặt để thử lại.');setupStatus(!cap[7]?'Chưa cài đặt. Bấm Cài đặt đồng hồ để bắt đầu.':eventSupport()&&!await bundleMatches(clockBundle())?'Có dữ liệu mới. Bấm Cài đặt đồng hồ để cập nhật.':'Dữ liệu đã sẵn sàng. Bạn có thể sử dụng đồng hồ.');},true);
 $('vn-install').onclick=()=>action(()=>installUnified(false),true);
+function recoverySupported(){return (resourceProfile()===0x21&&[219,220].includes(nrf52FirmwareVersion))||(resourceProfile()===0x29&&[221,222].includes(nrf52FirmwareVersion));}
+async function recoverClock(){
+ connection();
+ if(!recoverySupported())throw Error('Đồng hồ cần bản phần mềm có hỗ trợ khôi phục. Bấm Kiểm tra bản cập nhật trước.');
+ const key=deviceKey(),token=operation.current();
+ const same=()=>{operation.guard(token);if(deviceKey()!==key)throw Error('Thiết bị đã đổi. Chưa cài dữ liệu.');};
+ setupStatus('Đang khôi phục kết nối bộ nhớ. Chưa ghi hoặc xóa dữ liệu. Giữ pin và kết nối ổn định.');
+ const r=await request(15);same();
+ if(r.length!==12||r[6]!==1||r[7]>1||r[8]>1||r[9]>1||r[11]!==1)throw Error('Chưa nhận đủ kết quả khôi phục. Kết nối lại rồi thử lại.');
+ if(!r[7]||!r[9]||r[10]===255)throw Error('Chưa liên lạc ổn định với bộ nhớ. Chưa xóa dữ liệu. Kiểm tra pin và tiếp điểm; nếu vẫn lỗi, gửi nhật ký cho nơi bán.');
+ if(r[10]&1)throw Error('Bộ nhớ vẫn đang bận. Chưa xóa dữ liệu. Chờ rồi thử lại.');
+ await probe();same();
+ if(cap[7]){
+  await request(10);same();await loadConfig();same();
+  setupStatus('Đã khôi phục và mở lại đồng hồ. Không phải cài lại dữ liệu; ảnh và nội dung đã lưu được giữ nguyên. Hãy cài giờ hiện tại nếu vừa thay pin.');return;
+ }
+ if(r[10]&0xfc)throw Error('Bộ nhớ đang có bảo vệ ghi. Chưa thay đổi dữ liệu hoặc tự gỡ bảo vệ. Gửi nhật ký cho nơi bán.');
+ setupStatus('Đã liên lạc được với bộ nhớ, nhưng bộ dữ liệu chưa hợp lệ. Web sẽ hỏi trước khi cài lại.');
+ await installUnified(false);same();
+}
+$('vn-flash-recover').onclick=async()=>{
+ if(work||window.EpdDfuBusy?.()||window.EpdAutoUpdate?.busy?.()||window.countdownOperationBusy||window.EpdDesigner?.busy||(typeof clockImageUploadBusy!=='undefined'&&clockImageUploadBusy))return;
+ try{
+  connection();
+  if(!recoverySupported()){
+   setupStatus('Đồng hồ cần cập nhật phần mềm để có chức năng khôi phục. Đang kiểm tra gói phù hợp; chưa xóa dữ liệu.');
+   await window.EpdAutoUpdate?.prepare();return;
+  }
+  await runWork(recoverClock,null,true);
+ }catch(e){setupStatus('Chưa khôi phục được: '+e.message);}
+};
+
 $('vn-recover').onclick=()=>action(async()=>{
  connection();const key=deviceKey();
  if(!confirm('Hủy phiên cài dữ liệu chưa hoàn tất và thử cài lại trên đồng hồ đang kết nối? Bản dữ liệu đã lưu thành công trước đó không bị xóa. Giữ kết nối và nguồn ổn định.'))return;
@@ -267,7 +299,7 @@ document.addEventListener('change',e=>{if(work&&!ownControls(e.target)){e.preven
 window.VNDataBusy=()=>work;
 window.VNCountdownSupport=()=>!!resourceProfile();
 window.VNTransport={
- request,probe,read,verify:verifyRange,key:deviceKey,crc32,
+ request,probe,read,verify:verifyRange,key:deviceKey,crc32,recoverClock,recoverySupported,
  wait:operation.wait,
  async facesReady(){await probe();return !!cap[7]&&!cap[8]&&await bundleMatches(clockBundle());},
  busy:()=>work,cancel:()=>operation.cancel(),current:operation.current,guard:operation.guard,
@@ -300,14 +332,14 @@ window.startVNCountdown=async(date,title)=>{
   await window.startNrf52Countdown(request);
  });}catch(e){window.updateCountdownStatus?.(e.message,true);status(e.message);if(typeof addLog==='function')addLog('Đếm ngược tiếng Việt: '+e.message);}
 };
-function eventSupport(){const p=resourceProfile();return (p===0x21&&[151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218].includes(nrf52FirmwareVersion))||(p===0x29&&[157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216].includes(nrf52FirmwareVersion));}
+function eventSupport(){const p=resourceProfile();return (p===0x21&&[151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220].includes(nrf52FirmwareVersion))||(p===0x29&&[157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222].includes(nrf52FirmwareVersion));}
 function clockBundle(){
- const modern=resourceProfile()===0x21&&[159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218].includes(nrf52FirmwareVersion);
- const b=Uint8Array.from(([213,214,217,218].includes(nrf52FirmwareVersion)?window.CalendarMonth213Bytes:[215,216].includes(nrf52FirmwareVersion)?window.CalendarMonth290Bytes:[205,206,209,210,213,214,217,218].includes(nrf52FirmwareVersion)?window.Outline213Bytes:[207,208,211,212,215,216].includes(nrf52FirmwareVersion)?window.Outline290Bytes:[205,206,209,210,213,214,217,218].includes(nrf52FirmwareVersion)?window.Serif213Bytes:[207,208,211,212,215,216].includes(nrf52FirmwareVersion)?window.Serif290Bytes:resourceProfile()===0x21&&[193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218].includes(nrf52FirmwareVersion)?window.Face1Retro213Bytes:resourceProfile()===0x29&&[195,196,207,208,211,212,215,216].includes(nrf52FirmwareVersion)?window.Face1Retro290Bytes:resourceProfile()===0x21&&[181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218].includes(nrf52FirmwareVersion)?window.Face6White213Bytes:resourceProfile()===0x29&&[183,184,187,188,191,192,195,196,207,208,211,212,215,216].includes(nrf52FirmwareVersion)?window.Face6White290Bytes:resourceProfile()===0x29&&[183,184,187,188,191,192,195,196,207,208,211,212,215,216].includes(nrf52FirmwareVersion)?window.Face6Clock290Bytes:resourceProfile()===0x21&&[179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218].includes(nrf52FirmwareVersion)?window.Face6DarkTopBytes:resourceProfile()===0x21&&[178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218].includes(nrf52FirmwareVersion)?window.Face6FlipBytes:resourceProfile()===0x29&&[172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216].includes(nrf52FirmwareVersion)?window.Sans290Bold42Bytes:resourceProfile()===0x29&&[170,171].includes(nrf52FirmwareVersion)?window.Sans290ClassicBytes:resourceProfile()===0x29&&[167,168].includes(nrf52FirmwareVersion)?window.Sans290Bytes:[165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21?window.Face4SansBytes:[163,164].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21?window.Face23SansBytes:[161,162].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21?window.Face5SansBytes:modern?window.Face5ClockBytes:resourceProfile()===0x29?window.EventClock290Bytes:window.EventClockBytes)||[]),prefix=defaultBytes.length;
- if(b.length<prefix+8||b.length>([213,214,215,216,217,218].includes(nrf52FirmwareVersion)?65520:61440))throw Error('Bộ cài đặt chưa đầy đủ. Hãy tải lại trang.');
+ const modern=resourceProfile()===0x21&&[159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220].includes(nrf52FirmwareVersion);
+ const b=Uint8Array.from(([213,214,217,218,219,220].includes(nrf52FirmwareVersion)?window.CalendarMonth213Bytes:[215,216,221,222].includes(nrf52FirmwareVersion)?window.CalendarMonth290Bytes:[205,206,209,210,213,214,217,218,219,220].includes(nrf52FirmwareVersion)?window.Outline213Bytes:[207,208,211,212,215,216,221,222].includes(nrf52FirmwareVersion)?window.Outline290Bytes:[205,206,209,210,213,214,217,218,219,220].includes(nrf52FirmwareVersion)?window.Serif213Bytes:[207,208,211,212,215,216,221,222].includes(nrf52FirmwareVersion)?window.Serif290Bytes:resourceProfile()===0x21&&[193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220].includes(nrf52FirmwareVersion)?window.Face1Retro213Bytes:resourceProfile()===0x29&&[195,196,207,208,211,212,215,216,221,222].includes(nrf52FirmwareVersion)?window.Face1Retro290Bytes:resourceProfile()===0x21&&[181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220].includes(nrf52FirmwareVersion)?window.Face6White213Bytes:resourceProfile()===0x29&&[183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222].includes(nrf52FirmwareVersion)?window.Face6White290Bytes:resourceProfile()===0x29&&[183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222].includes(nrf52FirmwareVersion)?window.Face6Clock290Bytes:resourceProfile()===0x21&&[179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220].includes(nrf52FirmwareVersion)?window.Face6DarkTopBytes:resourceProfile()===0x21&&[178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220].includes(nrf52FirmwareVersion)?window.Face6FlipBytes:resourceProfile()===0x29&&[172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222].includes(nrf52FirmwareVersion)?window.Sans290Bold42Bytes:resourceProfile()===0x29&&[170,171].includes(nrf52FirmwareVersion)?window.Sans290ClassicBytes:resourceProfile()===0x29&&[167,168].includes(nrf52FirmwareVersion)?window.Sans290Bytes:[165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21?window.Face4SansBytes:[163,164].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21?window.Face23SansBytes:[161,162].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21?window.Face5SansBytes:modern?window.Face5ClockBytes:resourceProfile()===0x29?window.EventClock290Bytes:window.EventClockBytes)||[]),prefix=defaultBytes.length;
+ if(b.length<prefix+8||b.length>([213,214,215,216,217,218,219,220,221,222].includes(nrf52FirmwareVersion)?65520:61440))throw Error('Bộ cài đặt chưa đầy đủ. Hãy tải lại trang.');
  const v=new DataView(b.buffer);let at=prefix;
  if(crc32(b.subarray(512,prefix))!==crc32(defaultBytes.subarray(512)))throw Error('Bộ dữ liệu hiển thị chưa khớp. Hãy tải lại trang rồi thử Cài đặt đồng hồ.');
- if(modern||(resourceProfile()===0x29&&[167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216].includes(nrf52FirmwareVersion)))for(let slot=2;slot<(modern?4:[183,184,187,188,191,192,195,196,207,208,211,212,215,216].includes(nrf52FirmwareVersion)?8:7);slot++){
+ if(modern||(resourceProfile()===0x29&&[167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222].includes(nrf52FirmwareVersion)))for(let slot=2;slot<(modern?4:[183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222].includes(nrf52FirmwareVersion)?8:7);slot++){
   if(at+16>b.length||v.getUint8(at)!==slot)throw Error('Bộ dữ liệu giao diện chưa đầy đủ. Hãy tải lại trang rồi cài đặt lại đồng hồ.');
   const bytes=v.getUint32(at+4,true);if(bytes<16||bytes>b.length-at)throw Error('Bộ dữ liệu giao diện chưa hợp lệ. Hãy tải lại trang rồi cài đặt lại đồng hồ.');at+=bytes;
  }
@@ -317,19 +349,19 @@ function clockBundle(){
 }
 function bankAddress(){const a=new DataView(cap.buffer,cap.byteOffset).getUint32(10,true);if(a!==0x60000&&a!==0x70000)throw Error('Chưa xác nhận được vùng dữ liệu của đồng hồ.');return a;}
 function marksTail(bytes){
- if(!((resourceProfile()===0x21&&[180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218].includes(nrf52FirmwareVersion))||(resourceProfile()===0x29&&[183,184,187,188,191,192,195,196,207,208,211,212,215,216].includes(nrf52FirmwareVersion)))||bytes.length<256)return null;
+ if(!((resourceProfile()===0x21&&[180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220].includes(nrf52FirmwareVersion))||(resourceProfile()===0x29&&[183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222].includes(nrf52FirmwareVersion)))||bytes.length<256)return null;
  const tail=bytes.slice(-256),v=new DataView(tail.buffer);return v.getUint32(0,true)===0x314b4d44&&tail[4]===1&&tail[5]<=3?tail:null;
 }
 async function bundleMatches(bytes){
  if(!cap[7])return false;const base=bankAddress(),h=await read(base,16),v=new DataView(h.buffer);
  if(window.DailyQuotes?.supported()){
   const size=v.getUint32(8,true),prefix=window.DailyQuotes.locate(bytes).prefix;
-  if(v.getUint32(0,true)!==0x31544e56||size<prefix+16||size>([213,214,215,216,217,218].includes(nrf52FirmwareVersion)?65520:61440))return false;
+  if(v.getUint32(0,true)!==0x31544e56||size<prefix+16||size>([213,214,215,216,217,218,219,220,221,222].includes(nrf52FirmwareVersion)?65520:61440))return false;
   const q=await request(14);if(q.length!==10||!new DataView(q.buffer,q.byteOffset).getUint32(6,true))return false;
   const n=prefix-512,r=await request(8,[...u32(base+528),n&255,n>>8]);
   return r.length===10&&new DataView(r.buffer,r.byteOffset).getUint32(6,true)===crc32(bytes.subarray(512,prefix));
  }
- const size=v.getUint32(8,true);if(v.getUint32(0,true)!==0x31544e56||(size!==bytes.length&&!([180,181,182,185,186,189,190,193,194,183,184,187,188,191,192,195,196,197,198,199,200,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218].includes(nrf52FirmwareVersion)&&size===bytes.length+256)))return false;
+ const size=v.getUint32(8,true);if(v.getUint32(0,true)!==0x31544e56||(size!==bytes.length&&!([180,181,182,185,186,189,190,193,194,183,184,187,188,191,192,195,196,197,198,199,200,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222].includes(nrf52FirmwareVersion)&&size===bytes.length+256)))return false;
  if(size!==bytes.length&&!marksTail(await read(base+16+size-256,256)))return false;
  const expected=crc32(bytes.subarray(512));
  if(cap[6]>=3){const n=bytes.length-512,r=await request(8,[...u32(base+528),n&255,n>>8]);if(r.length!==10)throw Error('Chưa nhận đủ kết quả kiểm tra.');return new DataView(r.buffer,r.byteOffset).getUint32(6,true)===expected;}
@@ -343,7 +375,7 @@ async function installUnified(force=false){
  let old=null,base=0,header=null,blank=false;
  if(cap[7]){
   base=bankAddress();header=await read(base,16);const v=new DataView(header.buffer),size=v.getUint32(8,true);
-  if(v.getUint32(0,true)!==0x31544e56||size<544||size>([213,214,215,216,217,218].includes(nrf52FirmwareVersion)?65520:61440))throw Error('Dữ liệu cũ chưa hợp lệ. Chưa ghi dữ liệu mới.');
+  if(v.getUint32(0,true)!==0x31544e56||size<544||size>([213,214,215,216,217,218,219,220,221,222].includes(nrf52FirmwareVersion)?65520:61440))throw Error('Dữ liệu cũ chưa hợp lệ. Chưa ghi dữ liệu mới.');
   setupStatus('Đang sao lưu nội dung hiện có. Ảnh trong album không bị thay đổi.');old=await read(base+16,size);
   if(crc32(old)!==v.getUint32(12,true)||deviceKey()!==key)throw Error('Chưa kiểm tra được dữ liệu cũ. Chưa ghi dữ liệu mới.');
   const saved=new Uint8Array(16+size);saved.set(header);saved.set(old,16);const name='dong-ho-sao-luu-'+Date.now()+'.bin';download(saved,name);
@@ -351,7 +383,7 @@ async function installUnified(force=false){
  }else{
   const r=await request(11);if(r.length!==7||r[6]>1)throw Error('Chưa xác nhận được vùng cài đặt.');blank=r[6]===1;
   if(!blank){
-   if(!confirm('Đồng hồ có dữ liệu chưa nhận diện được. Web sẽ tải bản sao lưu trước khi cài đặt. Tiếp tục?'))return;
+   if(!confirm('Bộ dữ liệu hiện có chưa đọc được. Web sẽ sao lưu toàn bộ bộ nhớ trước khi cài lại tài nguyên. Nội dung trong vùng dữ liệu hỏng có thể không khôi phục được; ảnh album không bị xóa. Tiếp tục?'))return;
    await makeBackup();if(!confirm('Bạn đã lưu file '+backup.name+' trên máy chưa? Chỉ tiếp tục khi đã giữ được bản sao lưu.')){setupStatus('Đã dừng trước khi ghi dữ liệu.');return;}
   }else if(!confirm('Cài đặt dữ liệu cho đồng hồ? Giữ kết nối và không tháo pin cho đến khi hoàn tất.'))return;
  }
