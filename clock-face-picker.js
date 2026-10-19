@@ -24,12 +24,12 @@ function unavailable(){
  return typeof gattServer==='undefined'||!gattServer?.connected?'Kết nối đồng hồ để xem những giao diện phù hợp.':'Đồng hồ này vẫn dùng nút chuyển giao diện phía trên. Các mẫu chọn trực tiếp chỉ hiện trên phiên bản có hỗ trợ.';
 }
 function blocked(){return !!(window.VNDataBusy?.()||window.EpdDfuBusy?.()||window.EpdAutoUpdate?.busy?.()||window.countdownOperationBusy||(typeof clockImageUploadBusy!=='undefined'&&clockImageUploadBusy));}
-function preview(){const d=device();if(!d)return;const n=Number($('clock-face-select').value),row=availableRows()[n];if(!row)return;$('clock-face-preview').src='face-previews/'+d.id+'-'+(n+1)+'.png';$('clock-face-preview').alt=label(row)+' — hình minh họa';$('clock-face-description').textContent=row===rows[0]&&label(row)!==row.name?'Giờ lớn với kiểu chữ 3D.':row.description;}
+function preview(){const d=device();if(!d)return;const n=Number($('clock-face-select').value),row=availableRows()[n];if(!row)return;$('clock-face-preview').src='face-previews/clock-'+(n+1)+'.png';$('clock-face-preview').alt=label(row)+' — hình minh họa';$('clock-face-description').textContent=row===rows[0]&&label(row)!==row.name?'Giờ lớn với kiểu chữ 3D.':row.description;}
 function refresh(){
  const d=device();$('clock-face-controls').hidden=!d;
  if(!d){$('clock-face-availability').textContent=unavailable();if(versionKey){versionKey='';$('clock-face-status').textContent='';}return;}
  if(versionKey!==d.key){versionKey=d.key;$('clock-face-select').replaceChildren();availableRows().forEach((r,i)=>{const option=document.createElement('option');option.value=String(i);option.textContent=label(r);$('clock-face-select').append(option);});const current=availableRows().findIndex(r=>r.modes[d.big?1:0]===nrf52DisplayMode);$('clock-face-select').value=String(current<0?0:current);$('clock-face-status').textContent='Chọn mẫu rồi bấm Hiển thị trên đồng hồ.';preview();}
- $('clock-face-availability').textContent='Đã nhận diện đồng hồ '+(d.big?'2.9':'2.13')+' inch. Hình bên dưới là mẫu minh họa; ngày giờ thực tế theo đồng hồ.';
+ $('clock-face-availability').textContent='Đã nhận diện đồng hồ '+(d.big?'2.9':'2.13')+' inch. Ảnh là mẫu minh họa dùng chung; ngày giờ thực tế theo đồng hồ.';
  $('clock-face-select').disabled=busy||blocked();$('clock-face-apply').disabled=busy||blocked();
 }
 async function apply(){

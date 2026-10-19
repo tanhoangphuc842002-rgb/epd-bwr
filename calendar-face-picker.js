@@ -15,12 +15,12 @@ function device(){
  return{key:[bleDevice?.id,nrf52PanelProfile,nrf52FirmwareVersion].join('|'),id,big,ch:epdCharacteristic};
 }
 function blocked(){return !!(window.VNDataBusy?.()||window.EpdDfuBusy?.()||window.EpdAutoUpdate?.busy?.()||window.countdownOperationBusy||(typeof clockImageUploadBusy!=='undefined'&&clockImageUploadBusy));}
-function preview(){const d=device(),n=Number($('calendar-face-select').value),row=rows[n];if(!d||!row)return;$('calendar-face-preview').src='calendar-previews/'+d.id+'-'+(n+1)+'.png';$('calendar-face-preview').alt=row.name+' — hình minh họa';$('calendar-face-description').textContent=row.description;}
+function preview(){const d=device(),n=Number($('calendar-face-select').value),row=rows[n];if(!d||!row)return;$('calendar-face-preview').src='face-previews/calendar-'+(n+1)+'.png';$('calendar-face-preview').alt=row.name+' — hình minh họa';$('calendar-face-description').textContent=row.description;}
 function refresh(){
  const d=device();$('calendar-face-controls').hidden=!d;
  if(!d){$('calendar-face-availability').textContent=typeof gattServer==='undefined'||!gattServer?.connected?'Kết nối đồng hồ để xem những giao diện lịch phù hợp.':'Đồng hồ này vẫn dùng nút Chuyển sang chế độ lịch phía trên. Cập nhật phần mềm có hỗ trợ để chọn trực tiếp.';versionKey='';return;}
  if(versionKey!==d.key){versionKey=d.key;$('calendar-face-select').replaceChildren();rows.forEach((r,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent=r.name;$('calendar-face-select').append(o);});const n=rows.findIndex(r=>r.modes[d.big?1:0]===nrf52DisplayMode);$('calendar-face-select').value=String(n<0?0:n);$('calendar-face-status').textContent='Chọn mẫu rồi bấm Hiển thị lịch trên đồng hồ.';preview();}
- $('calendar-face-availability').textContent='Đã nhận diện đồng hồ '+(d.big?'2.9':'2.13')+' inch. Chọn mẫu lịch bạn muốn dùng; ngày tháng thực tế theo đồng hồ.';
+ $('calendar-face-availability').textContent='Đã nhận diện đồng hồ '+(d.big?'2.9':'2.13')+' inch. Ảnh là mẫu minh họa dùng chung; ngày tháng thực tế theo đồng hồ.';
  $('calendar-face-select').disabled=busy||blocked();$('calendar-face-apply').disabled=busy||blocked();
 }
 async function apply(){
