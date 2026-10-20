@@ -975,6 +975,10 @@
         </select>
     </div>
 
+    <script src="website-en-1.js?v=8e40215a4a1d"></script>
+    <script src="website-en-2.js?v=912dc4029ee7"></script>
+    <script src="website-en-3.js?v=0e8ff17a56e4"></script>
+    <script src="website-i18n.js?v=ec8f3e081885"></script>
     <script>
         const APP_TRANSLATIONS = {
             vi: {
@@ -1229,65 +1233,13 @@
             }
         };
 
-        const i18nTextNodes = new WeakMap();
-        const i18nAttrs = ['placeholder', 'title', 'aria-label'];
-        const i18nSkipTags = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEXTAREA', 'CODE', 'PRE']);
-
-        function getCurrentLanguage() {
-            return localStorage.getItem('app-language') || 'vi';
-        }
-
-        function translateText(text, lang = getCurrentLanguage()) {
-            if (lang === 'en') return text;
-            return (APP_TRANSLATIONS[lang] && APP_TRANSLATIONS[lang][text]) || text;
-        }
-
-        function t(text) {
-            return translateText(text);
-        }
-
-        function translateTextNode(node, lang) {
-            const raw = node.nodeValue;
-            if (!raw || !raw.trim()) return;
-            const original = i18nTextNodes.get(node) || raw.replace(/\s+/g, ' ').trim();
-            i18nTextNodes.set(node, original);
-            const translated = translateText(original, lang);
-            const leading = raw.match(/^\s*/)[0];
-            const trailing = raw.match(/\s*$/)[0];
-            const nextValue = leading + translated + trailing;
-            if (node.nodeValue !== nextValue) node.nodeValue = nextValue;
-        }
-
-        function translateAttributes(element, lang) {
-            i18nAttrs.forEach(attr => {
-                if (!element.hasAttribute(attr)) return;
-                const key = `i18nOriginal${attr.replace(/(^|-)([a-z])/g, (_, dash, ch) => ch.toUpperCase())}`;
-                const original = element.dataset[key] || element.getAttribute(attr);
-                element.dataset[key] = original;
-                element.setAttribute(attr, translateText(original, lang));
-            });
-        }
-
-        function applyLanguage(lang = getCurrentLanguage()) {
-            localStorage.setItem('app-language', lang);
-            document.documentElement.lang = lang;
-            document.title = translateText('E-Paper Tag - Bluetooth Controller', lang);
-
-            const selector = document.getElementById('language-selector');
-            if (selector) selector.value = lang;
-
-            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
-                acceptNode(node) {
-                    const parent = node.parentElement;
-                    if (!parent || i18nSkipTags.has(parent.tagName)) return NodeFilter.FILTER_REJECT;
-                    return node.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
-                }
-            });
-
-            const nodes = [];
-            while (walker.nextNode()) nodes.push(walker.currentNode);
-            nodes.forEach(node => translateTextNode(node, lang));
-            document.querySelectorAll('[placeholder], [title], [aria-label]').forEach(element => translateAttributes(element, lang));
+        window.EpdWebsiteI18n.configure(APP_TRANSLATIONS.vi,window.EpdWebsiteEnglish);
+        function getCurrentLanguage(){return window.EpdWebsiteI18n.current();}
+        function translateText(text,lang=getCurrentLanguage()){return window.EpdWebsiteI18n.translate(text,lang);}
+        function t(text){return translateText(text);}
+        function applyLanguage(lang=getCurrentLanguage()){
+            window.EpdWebsiteI18n.apply(lang);
+            if(typeof updateTimeSetterLabel==='function')updateTimeSetterLabel();
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -1312,20 +1264,7 @@
             }
             applyLanguage(initialLanguage);
 
-            const observer = new MutationObserver(mutations => {
-                if (getCurrentLanguage() === 'en') return;
-                mutations.forEach(mutation => {
-                    mutation.addedNodes.forEach(node => {
-                        if (node.nodeType === Node.TEXT_NODE) translateTextNode(node, getCurrentLanguage());
-                        if (node.nodeType === Node.ELEMENT_NODE) {
-                            translateAttributes(node, getCurrentLanguage());
-                            node.querySelectorAll && node.querySelectorAll('[placeholder], [title], [aria-label]').forEach(element => translateAttributes(element, getCurrentLanguage()));
-                        }
-                    });
-                    if (mutation.type === 'characterData') translateTextNode(mutation.target, getCurrentLanguage());
-                });
-            });
-            observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+            window.EpdWebsiteI18n.observe();
         });
     </script>
    
@@ -1775,7 +1714,15 @@
             <button id="auto-update-check" type="button">Kiểm tra bản cập nhật</button>
             <p id="auto-update-status" role="status" aria-live="polite">Web tự chọn bản cập nhật cho đồng hồ tương thích. Nếu không có bản tự động, hãy dùng file được cung cấp ở bên dưới.</p>
         </div>
-        <div class="dfu-card" id="vn-setup-controls" style="margin-bottom:20px">
+        <section id="clock-language-panel" hidden style="border:1px solid #ddd;border-radius:8px;padding:16px;margin:16px 0">
+<h3>Ngôn ngữ đồng hồ / Clock language</h3>
+<p>Chọn ngôn ngữ rồi áp dụng. Lịch âm vẫn hiển thị; nội dung bạn nhập và ảnh được giữ nguyên. / Select a language and apply. Lunar dates, personal text and photos are kept.</p>
+<div id="clock-language-controls"><label for="clock-language-select">Ngôn ngữ / Language</label>
+<select id="clock-language-select"><option value="0">Tiếng Việt</option><option value="1">English</option></select>
+<button id="clock-language-read">Đọc lựa chọn / Read current</button><button id="clock-language-apply">Áp dụng vào đồng hồ / Apply to clock</button></div>
+<p id="clock-language-status" role="status">Ngày dd-mm-yyyy, giờ 24h. / Date dd-mm-yyyy, 24-hour time.</p>
+</section>
+<div class="dfu-card" id="vn-setup-controls" style="margin-bottom:20px">
             <h3>Cài đặt và khôi phục đồng hồ</h3>
             <p>Nếu sau khi thay pin màn hình hiện NO DATA, bấm <strong>Khôi phục đồng hồ</strong>. Web sẽ thử đọc lại dữ liệu trước, không tự xóa ảnh hoặc nội dung đã lưu. Nếu cần cập nhật phần mềm, trang sẽ hướng dẫn từng bước.</p>
             <p>Dùng khi cài lần đầu, khi màn hình báo thiếu dữ liệu hoặc khi được hướng dẫn cập nhật dữ liệu. Kết nối đồng hồ rồi bấm Cài đặt đồng hồ; web sẽ tự chọn dữ liệu phù hợp.</p>
@@ -2328,9 +2275,9 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         function applyBayerDithering(ctx, width, height, threshold, diffusion = 1.0, isColor = false) {
             const bayerThresholdMap = [
                 [15, 135, 45, 165],
-                [195,75,225,105,207,211,215,221],
+                [195,75,225,105,207,211,215,221,230],
                 [60, 180, 30, 150],
-                [240,120,210,90,214,218,220]
+                [240,120,210,90,214,218,220,224,229]
             ];
             const imageData = ctx.getImageData(0, 0, width, height);
             const data = imageData.data;
@@ -2559,9 +2506,9 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         function applyBWRBayerDithering(ctx, width, height, threshold, diffusion = 1.0) {
             const bayerThresholdMap = [
                 [15, 135, 45, 165],
-                [195,75,225,105,207,211,215,221],
+                [195,75,225,105,207,211,215,221,230],
                 [60, 180, 30, 150],
-                [240,120,210,90,214,218,220]
+                [240,120,210,90,214,218,220,224,229]
             ];
             const imageData = ctx.getImageData(0, 0, width, height);
             const data = imageData.data;
@@ -3172,12 +3119,12 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             // 2.13 CE v19.2 reports panel profile 0x21 and app version 0x2B.
             if (nrf52PanelProfile === 0x21) return nrf52FirmwareVersion >= 0x2B;
             // The compatible 2.9 release reports model 2 and app version 0x22.
-            return (nrf52FirmwareVersion >= 0x22 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222].includes(nrf52FirmwareVersion);
+            return (nrf52FirmwareVersion >= 0x22 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231].includes(nrf52FirmwareVersion);
         }
         function nrf52WeekStartAckSupported() {
             return nrf52ModelDetected && nrf52ModelId === 2 &&
                 nrf52PanelProfile !== 0x21 &&
-                ((nrf52FirmwareVersion >= 0x23 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222].includes(nrf52FirmwareVersion));
+                ((nrf52FirmwareVersion >= 0x23 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231].includes(nrf52FirmwareVersion));
         }
         function waitForNrf52WeekStartAck(weekStart, timeoutMs = 8000) {
             if (nrf52WeekStartAckWaiter) {
@@ -3306,7 +3253,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         }
         async function sendNrf52Mode(mode) {
             const previousMode = nrf52DisplayMode;
-            const nativeCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29);
+            const nativeCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29);
             const actualMode = mode & (nativeCalendar ? 0x3f : 0x7f);
             // Save the calendar layout before SET_TIME triggers a redraw. The
             // firmware writes flash only when the value actually changes.
@@ -3325,12 +3272,12 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             await sendCommand(packet);
             nrf52DisplayMode = nativeCalendar && actualMode === 1 && !(mode & 0x40)
                 ? (previousMode === 1 ? 9 : previousMode === 9 ? (nrf52PanelProfile === 0x29 ? 5 : 7) : 1)
-                : actualMode === 2 && ((nrf52PanelProfile === 0x21 && [209,210,213,214,217,218,219,220].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x29 && [211,212,215,216,221,222].includes(nrf52FirmwareVersion)))
+                : actualMode === 2 && ((nrf52PanelProfile === 0x21 && [209,210,213,214,217,218,219,220,223,224,227,228,229].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x29 && [211,212,215,216,221,222,225,226,230,231].includes(nrf52FirmwareVersion)))
                     ? ((mode & 0x40) ? 2 : ((nrf52PanelProfile === 0x29 ? [2,3,4,10,11,12,13,2] : [2,3,4,5,10,11,12,2])[(nrf52PanelProfile === 0x29 ? [2,3,4,10,11,12,13] : [2,3,4,5,10,11,12]).indexOf(previousMode)+1] || 2))
-                : actualMode === 2 && ((nrf52PanelProfile === 0x21 && [205,206,209,210,213,214,217,218,219,220].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x29 && [207,208,211,212,215,216,221,222].includes(nrf52FirmwareVersion)))
+                : actualMode === 2 && ((nrf52PanelProfile === 0x21 && [205,206,209,210,213,214,217,218,219,220,223,224,227,228,229].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x29 && [207,208,211,212,215,216,221,222,225,226,230,231].includes(nrf52FirmwareVersion)))
                     ? ((mode & 0x40) ? 2 : ((nrf52PanelProfile === 0x29 ? [2,3,4,10,11,12,13,2] : [2,3,4,5,10,11,12,2])[(nrf52PanelProfile === 0x29 ? [2,3,4,10,11,12,13] : [2,3,4,5,10,11,12]).indexOf(previousMode)+1] || 2))
-                : actualMode === 2 && ((nrf52PanelProfile === 0x29 && [157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x21 && [151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220].includes(nrf52FirmwareVersion)))
-                    ? (previousMode === 2 ? 3 : previousMode === 3 ? 4 : previousMode === 4 ? (nrf52PanelProfile === 0x29 ? 10 : 5) : previousMode === 11 && nrf52PanelProfile === 0x29 && [183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222].includes(nrf52FirmwareVersion) ? 12 : previousMode === 10 && nrf52PanelProfile === 0x29 && [167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222].includes(nrf52FirmwareVersion) ? 11 : previousMode === 10 && nrf52PanelProfile === 0x21 && [178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220].includes(nrf52FirmwareVersion) ? 11 : previousMode === 5 && nrf52PanelProfile === 0x21 && [159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220].includes(nrf52FirmwareVersion) ? 10 : 2)
+                : actualMode === 2 && ((nrf52PanelProfile === 0x29 && [157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x21 && [151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229].includes(nrf52FirmwareVersion)))
+                    ? (previousMode === 2 ? 3 : previousMode === 3 ? 4 : previousMode === 4 ? (nrf52PanelProfile === 0x29 ? 10 : 5) : previousMode === 11 && nrf52PanelProfile === 0x29 && [183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231].includes(nrf52FirmwareVersion) ? 12 : previousMode === 10 && nrf52PanelProfile === 0x29 && [167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231].includes(nrf52FirmwareVersion) ? 11 : previousMode === 10 && nrf52PanelProfile === 0x21 && [178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229].includes(nrf52FirmwareVersion) ? 11 : previousMode === 5 && nrf52PanelProfile === 0x21 && [159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229].includes(nrf52FirmwareVersion) ? 10 : 2)
                     : (actualMode === 2 && previousMode === 2) ? 3 : actualMode;
             addLog(`nRF52 mode ${nrf52DisplayMode} command sent`);
         }
@@ -4484,7 +4431,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         async function setTime() {
             if (window.countdownOperationBusy) return;
             if (deviceProtocol === PROTOCOL_NRF52) {
-                const keepCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21 && [1,7,9].includes(nrf52DisplayMode)) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29 && [1,5,9].includes(nrf52DisplayMode));
+                const keepCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21 && [1,7,9].includes(nrf52DisplayMode)) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29 && [1,5,9].includes(nrf52DisplayMode));
                 await sendNrf52Mode(nrf52DisplayMode | (keepCalendar ? 0x40 : 0));
                 return;
             }
@@ -6827,29 +6774,31 @@ function toggleSwitch(e) {
 
 
 </script>
-<script src="crc32.min.js"></script>
-<script src="jszip.min.js"></script>
-<script src="secure-dfu-package.js"></script>
-<script src="secure-dfu.js"></script>
-<script src="ota-verifier.js"></script>
-<script src="ota-dual-update.js?v=61.39"></script>
-<script src="ota-auto-update.js?v=61.47"></script>
-<script src="countdown-nrf52.js"></script>
-<script src="countdown-da14585.js"></script>
-<script src="led-effects.js?v=61.47"></script>
-<script src="ble-write-queue.js"></script>
-<script src="vn-font-data.js"></script>
-<script src="face5-font-data.js"></script>
-    <script src="face5-sans-centered-data.js"></script>
-    <script src="face23-sans22-data.js"></script>
-    <script src="face4-sans36-data.js"></script><script src="face6-flip-data.js"></script><script src="face6-dark-top-data.js"></script><script src="face6-freesans-white-data.js"></script><script src="face6-white-213-data.js"></script><script src="face1-retro-213-data.js"></script><script src="face1-retro-290-data.js?v=61.39"></script><script src="face6-white-290-data.js?v=61.39"></script><script src="face6-290-data.js?v=61.39"></script>
-    <script src="sans290-data.js?v=61.39"></script><script src="sans290-classic-data.js?v=61.39"></script><script src="sans290-bold42-data.js?v=61.39"></script>
-    <script src="vn-operation.js?v=61.39"></script><script src="vn-todo.js?v=61.47"></script><script src="date-marks.js?v=61.47"></script><script src="daily-quotes-data.js?v=61.39"></script><script src="calendar-month-213-data.js?v=61.46"></script><script src="calendar-month-290-data.js?v=61.46"></script><script src="outline-213-data.js?v=61.45"></script><script src="outline-290-data.js?v=61.45"></script><script src="serif-213-data.js?v=61.43"></script><script src="serif-290-data.js?v=61.43"></script><script src="daily-quotes.js?v=61.47"></script><script src="daily-quote-panel.js?v=61.47"></script>
-<script src="photo-album.js?v=61.47"></script>
-<script src="clock-face-picker.js?v=61.47"></script>
-<script src="calendar-face-picker.js?v=61.47"></script>
-<script src="event-clock-data.js"></script>
-<script src="event-clock-290-data.js?v=61.39"></script>
+<script src="crc32.min.js?v=d1b1a7be0d7a"></script>
+<script src="jszip.min.js?v=45b3ffadbc78"></script>
+<script src="secure-dfu-package.js?v=d8d3c4c1214a"></script>
+<script src="secure-dfu.js?v=29ecdcf208d6"></script>
+<script src="ota-verifier.js?v=531f216ef5de"></script>
+<script src="ota-dual-update.js?v=25c9650ac4aa"></script>
+<script src="ota-auto-update.js?v=d766c49a0ae0"></script>
+<script src="countdown-nrf52.js?v=fc5f43fa9142"></script>
+<script src="countdown-da14585.js?v=db312a00c536"></script>
+<script src="led-effects.js?v=431e73ab5c61"></script>
+<script src="ble-write-queue.js?v=3a9376f9bbe0"></script>
+<script src="vn-font-data.js?v=8c4bba3d7ba3"></script>
+<script src="face5-font-data.js?v=cda1a34f4245"></script>
+    <script src="face5-sans-centered-data.js?v=e7fbecf4dbb7"></script>
+    <script src="face23-sans22-data.js?v=d99f2719fb87"></script>
+    <script src="face4-sans36-data.js?v=0bd3fb195566"></script><script src="face6-flip-data.js?v=40153a160b08"></script><script src="face6-dark-top-data.js?v=240e9ac16b14"></script><script src="face6-freesans-white-data.js?v=d0fc9fc6ca1e"></script><script src="face6-white-213-data.js?v=2684c121fc8d"></script><script src="face1-retro-213-data.js?v=2c2a8d4881e4"></script><script src="face1-retro-290-data.js?v=2f1ba7fc3a78"></script><script src="face6-white-290-data.js?v=cd037f540c37"></script><script src="face6-290-data.js?v=b3c450ea251e"></script>
+    <script src="sans290-data.js?v=d8ee1cdd678e"></script><script src="sans290-classic-data.js?v=2286d7b11b96"></script><script src="sans290-bold42-data.js?v=6483e04596db"></script>
+    <script src="language-290-resources-data.js?v=82420958b15a"></script>
+<script src="language-resources-data.js?v=c3e7c8eb2e30"></script>
+<script src="vn-operation.js?v=fd5ea3484992"></script><script src="vn-todo.js?v=ceabfbb4cc1b"></script><script src="date-marks.js?v=41fd8e01624e"></script><script src="daily-quotes-data.js?v=568ad63762f4"></script><script src="calendar-month-213-data.js?v=dcd75adc3ac6"></script><script src="calendar-month-290-data.js?v=2078a8947689"></script><script src="outline-213-data.js?v=5c4fb5adf44d"></script><script src="outline-290-data.js?v=3699020f18cf"></script><script src="serif-213-data.js?v=98f6c0a699b4"></script><script src="serif-290-data.js?v=e4d8e2ad66a8"></script><script src="daily-quotes.js?v=d6539b1125b0"></script><script src="daily-quote-panel.js?v=2882aba31752"></script>
+<script src="photo-album.js?v=96e386cda862"></script>
+<script src="clock-face-picker.js?v=6738208c6af6"></script>
+<script src="calendar-face-picker.js?v=d307eaf87a63"></script>
+<script src="event-clock-data.js?v=1277c0f499c0"></script>
+<script src="event-clock-290-data.js?v=06efe3c71fc0"></script>
 <!-- Unified clock setup is part of the normal settings panel. -->
 
 </body>

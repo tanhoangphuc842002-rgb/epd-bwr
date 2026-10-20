@@ -10,8 +10,8 @@ const rows=[
 let busy=false,versionKey='';
 function device(){
  if(typeof deviceProtocol==='undefined'||deviceProtocol!==PROTOCOL_NRF52||!gattServer?.connected||!nrf52ModelDetected||nrf52ModelId!==2||!epdCharacteristic)return null;
- const id=({213:'ce213',214:'noce213',215:'ce290',216:'noce290',217:'ce213-up3',218:'noce213-up3',219:'ce213-up3',220:'noce213-up3',221:'ce290',222:'noce290'})[nrf52FirmwareVersion],big=nrf52PanelProfile===0x29;
- if(!id||!(big?[215,216,221,222]:nrf52PanelProfile===0x21?[213,214,217,218,219,220]:[]).includes(nrf52FirmwareVersion))return null;
+ const id=({213:'ce213',214:'noce213',215:'ce290',216:'noce290',217:'ce213-up3',218:'noce213-up3',219:'ce213-up3',220:'noce213-up3',221:'ce290',222:'noce290',223:'ce213-up3',224:'noce213-up3',229:'noce213-up3',225:'ce290',230:'ce290',226:'noce290',231:'noce290',227:'ce213-up3',228:'ce213-up3'})[nrf52FirmwareVersion],big=nrf52PanelProfile===0x29;
+ if(!id||!(big?[215,216,221,222,225,226,230,231]:nrf52PanelProfile===0x21?[213,214,217,218,219,220,223,224,227,228,229]:[]).includes(nrf52FirmwareVersion))return null;
  return{key:[bleDevice?.id,nrf52PanelProfile,nrf52FirmwareVersion].join('|'),id,big,ch:epdCharacteristic};
 }
 function blocked(){return !!(window.VNDataBusy?.()||window.EpdDfuBusy?.()||window.EpdAutoUpdate?.busy?.()||window.countdownOperationBusy||(typeof clockImageUploadBusy!=='undefined'&&clockImageUploadBusy));}

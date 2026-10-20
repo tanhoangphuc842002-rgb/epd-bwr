@@ -11,7 +11,7 @@ const identities = {58:0x10,60:0x10,61:0x10,65:0x20,66:0x40,67:0x80,127:0x20,128
     function status(message) { $('led-status').textContent = message; }
     function log(message) {
         const target = $('led-log');
-        target.textContent += `${new Date().toLocaleTimeString('vi-VN')} ${message}\n`;
+        target.textContent += `${new Date().toLocaleTimeString('vi-VN')} ${typeof t==='function'?t(message):message}\n`;
         target.scrollTop = target.scrollHeight;
     }
     function controls() {
@@ -84,7 +84,7 @@ const identities = {58:0x10,60:0x10,61:0x10,65:0x20,66:0x40,67:0x80,127:0x20,128
         const supported213 = nrf52ModelId === 2 && nrf52PanelProfile === 0x21 && [0x34,0x36,0x38,0x41,0x42,127,128,129,130,131,132,137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194].includes(nrf52FirmwareVersion);
         const supported290 = typeof nrf52ModelId !== 'undefined' && nrf52ModelId === 2 &&
             nrf52PanelProfile !== 0x21 && [0x3A,0x3C,0x3D,0x43,135,136,145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196].includes(nrf52FirmwareVersion) &&
-            (![135,136,145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222].includes(nrf52FirmwareVersion) || nrf52PanelProfile===0x29);
+            (![135,136,145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231].includes(nrf52FirmwareVersion) || nrf52PanelProfile===0x29);
         if (!supported213 && !supported290)
             throw new Error('Đồng hồ đang kết nối chưa hỗ trợ điều khiển đèn. Các chức năng khác vẫn dùng bình thường.');
         if ((typeof clockImageUploadBusy !== 'undefined' && clockImageUploadBusy) || window.countdownOperationBusy || window.VNDataBusy?.())

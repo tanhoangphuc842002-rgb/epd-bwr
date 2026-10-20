@@ -7,7 +7,7 @@
  const ui=Object.fromEntries(ids.map(n=>[n,document.getElementById('dfu-'+n)]));
  const service='0000fe59-0000-1000-8000-00805f9b34fb';
  let busy=false,waiting=false,images=null,meta=null,info=null,phase=0,device=null,generation=0;
- const status=s=>{ui.status.textContent=s;},log=s=>{ui.log.value+='['+new Date().toLocaleTimeString('vi-VN')+'] '+s+'\n';ui.log.scrollTop=ui.log.scrollHeight;};
+ const status=s=>{ui.status.textContent=s;},log=s=>{ui.log.value+='['+new Date().toLocaleTimeString('vi-VN')+'] '+(typeof t==='function'?t(s):s)+'\n';ui.log.scrollTop=ui.log.scrollHeight;};
  function controls(){ui.file.disabled=busy;ui['start-button'].disabled=busy||!images;ui['new-device-button'].disabled=busy||!images;ui['clear-log-button'].disabled=busy;}
  const message=e=>e?.message||String(e);
  function release(){if(device?.gatt?.connected)device.gatt.disconnect();device=null;}
