@@ -1,12 +1,12 @@
 # Hướng dẫn dùng đồng hồ mực điện tử
 
-Web v61.49.1: chọn English ở đầu trang để đổi ngôn ngữ điều khiển. Không cần nạp lại firmware chỉ để sửa tiếng Anh của web. Ngôn ngữ trang web và ngôn ngữ hiển thị trên đồng hồ là hai lựa chọn riêng.
+Web v61.50: hàng thứ lớn trong mode lịch và tháng tiếng Anh viết tắt cần firmware mới tương thích. Chọn English ở đầu trang để đổi ngôn ngữ điều khiển. Thanh tiến trình đổi ngôn ngữ đồng hồ hiện ngay dưới nút Áp dụng. Ngôn ngữ trang web và ngôn ngữ hiển thị trên đồng hồ là hai lựa chọn riêng.
 
 ## English quick start
 
 Choose English at the top of the page. Connect your clock in E-Paper Settings, then set the current time. Use Software update → Set up clock only when resources are missing or an update is recommended. Choose a face in Settings on supported clocks. The page language does not change the clock's language or translate your personal text. To change the clock itself, use Clock language under Software update on supported firmware.
 
-After replacing the website files, reload without cache if old labels remain. This web-only update does not require flashing firmware. Sample images and personal content are kept as they are.
+After replacing the website files, reload without cache if old labels remain. The larger calendar weekday header and abbreviated English dates require the matching firmware update. Compatible clocks can update over encrypted OTA; reinstalling resources is not necessary when they are already complete. Sample images and personal content are kept as they are.
 
 Mở trang bằng trình duyệt có hỗ trợ Bluetooth. Kết nối đồng hồ trong thẻ Cài đặt màn hình rồi bấm Cài giờ để đồng bộ ngày giờ hiện tại.
 

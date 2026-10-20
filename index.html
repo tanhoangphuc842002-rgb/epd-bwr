@@ -975,9 +975,9 @@
         </select>
     </div>
 
-    <script src="website-en-1.js?v=8e40215a4a1d"></script>
+    <script src="website-en-1.js?v=904fa24bcf58"></script>
     <script src="website-en-2.js?v=912dc4029ee7"></script>
-    <script src="website-en-3.js?v=0e8ff17a56e4"></script>
+    <script src="website-en-3.js?v=34d64829e8a5"></script>
     <script src="website-i18n.js?v=ec8f3e081885"></script>
     <script>
         const APP_TRANSLATIONS = {
@@ -1720,7 +1720,12 @@
 <div id="clock-language-controls"><label for="clock-language-select">Ngôn ngữ / Language</label>
 <select id="clock-language-select"><option value="0">Tiếng Việt</option><option value="1">English</option></select>
 <button id="clock-language-read">Đọc lựa chọn / Read current</button><button id="clock-language-apply">Áp dụng vào đồng hồ / Apply to clock</button></div>
-<p id="clock-language-status" role="status">Ngày dd-mm-yyyy, giờ 24h. / Date dd-mm-yyyy, 24-hour time.</p>
+<div id="clock-language-progress-wrap" hidden aria-busy="false" style="margin-top:12px">
+<label for="clock-language-progress">Tiến trình đổi ngôn ngữ</label>
+<progress id="clock-language-progress" max="100" value="0" aria-describedby="clock-language-progress-detail" style="display:block;width:100%;height:18px;margin:8px 0;accent-color:#43a047"></progress>
+<p id="clock-language-progress-detail" role="status" aria-live="polite" style="margin:6px 0">Chưa bắt đầu.</p>
+</div>
+<p id="clock-language-status" role="status">Tiếng Việt: ngày-tháng-năm. English: 20 Oct 2026. Giờ / Time: 24h.</p>
 </section>
 <div class="dfu-card" id="vn-setup-controls" style="margin-bottom:20px">
             <h3>Cài đặt và khôi phục đồng hồ</h3>
@@ -3119,12 +3124,12 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             // 2.13 CE v19.2 reports panel profile 0x21 and app version 0x2B.
             if (nrf52PanelProfile === 0x21) return nrf52FirmwareVersion >= 0x2B;
             // The compatible 2.9 release reports model 2 and app version 0x22.
-            return (nrf52FirmwareVersion >= 0x22 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231].includes(nrf52FirmwareVersion);
+            return (nrf52FirmwareVersion >= 0x22 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235].includes(nrf52FirmwareVersion);
         }
         function nrf52WeekStartAckSupported() {
             return nrf52ModelDetected && nrf52ModelId === 2 &&
                 nrf52PanelProfile !== 0x21 &&
-                ((nrf52FirmwareVersion >= 0x23 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231].includes(nrf52FirmwareVersion));
+                ((nrf52FirmwareVersion >= 0x23 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235].includes(nrf52FirmwareVersion));
         }
         function waitForNrf52WeekStartAck(weekStart, timeoutMs = 8000) {
             if (nrf52WeekStartAckWaiter) {
@@ -3253,7 +3258,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         }
         async function sendNrf52Mode(mode) {
             const previousMode = nrf52DisplayMode;
-            const nativeCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29);
+            const nativeCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29);
             const actualMode = mode & (nativeCalendar ? 0x3f : 0x7f);
             // Save the calendar layout before SET_TIME triggers a redraw. The
             // firmware writes flash only when the value actually changes.
@@ -3272,12 +3277,12 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             await sendCommand(packet);
             nrf52DisplayMode = nativeCalendar && actualMode === 1 && !(mode & 0x40)
                 ? (previousMode === 1 ? 9 : previousMode === 9 ? (nrf52PanelProfile === 0x29 ? 5 : 7) : 1)
-                : actualMode === 2 && ((nrf52PanelProfile === 0x21 && [209,210,213,214,217,218,219,220,223,224,227,228,229].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x29 && [211,212,215,216,221,222,225,226,230,231].includes(nrf52FirmwareVersion)))
+                : actualMode === 2 && ((nrf52PanelProfile === 0x21 && [209,210,213,214,217,218,219,220,223,224,227,228,229,232,233].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x29 && [211,212,215,216,221,222,225,226,230,231,234,235].includes(nrf52FirmwareVersion)))
                     ? ((mode & 0x40) ? 2 : ((nrf52PanelProfile === 0x29 ? [2,3,4,10,11,12,13,2] : [2,3,4,5,10,11,12,2])[(nrf52PanelProfile === 0x29 ? [2,3,4,10,11,12,13] : [2,3,4,5,10,11,12]).indexOf(previousMode)+1] || 2))
-                : actualMode === 2 && ((nrf52PanelProfile === 0x21 && [205,206,209,210,213,214,217,218,219,220,223,224,227,228,229].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x29 && [207,208,211,212,215,216,221,222,225,226,230,231].includes(nrf52FirmwareVersion)))
+                : actualMode === 2 && ((nrf52PanelProfile === 0x21 && [205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x29 && [207,208,211,212,215,216,221,222,225,226,230,231,234,235].includes(nrf52FirmwareVersion)))
                     ? ((mode & 0x40) ? 2 : ((nrf52PanelProfile === 0x29 ? [2,3,4,10,11,12,13,2] : [2,3,4,5,10,11,12,2])[(nrf52PanelProfile === 0x29 ? [2,3,4,10,11,12,13] : [2,3,4,5,10,11,12]).indexOf(previousMode)+1] || 2))
-                : actualMode === 2 && ((nrf52PanelProfile === 0x29 && [157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x21 && [151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229].includes(nrf52FirmwareVersion)))
-                    ? (previousMode === 2 ? 3 : previousMode === 3 ? 4 : previousMode === 4 ? (nrf52PanelProfile === 0x29 ? 10 : 5) : previousMode === 11 && nrf52PanelProfile === 0x29 && [183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231].includes(nrf52FirmwareVersion) ? 12 : previousMode === 10 && nrf52PanelProfile === 0x29 && [167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231].includes(nrf52FirmwareVersion) ? 11 : previousMode === 10 && nrf52PanelProfile === 0x21 && [178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229].includes(nrf52FirmwareVersion) ? 11 : previousMode === 5 && nrf52PanelProfile === 0x21 && [159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229].includes(nrf52FirmwareVersion) ? 10 : 2)
+                : actualMode === 2 && ((nrf52PanelProfile === 0x29 && [157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x21 && [151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233].includes(nrf52FirmwareVersion)))
+                    ? (previousMode === 2 ? 3 : previousMode === 3 ? 4 : previousMode === 4 ? (nrf52PanelProfile === 0x29 ? 10 : 5) : previousMode === 11 && nrf52PanelProfile === 0x29 && [183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235].includes(nrf52FirmwareVersion) ? 12 : previousMode === 10 && nrf52PanelProfile === 0x29 && [167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235].includes(nrf52FirmwareVersion) ? 11 : previousMode === 10 && nrf52PanelProfile === 0x21 && [178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233].includes(nrf52FirmwareVersion) ? 11 : previousMode === 5 && nrf52PanelProfile === 0x21 && [159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233].includes(nrf52FirmwareVersion) ? 10 : 2)
                     : (actualMode === 2 && previousMode === 2) ? 3 : actualMode;
             addLog(`nRF52 mode ${nrf52DisplayMode} command sent`);
         }
@@ -4431,7 +4436,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         async function setTime() {
             if (window.countdownOperationBusy) return;
             if (deviceProtocol === PROTOCOL_NRF52) {
-                const keepCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21 && [1,7,9].includes(nrf52DisplayMode)) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29 && [1,5,9].includes(nrf52DisplayMode));
+                const keepCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21 && [1,7,9].includes(nrf52DisplayMode)) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29 && [1,5,9].includes(nrf52DisplayMode));
                 await sendNrf52Mode(nrf52DisplayMode | (keepCalendar ? 0x40 : 0));
                 return;
             }
@@ -6780,10 +6785,10 @@ function toggleSwitch(e) {
 <script src="secure-dfu.js?v=29ecdcf208d6"></script>
 <script src="ota-verifier.js?v=531f216ef5de"></script>
 <script src="ota-dual-update.js?v=25c9650ac4aa"></script>
-<script src="ota-auto-update.js?v=d766c49a0ae0"></script>
+<script src="ota-auto-update.js?v=c0346c203532"></script>
 <script src="countdown-nrf52.js?v=fc5f43fa9142"></script>
 <script src="countdown-da14585.js?v=db312a00c536"></script>
-<script src="led-effects.js?v=431e73ab5c61"></script>
+<script src="led-effects.js?v=3b8a559da2ce"></script>
 <script src="ble-write-queue.js?v=3a9376f9bbe0"></script>
 <script src="vn-font-data.js?v=8c4bba3d7ba3"></script>
 <script src="face5-font-data.js?v=cda1a34f4245"></script>
@@ -6793,10 +6798,10 @@ function toggleSwitch(e) {
     <script src="sans290-data.js?v=d8ee1cdd678e"></script><script src="sans290-classic-data.js?v=2286d7b11b96"></script><script src="sans290-bold42-data.js?v=6483e04596db"></script>
     <script src="language-290-resources-data.js?v=82420958b15a"></script>
 <script src="language-resources-data.js?v=c3e7c8eb2e30"></script>
-<script src="vn-operation.js?v=fd5ea3484992"></script><script src="vn-todo.js?v=ceabfbb4cc1b"></script><script src="date-marks.js?v=41fd8e01624e"></script><script src="daily-quotes-data.js?v=568ad63762f4"></script><script src="calendar-month-213-data.js?v=dcd75adc3ac6"></script><script src="calendar-month-290-data.js?v=2078a8947689"></script><script src="outline-213-data.js?v=5c4fb5adf44d"></script><script src="outline-290-data.js?v=3699020f18cf"></script><script src="serif-213-data.js?v=98f6c0a699b4"></script><script src="serif-290-data.js?v=e4d8e2ad66a8"></script><script src="daily-quotes.js?v=d6539b1125b0"></script><script src="daily-quote-panel.js?v=2882aba31752"></script>
-<script src="photo-album.js?v=96e386cda862"></script>
-<script src="clock-face-picker.js?v=6738208c6af6"></script>
-<script src="calendar-face-picker.js?v=d307eaf87a63"></script>
+<script src="vn-operation.js?v=fd5ea3484992"></script><script src="vn-todo.js?v=b74df1979cc2"></script><script src="date-marks.js?v=99726c830663"></script><script src="daily-quotes-data.js?v=568ad63762f4"></script><script src="calendar-month-213-data.js?v=dcd75adc3ac6"></script><script src="calendar-month-290-data.js?v=2078a8947689"></script><script src="outline-213-data.js?v=5c4fb5adf44d"></script><script src="outline-290-data.js?v=3699020f18cf"></script><script src="serif-213-data.js?v=98f6c0a699b4"></script><script src="serif-290-data.js?v=e4d8e2ad66a8"></script><script src="daily-quotes.js?v=de19dda59f11"></script><script src="daily-quote-panel.js?v=9cb7b1b77c9c"></script>
+<script src="photo-album.js?v=90e6623a343f"></script>
+<script src="clock-face-picker.js?v=7dc809197ad9"></script>
+<script src="calendar-face-picker.js?v=c4bd46bb270a"></script>
 <script src="event-clock-data.js?v=1277c0f499c0"></script>
 <script src="event-clock-290-data.js?v=06efe3c71fc0"></script>
 <!-- Unified clock setup is part of the normal settings panel. -->

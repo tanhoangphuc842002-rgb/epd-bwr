@@ -48,7 +48,7 @@ async function bank(){
  const b=await Q.readBank();if(key!==T.key())throw Error('Kết nối đã thay đổi. Hãy thử lại.');if(!b.tail.quote)throw Error('Chưa đọc được bản danh ngôn đã lưu. Chưa ghi thay đổi.');cache={...b,key};return cache;
 }
 async function commit(b,bytes){
- const key=T.key(),token=T.current();if(bytes.length>([213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231].includes(nrf52FirmwareVersion)?65520:61440))throw Error('Danh sách đã đầy vùng lưu. Hãy rút ngắn hoặc bỏ bớt câu.');
+ const key=T.key(),token=T.current();if(bytes.length>([213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235].includes(nrf52FirmwareVersion)?65520:61440))throw Error('Danh sách đã đầy vùng lưu. Hãy rút ngắn hoặc bỏ bớt câu.');
  if(key!==b.key||!same(await T.read(b.a,16),b.h))throw Error('Dữ liệu đã thay đổi. Hãy mở lại câu riêng để đọc bản mới.');
  const crc=T.crc32(bytes);if(!same(bytes,b.bytes)){
   T.guard(token);writeKey=key;await T.request(2,[...u32(0xc0decafe),bytes.length&255,bytes.length>>8,...u32(crc)]);

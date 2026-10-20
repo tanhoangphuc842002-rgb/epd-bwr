@@ -3,7 +3,7 @@
 'use strict';
 const $=id=>document.getElementById(id),T=window.VNTransport,enc=new TextEncoder(),dec=new TextDecoder('utf-8',{fatal:true});
 let busy=false,serial=0;
-function supported(){return typeof deviceProtocol!=='undefined'&&deviceProtocol===PROTOCOL_NRF52&&nrf52ModelDetected&&nrf52ModelId===2&&((nrf52PanelProfile===0x21&&[180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229].includes(nrf52FirmwareVersion))||(nrf52PanelProfile===0x29&&[183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231].includes(nrf52FirmwareVersion)));}
+function supported(){return typeof deviceProtocol!=='undefined'&&deviceProtocol===PROTOCOL_NRF52&&nrf52ModelDetected&&nrf52ModelId===2&&((nrf52PanelProfile===0x21&&[180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233].includes(nrf52FirmwareVersion))||(nrf52PanelProfile===0x29&&[183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235].includes(nrf52FirmwareVersion)));}
 const u32=n=>{const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,n,true);return b;};
 const clockMode=()=>nrf52PanelProfile===0x29?12:11;
 function status(s){$('date-mark-status').textContent=s;if(typeof addLog==='function')addLog('Đánh dấu ngày tháng: '+s);}

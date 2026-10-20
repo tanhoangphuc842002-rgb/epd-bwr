@@ -138,6 +138,7 @@ window.EpdWebsiteEnglish=Object.assign(window.EpdWebsiteEnglish||{},{
   "Ngôn ngữ / Language": "Language",
   "Đọc lựa chọn / Read current": "Read current language",
   "Áp dụng vào đồng hồ / Apply to clock": "Apply to clock",
+  "Tiếng Việt: ngày-tháng-năm. English: 20 Oct 2026. Giờ / Time: 24h.": "English date: 20 Oct 2026. 24-hour time. Older software may show numeric months.",
   "Ngày dd-mm-yyyy, giờ 24h. / Date dd-mm-yyyy, 24-hour time.": "Date dd-mm-yyyy, 24-hour time.",
   "Cài đặt và khôi phục đồng hồ": "Set up and recover your clock",
   "Nếu sau khi thay pin màn hình hiện NO DATA, bấm": "If NO DATA appears after replacing the battery, press",

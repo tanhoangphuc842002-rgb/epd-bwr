@@ -276,5 +276,12 @@ window.EpdWebsiteEnglish=Object.assign(window.EpdWebsiteEnglish||{},{
   ". Nội dung cá nhân được giữ nguyên.": ". Personal content is kept.",
   "Chưa hoàn tất / Not applied:": "Not applied:",
   "Hôm nay sống tốt, ngày mai thêm vui. Mỗi ngày một niềm vui.": "Make today count.\nOne small step every day.",
-  "Nhập mỗi câu trên một dòng.": "Enter one quote per line."
+  "Nhập mỗi câu trên một dòng.": "Enter one quote per line.",
+  "Tiến trình đổi ngôn ngữ": "Language update progress",
+  "Chưa bắt đầu.": "Not started.",
+  "Đang chuẩn bị dữ liệu…": "Preparing resources…",
+  "Đang tải lên đồng hồ:": "Uploading to clock:",
+  "Đang kiểm tra và hoàn tất…": "Verifying and finishing…",
+  "Hoàn tất: 100%": "Complete: 100%",
+  "Chưa hoàn tất. Hãy kiểm tra thông báo bên dưới.": "Not complete. Check the message below."
 });
