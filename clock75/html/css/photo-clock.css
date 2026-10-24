@@ -1,0 +1,39 @@
+#photoClockEditor { min-width:0; margin-top:20px; padding:18px; border:1px solid var(--border-color,#d8e0ea); border-radius:12px; scroll-margin-top:90px; }
+#canvas { touch-action:none; cursor:grab; width:800px; max-width:min(100%,800px,80vh); height:auto; }
+.countdown-settings { display:grid; gap:14px; max-width:700px; }
+.countdown-settings label { display:grid; grid-template-columns:150px minmax(0,1fr); gap:12px; align-items:center; }
+.countdown-settings input { width:100%; min-width:0; }
+.countdown-settings p { margin:0; }
+@media(max-width:500px) { .countdown-settings label { grid-template-columns:minmax(0,1fr); gap:6px; } }
+.image75-controls { margin:20px 0; padding:16px; background:var(--surface-alt,#f4f7fa); border:1px solid var(--border-color,#d8e0ea); border-radius:12px; }
+.image75-controls label { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+.image75-controls .photo-adjustments label { display:grid; grid-template-columns:150px minmax(80px,1fr); margin:12px 0; }
+.image75-controls input[type=range] { width:100%; }
+.image75-controls select { max-width:100%; }
+#photoClockEditor legend { padding:0 8px; font-size:18px; font-weight:700; }
+#photoClockEditor label { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin:10px 0; }
+#photoClockEditor input[type=file] { max-width:100%; }
+.photo-file-name { overflow-wrap:anywhere; font-size:13px; color:var(--text-secondary,#65748a); }
+.photo-editor-layout { display:flex; flex-direction:column; gap:12px; margin:16px 0; align-items:stretch; }
+.photo-editor-controls { min-width:0; }
+.photo-tool-row { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:12px 0; }
+.photo-tool-row button { min-width:40px; margin:0; padding:9px 12px; }
+.photo-tool-row output { min-width:44px; text-align:center; font-size:13px; }
+.photo-editor-preview { text-align:center; }
+#photoClockCanvas { display:block; width:100%; max-width:min(240px,33vh); height:auto; margin:0 auto 8px; border:1px solid #b5bfcd; border-radius:4px; background:#fff; touch-action:none; cursor:grab; }
+#photoClockCanvas:active { cursor:grabbing; }
+.photo-editor-preview small { color:var(--text-secondary,#65748a); }
+.photo-adjustments { margin:16px 0; }
+.photo-adjustments summary { cursor:pointer; font-weight:600; padding:8px 0; }
+#photoClockEditor .photo-adjustments label { display:grid; grid-template-columns:140px minmax(80px,1fr); }
+#photoClockEditor .photo-adjustments input { width:100%; }
+.photo-quick-status:empty { display:none; }
+.photo-quick-status { margin:12px 0 4px; font-size:14px; }
+.photo-editor-link { display:block; width:fit-content; margin-top:8px; }
+@media(max-width:700px) {
+ #photoClockEditor { padding:12px; }
+ .photo-editor-layout { grid-template-columns:minmax(0,1fr); gap:16px; }
+ .photo-editor-preview { grid-row:1; }
+ #photoClockCanvas { max-width:200px; }
+ #photoClockEditor .photo-adjustments label { grid-template-columns:120px minmax(80px,1fr); }
+}

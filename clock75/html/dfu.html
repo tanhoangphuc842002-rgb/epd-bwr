@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+	<script src="js/vi-ui.js?v=original-vi-5"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#2563eb">
+  <title>Cập nhật phần mềm · EPD Bộ điều khiển </title>
+  <link rel="shortcut icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="css/main.css?v=20261005d">
+</head>
+
+<body>
+  <main class="main dfu-page">
+    <header class="page-header">
+      <div>
+        <div class="page-kicker">EPD CONTROL / NORDIC DFU</div>
+        <h1>Cập nhật phần mềm</h1>
+        <p class="page-subtitle">Chọn phần mềm, Kết nối thiết bị, Làm theo các bước để cập nhật qua Bluetooth. </p>
+      </div>
+      <div class="page-actions">
+        <button id="themeToggle" type="button" class="secondary" aria-pressed="false">Giao diện tối</button>
+        <button id="dfuBackButton" type="button" class="secondary">Về trang điều khiển</button>
+      </div>
+    </header>
+
+    <section class="section" aria-labelledby="dfuFlowHeading">
+      <div class="section-heading">
+        <div>
+          <h2 id="dfuFlowHeading">Cập nhật phần mềm</h2>
+          <p class="section-note">Kiểm tra môi trường trước, rồi chuẩn bị Nordic Secure DFU Gói cập nhật. </p>
+        </div>
+        <button id="dfuSelfCheckButton" type="button" class="secondary">Kiểm tra môi trường</button>
+      </div>
+      <div class="device-info">
+        <b>Quy trình hiện tại</b><span id="dfuModeBadge" class="device-badge">Quy trình mặc định</span>
+      </div>
+      <p id="dfuModeHint" class="dfu-hint"></p>
+
+      <div class="dfu-steps-cards">
+        <article class="dfu-step-card" id="stepCardPkg" aria-labelledby="dfuPackageHeading">
+          <div class="step-badge step-pill">01</div>
+          <div class="step-body">
+            <h3 id="dfuPackageHeading">Chọn gói cập nhật</h3>
+            <p id="dfuPackageHint" class="step-desc">Chọn gói đã đóng thành Nordic Secure DFU Tệp （.zip）. </p>
+            <div class="step-action">
+              <label class="field-label" for="dfuPackageFile">Tệp cập nhật trên máy</label>
+              <input type="file" id="dfuPackageFile" accept=".zip" aria-describedby="dfuPackageHint">
+            </div>
+          </div>
+        </article>
+
+        <article class="dfu-step-card" id="stepCardSwitch" aria-labelledby="dfuSwitchHeading">
+          <div class="step-badge step-pill">02</div>
+          <div class="step-body">
+            <div class="dfu-step-heading">
+              <h3 id="dfuSwitchHeading">Vào chế độ cập nhật</h3>
+              <span class="device-badge">Không bắt buộc</span>
+            </div>
+            <p class="step-desc">Kết nối thiết bị đang chạy để khởi động vào DfuTarg. Nếu đã ở DfuTarg, chuyển thẳng sang bước tiếp theo.</p>
+            <div class="step-action">
+              <button id="dfuSwitchModeButton" type="button" class="secondary">Kết nối và vào DFU Chế độ </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="dfu-step-card" id="stepCardUpgrade" aria-labelledby="dfuUpgradeHeading">
+          <div class="step-badge step-pill">03</div>
+          <div class="step-body">
+            <h3 id="dfuUpgradeHeading">Kết nối thiết bị và cập nhật</h3>
+            <p class="step-desc">Chọn thiết bị cần cập nhật trong hộp thoại （Thường là DfuTarg）. Tự truyền phần mềm sau khi kết nối; Giữ nguồn điện ổn định trong khi cập nhật. </p>
+            <div class="step-action">
+              <button id="dfuStartButton" type="button" class="primary">Chọn thiết bị và cập nhật</button>
+              <button id="dfuManualPickButton" type="button" class="secondary" style="display:none;">Chọn thủ công DFU thiết bị và tiếp tục </button>
+              <button id="dfuAbandonSessionButton" type="button" class="secondary" disabled>Hủy phiên hiện tại</button>
+              <button id="dfuResetModeButton" type="button" class="secondary" disabled>Khôi phục quy trình mặc định</button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="dfu-status-panel" aria-label="Trạng thái cập nhật">
+        <div id="dfuStatus" class="dfu-status" role="status" aria-live="polite" aria-atomic="true">Chưa chọn DFU Gói cập nhật </div>
+        <div id="dfuPrecheck" class="dfu-precheck" style="display:none;"></div>
+        <div id="dfuRetryInfo" class="dfu-retry-info" style="display:none;"></div>
+        <div id="dfuProgressWrap" class="dfu-progress-wrap" style="display:none;" aria-label="Tiến độ truyền phần mềm">
+          <div id="dfuProgressBar" class="dfu-progress-bar"></div>
+          <div id="dfuProgressText" class="dfu-progress-text"></div>
+        </div>
+      </div>
+
+      <details class="help-details">
+        <summary>Thiết lập truyền nâng cao</summary>
+        <div class="dfu-options-group">
+          <label class="dfu-checkbox-label" for="dfuEnableAutoFind">
+            <input type="checkbox" id="dfuEnableAutoFind" aria-describedby="dfuAutoFindHint">
+            自动识别 DFU 设备
+          </label>
+          <p id="dfuAutoFindHint" class="dfu-hint">Mặc định tắt. unbonded DFU Sau khi khởi động lại MAC địa chỉ sẽ thay đổi, thường không tự nhận diện được; Tắt mục này để hiện hộp chọn thiết bị ngay sau khi khởi động lại. </p>
+          <div class="dfu-select-row">
+            <label for="dfuPrnValue">PRN Chia gói điều khiển luồng </label>
+            <select id="dfuPrnValue" aria-describedby="dfuPrnHint">
+              <option value="0">Tắt （PRN = 0, PC / Chrome Truyền nhanh ）</option>
+              <option value="12" selected>12（Mặc định, Khuyến nghị cho điện thoại / Tương thích cao ）</option>
+              <option value="16">16</option>
+              <option value="32">32</option>
+            </select>
+          </div>
+          <p id="dfuPrnHint" class="dfu-hint">Packet Receipt Notification: Khoảng xác nhận nhận dữ liệu của thiết bị. </p>
+        </div>
+      </details>
+
+      <details class="help-details">
+        <summary>Hướng dẫn kết nối và cập nhật</summary>
+        <div class="device-info">
+          <b>Cách vào</b><span id="dfuEntrySource" class="device-badge">Đang kiểm tra</span>
+        </div>
+        <p id="dfuEntryNotice" class="dfu-hint"></p>
+        <p id="dfuFlowGuide" class="dfu-hint">Trang mới không kế thừa kết nối Bluetooth. Bạn cần chọn lại thiết bị; sau khi vào bộ nạp, trình duyệt có thể yêu cầu cấp quyền cho DfuTarg lần nữa.</p>
+        <p class="dfu-hint">Trang dùng Nordic chính thức unbonded buttonless DFU Quy trình. Nên thực hiện trước “Kiểm tra môi trường ”, rồi chọn gói cập nhật; Thiết bị đang ở DfuTarg có thể bỏ qua bước 2, Kết nối trực tiếp và cập nhật. </p>
+      </details>
+    </section>
+
+    <section class="section" aria-labelledby="dfuLogHeading">
+      <div class="section-heading">
+        <div>
+          <h2 id="dfuLogHeading">Nhật ký cập nhật</h2>
+          <p class="section-note">Ghi lại gần nhất 200 thao tác và thông tin truyền, để kiểm tra lỗi cập nhật. </p>
+        </div>
+        <div class="log-toolbar">
+          <button id="exportLogButton" type="button" class="secondary">Xuất nhật ký</button>
+          <button id="dfuClearLogButton" type="button" class="secondary" aria-controls="log">Xóa nhật ký</button>
+        </div>
+      </div>
+      <details class="help-details log-details" open>
+        <summary>Xem nhật ký hoạt động</summary>
+        <div class="log-legend" aria-label="Loại nhật ký">
+          <span class="log-chip log-chip-info">Thông tin</span>
+          <span class="log-chip log-chip-warn">Thông báo</span>
+          <span class="log-chip log-chip-success">Tiến độ</span>
+          <span class="log-chip log-chip-error">Bất thường</span>
+        </div>
+        <div class="log-container" id="log" role="region" aria-label="DFU Nhật ký cập nhật " tabindex="0"></div>
+      </details>
+    </section>
+    <footer class="footer">
+      <div class="site-statistics" aria-label="Thống kê truy cập">
+        <span id="busuanzi_container_site_pv" style="display:none;">Tổng lượt truy cập <strong id="busuanzi_value_site_pv">—</strong> lần</span>
+        <span id="busuanzi_container_site_uv" style="display:none;">Số người truy cập <strong id="busuanzi_value_site_uv">—</strong> người</span>
+      </div>
+    </footer>
+  </main>
+
+  <div id="toast" class="toast-message" style="display:none;" role="status" aria-live="polite"></div>
+  <script type="text/javascript" src="js/dfu.js?v=20261004a"></script>
+  <script type="text/javascript" src="js/console_ui.js?v=20261004a"></script>
+  <script type="text/javascript" src="js/dfu_page.js?v=20261004a"></script>
+  <script src="js/site_statistics.js?v=20261004a"></script>
+</body>
+
+</html>

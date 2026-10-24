@@ -1,0 +1,186 @@
+{
+  "format": "EPD-VN-HOLIDAYS-1",
+  "years": [
+    2025,
+    2027
+  ],
+  "timezone": 7,
+  "note": "Ngày kỷ niệm/lễ hội không đồng nghĩa ngày nghỉ làm. Không cài lịch nghỉ bù/làm bù. Tết và Giỗ Tổ dùng âm lịch Việt Nam UTC+7; không lặp lễ trong tháng nhuận.",
+  "solar": [
+    {
+      "month": 1,
+      "day": 1,
+      "label": "Tết DL",
+      "name": "Tết Dương lịch"
+    },
+    {
+      "month": 2,
+      "day": 3,
+      "label": "Đảng",
+      "name": "Ngày thành lập Đảng Cộng sản Việt Nam"
+    },
+    {
+      "month": 2,
+      "day": 27,
+      "label": "Thầy thuốc",
+      "name": "Ngày Thầy thuốc Việt Nam"
+    },
+    {
+      "month": 3,
+      "day": 8,
+      "label": "Phụ nữ",
+      "name": "Ngày Quốc tế Phụ nữ"
+    },
+    {
+      "month": 3,
+      "day": 26,
+      "label": "Đoàn",
+      "name": "Ngày thành lập Đoàn TNCS Hồ Chí Minh"
+    },
+    {
+      "month": 4,
+      "day": 30,
+      "label": "30/4",
+      "name": "Ngày Giải phóng miền Nam, thống nhất đất nước"
+    },
+    {
+      "month": 5,
+      "day": 1,
+      "label": "Lao động",
+      "name": "Ngày Quốc tế Lao động"
+    },
+    {
+      "month": 5,
+      "day": 7,
+      "label": "ĐBP",
+      "name": "Ngày Chiến thắng Điện Biên Phủ"
+    },
+    {
+      "month": 5,
+      "day": 19,
+      "label": "Bác Hồ",
+      "name": "Ngày sinh Chủ tịch Hồ Chí Minh"
+    },
+    {
+      "month": 6,
+      "day": 1,
+      "label": "Thiếu nhi",
+      "name": "Ngày Quốc tế Thiếu nhi"
+    },
+    {
+      "month": 6,
+      "day": 28,
+      "label": "Gia đình",
+      "name": "Ngày Gia đình Việt Nam"
+    },
+    {
+      "month": 7,
+      "day": 27,
+      "label": "TB-LS",
+      "name": "Ngày Thương binh - Liệt sĩ"
+    },
+    {
+      "month": 8,
+      "day": 19,
+      "label": "CMT8",
+      "name": "Ngày Cách mạng tháng Tám thành công"
+    },
+    {
+      "month": 9,
+      "day": 2,
+      "label": "Quốc khánh",
+      "name": "Quốc khánh Việt Nam"
+    },
+    {
+      "month": 10,
+      "day": 20,
+      "label": "PNVN",
+      "name": "Ngày Phụ nữ Việt Nam"
+    },
+    {
+      "month": 11,
+      "day": 20,
+      "label": "Nhà giáo",
+      "name": "Ngày Nhà giáo Việt Nam"
+    },
+    {
+      "month": 12,
+      "day": 22,
+      "label": "QĐND",
+      "name": "Ngày thành lập Quân đội nhân dân Việt Nam"
+    }
+  ],
+  "lunar": [
+    {
+      "month": 1,
+      "day": 1,
+      "label": "Tết",
+      "name": "Tết Nguyên đán"
+    },
+    {
+      "month": 1,
+      "day": 2,
+      "label": "Mùng 2",
+      "name": "Mùng 2 Tết"
+    },
+    {
+      "month": 1,
+      "day": 3,
+      "label": "Mùng 3",
+      "name": "Mùng 3 Tết"
+    },
+    {
+      "month": 1,
+      "day": 15,
+      "label": "Nguyên tiêu",
+      "name": "Tết Nguyên tiêu"
+    },
+    {
+      "month": 3,
+      "day": 3,
+      "label": "Hàn thực",
+      "name": "Tết Hàn thực"
+    },
+    {
+      "month": 3,
+      "day": 10,
+      "label": "Giỗ Tổ",
+      "name": "Giỗ Tổ Hùng Vương"
+    },
+    {
+      "month": 5,
+      "day": 5,
+      "label": "Đoan Ngọ",
+      "name": "Tết Đoan Ngọ"
+    },
+    {
+      "month": 7,
+      "day": 15,
+      "label": "Vu Lan",
+      "name": "Lễ Vu Lan"
+    },
+    {
+      "month": 8,
+      "day": 15,
+      "label": "Trung thu",
+      "name": "Tết Trung thu"
+    },
+    {
+      "month": 12,
+      "day": 23,
+      "label": "Ông Táo",
+      "name": "Lễ ông Công, ông Táo"
+    },
+    {
+      "month": 12,
+      "day": 30,
+      "label": "Giao thừa",
+      "name": "Giao thừa"
+    }
+  ],
+  "sources": [
+    "https://www.moc.gov.vn/vn/tin-tuc/1326/91070/huong-dan-ky-niem-cac-ngay-le-lon-va-su-kien-lich-su-quan-trong-trong-nam-2026.aspx",
+    "https://xaydungchinhsach.chinhphu.vn/toan-van-quyet-dinh-so-167-hdbt-ve-ngay-nha-giao-viet-nam-119231120070916265.htm",
+    "https://xaydungchinhsach.chinhphu.vn/lich-nghi-le-gio-to-hung-vuong-30-4-1-5-quoc-khanh-2-9-nam-2026-119260222115822151.htm"
+  ]
+}

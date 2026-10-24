@@ -1,0 +1,338 @@
+{
+  "year_min": 2025,
+  "year_max": 2027,
+  "holiday_year": 2026,
+  "month_names": [
+    "--",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12"
+  ],
+  "leap_names": [
+    "",
+    " nhuận"
+  ],
+  "date_names": [
+    "--",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16",
+    "17",
+    "18",
+    "19",
+    "20",
+    "21",
+    "22",
+    "23",
+    "24",
+    "25",
+    "26",
+    "27",
+    "28",
+    "29",
+    "30"
+  ],
+  "weekday_names": [
+    "CN",
+    "Thứ 2",
+    "Thứ 3",
+    "Thứ 4",
+    "Thứ 5",
+    "Thứ 6",
+    "Thứ 7"
+  ],
+  "zodiac_names": [
+    "Khỉ",
+    "Gà",
+    "Chó",
+    "Lợn",
+    "Chuột",
+    "Trâu",
+    "Hổ",
+    "Mèo",
+    "Rồng",
+    "Rắn",
+    "Ngựa",
+    "Dê"
+  ],
+  "stem_names": [
+    "Canh",
+    "Tân",
+    "Nhâm",
+    "Quý",
+    "Giáp",
+    "Ất",
+    "Bính",
+    "Đinh",
+    "Mậu",
+    "Kỷ"
+  ],
+  "branch_names": [
+    "Thân",
+    "Dậu",
+    "Tuất",
+    "Hợi",
+    "Tý",
+    "Sửu",
+    "Dần",
+    "Mão",
+    "Thìn",
+    "Tỵ",
+    "Ngọ",
+    "Mùi"
+  ],
+  "jieqi_names": [
+    "Tiểu Hàn",
+    "Đại Hàn",
+    "Lập Xuân",
+    "Vũ Thủy",
+    "Kinh Trập",
+    "Xuân Phân",
+    "Thanh Minh",
+    "Cốc Vũ",
+    "Lập Hạ",
+    "Tiểu Mãn",
+    "Mang Chủng",
+    "Hạ Chí",
+    "Tiểu Thử",
+    "Đại Thử",
+    "Lập Thu",
+    "Xử Thử",
+    "Bạch Lộ",
+    "Thu Phân",
+    "Hàn Lộ",
+    "Sương Giáng",
+    "Lập Đông",
+    "Tiểu Tuyết",
+    "Đại Tuyết",
+    "Đông Chí"
+  ],
+  "lunar_month_days": [
+    2024,
+    2412,
+    54446,
+    5276,
+    6732
+  ],
+  "solar_new_year": [
+    2024,
+    1036362,
+    1036861,
+    1037393,
+    1037894
+  ],
+  "jieqi_year_bits": [
+    15,
+    239,
+    219,
+    190,
+    166,
+    153,
+    156,
+    162,
+    152,
+    128,
+    0,
+    24
+  ],
+  "jieqi_base_days": [
+    6,
+    20,
+    4,
+    19,
+    6,
+    21,
+    5,
+    20,
+    6,
+    21,
+    6,
+    21,
+    7,
+    23,
+    8,
+    23,
+    8,
+    23,
+    8,
+    24,
+    8,
+    22,
+    7,
+    22
+  ],
+  "solar_festivals": [
+    {
+      "month": 1,
+      "day": 1,
+      "name": "Tết DL"
+    },
+    {
+      "month": 2,
+      "day": 3,
+      "name": "Đảng"
+    },
+    {
+      "month": 2,
+      "day": 27,
+      "name": "Thầy thuốc"
+    },
+    {
+      "month": 3,
+      "day": 8,
+      "name": "Phụ nữ"
+    },
+    {
+      "month": 3,
+      "day": 26,
+      "name": "Đoàn"
+    },
+    {
+      "month": 4,
+      "day": 30,
+      "name": "30/4"
+    },
+    {
+      "month": 5,
+      "day": 1,
+      "name": "Lao động"
+    },
+    {
+      "month": 5,
+      "day": 7,
+      "name": "ĐBP"
+    },
+    {
+      "month": 5,
+      "day": 19,
+      "name": "Bác Hồ"
+    },
+    {
+      "month": 6,
+      "day": 1,
+      "name": "Thiếu nhi"
+    },
+    {
+      "month": 6,
+      "day": 28,
+      "name": "Gia đình"
+    },
+    {
+      "month": 7,
+      "day": 27,
+      "name": "TB-LS"
+    },
+    {
+      "month": 8,
+      "day": 19,
+      "name": "CMT8"
+    },
+    {
+      "month": 9,
+      "day": 2,
+      "name": "Quốc khánh"
+    },
+    {
+      "month": 10,
+      "day": 20,
+      "name": "PNVN"
+    },
+    {
+      "month": 11,
+      "day": 20,
+      "name": "Nhà giáo"
+    },
+    {
+      "month": 12,
+      "day": 22,
+      "name": "QĐND"
+    }
+  ],
+  "lunar_festivals": [
+    {
+      "month": 1,
+      "day": 1,
+      "name": "Tết"
+    },
+    {
+      "month": 1,
+      "day": 2,
+      "name": "Mùng 2"
+    },
+    {
+      "month": 1,
+      "day": 3,
+      "name": "Mùng 3"
+    },
+    {
+      "month": 1,
+      "day": 15,
+      "name": "Nguyên tiêu"
+    },
+    {
+      "month": 3,
+      "day": 3,
+      "name": "Hàn thực"
+    },
+    {
+      "month": 3,
+      "day": 10,
+      "name": "Giỗ Tổ"
+    },
+    {
+      "month": 5,
+      "day": 5,
+      "name": "Đoan Ngọ"
+    },
+    {
+      "month": 7,
+      "day": 15,
+      "name": "Vu Lan"
+    },
+    {
+      "month": 8,
+      "day": 15,
+      "name": "Trung thu"
+    },
+    {
+      "month": 12,
+      "day": 23,
+      "name": "Ông Táo"
+    },
+    {
+      "month": 12,
+      "day": 30,
+      "name": "Giao thừa"
+    }
+  ],
+  "holidays": [],
+  "special_festival_names": [
+    "Giao thừa",
+    "",
+    "",
+    "",
+    "Thanh Minh"
+  ]
+}

@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+	<script src="js/vi-ui.js?v=original-vi-5.9.3-customer"></script>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Bộ điều khiển đồng hồ 7.5</title>
+	<link rel="shortcut icon" type="image/png" href="favicon.png">
+	<meta name="theme-color" content="#2563eb">
+	<link rel="stylesheet" href="css/main.css?v=5.9.8-log">
+	<link rel="stylesheet" href="css/photo-clock.css?v=5.9.3">
+</head>
+
+<body>
+	<a class="skip-link" href="#deviceConnection">Đến phần kết nối thiết bị</a>
+	<main class="main console-page">
+		<header class="page-header">
+			<div class="brand">
+				<div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><rect x="5" y="6" width="22" height="17" rx="3" stroke="currentColor" stroke-width="2"/><path d="M10 12h12M10 17h7M12 27h8M16 23v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+				<div><p class="page-kicker">ĐỒNG HỒ 7.5</p><h1>Bộ điều khiển đồng hồ 7.5</h1><p class="page-subtitle">Kết nối đồng hồ để chọn chế độ, gửi ảnh và lưu những ngày quan trọng. </p></div>
+			</div>
+			<div class="page-actions">
+				<button id="openActivityLogButton" type="button" class="secondary" onclick="ConsoleUI.openLog()">Nhật ký</button>
+				<button id="openMainPageButton" type="button" class="secondary" onclick="openMainPage()"><span aria-hidden="true">←</span> Trang chính</button>
+				<button id="themeToggle" type="button" class="secondary" aria-pressed="false">Giao diện tối</button>
+				<button id="openDfuPageButton" type="button" class="secondary" onclick="openDfuPage()">Cài đặt <span aria-hidden="true">↗</span></button>
+			</div>
+		</header>
+		<nav id="workspaceNav" class="workspace-nav" aria-label="Điều hướng">
+			<a class="active" href="#deviceConnection" aria-current="location">Kết nối thiết bị</a>
+			<a href="#imageWorkspace">Chỉnh sửa và truyền ảnh</a>
+			<a href="#photoClockEditor">Đồng hồ+ảnh</a>
+			<a href="#todoWorkspace">Việc cần làm</a>
+			<a href="#calendarWorkspace">Đánh dấu ngày</a>
+			<a href="#countdownWorkspace">Đồng hồ đếm ngược</a>
+			<a href="#externalResources">Cài đặt đồng hồ</a>
+		</nav>
+		<div class="overview-grid">
+		<section id="deviceConnection" class="section connection-section" aria-labelledby="connectionHeading">
+			<div class="section-heading"><div><p class="section-kicker">KẾT NỐI</p><h2 id="connectionHeading">Kết nối thiết bị</h2></div><span id="connectionBadge" class="connection-badge" data-state="disconnected" role="status"><span class="status-dot" aria-hidden="true"></span><span id="connectionLabel">Chưa kết nối</span></span></div>
+			<p id="connectionDetail" class="section-note">Sau khi kết nối Bluetooth, tự đồng bộ giờ và đọc thông tin thiết bị. </p>
+			<div class="flex-container">
+				<div class="flex-group">
+					<button id="connectbutton" type="button" class="primary" onclick="preConnect()">Kết nối thiết bị</button>
+					<button id="reconnectbutton" type="button" class="secondary" onclick="reConnect()">Kết nối lại</button>
+					<button id="deviceFilterToggle" type="button" class="secondary" onclick="toggleDeviceFilter()">Không lọc thiết bị</button>
+				</div>
+				<div class="flex-group right debug">
+					<label for="epddriver">Bộ điều khiển</label>
+					<select id="epddriver" onchange="updateDitcherOptions()">
+						<option value="01" data-color="blackWhiteColor" data-size="4.2_400_300">4.2 inch (đen trắng, UC8176)
+						</option>
+						<option value="03" data-color="threeColor" data-size="4.2_400_300">4.2inch (3 màu , UC8176)</option>
+						<option value="04" data-color="blackWhiteColor" data-size="4.2_400_300">4.2 inch (đen trắng, SSD1619)
+						</option>
+						<option value="02" data-color="threeColor" data-size="4.2_400_300">4.2inch (3 màu , SSD1619)</option>
+						<option value="05" data-color="fourColor" data-size="4.2_400_300">4.2inch (4 màu , JD79668)</option>
+						<option value="06" data-color="blackWhiteColor" data-size="7.5_800_480">7.5 inch (đen trắng, UC8179)
+						</option>
+						<option value="07" selected data-color="threeColor" data-size="7.5_800_480">7.5inch (3 màu , UC8179)</option>
+						<option value="0c" data-color="fourColor" data-size="7.5_800_480">7.5inch (4 màu , JD79668)</option>
+						<option value="08" data-color="blackWhiteColor" data-size="7.5_640_384">7.5 inch độ phân giải thấp (đen trắng, UC8159)
+						</option>
+						<option value="09" data-color="threeColor" data-size="7.5_640_384">7.5inch độ phân giải thấp (3 màu , UC8159)</option>
+						<option value="0a" data-color="blackWhiteColor" data-size="7.5_880_528">7.5 inch HD (đen trắng, SSD1677)
+						</option>
+						<option value="0b" data-color="threeColor" data-size="7.5_880_528">7.5inch HD (3 màu , SSD1677)</option>
+					</select>
+				</div>
+				<div class="flex-group debug">
+					<label for="epdpins">Chân kết nối</label>
+					<input id="epdpins" type="text" value="">
+					<button id="setDriverbutton" type="button" class="primary" onclick="setDriver()">Xác nhận</button>
+				</div>
+			</div>
+			<div class="device-info">
+				<div class="device-metric"><span class="metric-label">Điện áp pin</span><span id="batteryVoltage" class="metric-value">Chưa kết nối</span><span id="batteryWarning" class="device-warning" style="display:none;"></span></div>
+				<div class="device-metric debug"><span class="metric-label">Phiên bản phần mềm</span><span id="firmwareVersion" class="metric-value">Chưa kết nối</span></div>
+			</div>
+			<details id="activityLog" class="help-details connection-log" open><summary>Nhật ký hoạt động</summary><div class="log-toolbar"><span class="dfu-hint">Giữ lại 200 dòng gần nhất</span><div class="flex-group"><button id="exportLogButton" type="button" class="secondary">Tải nhật ký</button><button type="button" class="secondary" onclick="clearLog()">Xóa</button></div></div><div class="log-container" id="log" aria-label="Nhật ký hoạt động"></div></details>
+		</section>
+		<section id="deviceControls" class="section" aria-labelledby="controlsHeading">
+			<div class="section-heading"><div><p class="section-kicker">CHỌN CHẾ ĐỘ</p><h2 id="controlsHeading">Điều khiển thiết bị</h2></div><span class="device-badge">Đồng bộ giờ</span></div>
+			<p class="section-note">Chọn chế độ hiển thị, đồng thời đồng bộ giờ từ máy này sang đồng hồ. </p>
+			<div class="flex-container">
+				<div class="flex-group">
+					<label for="weekStart">Ngày đầu tuần</label>
+					<select id="weekStart">
+						<option value="0" selected>Chủ Nhật</option>
+						<option value="1">Thứ Hai</option>
+						<option value="2">Thứ Ba</option>
+						<option value="3">Thứ Tư</option>
+						<option value="4">Thứ Năm</option>
+						<option value="5">Thứ Sáu</option>
+						<option value="6">Thứ Bảy</option>
+					</select>
+				</div>
+				<div class="flex-group mode-actions">
+					<button id="calendarmodebutton" type="button" class="primary" onclick="syncTime(1)">Chế độ lịch</button>
+					<button id="clockmodebutton" type="button" class="primary" onclick="syncTime(2)">Đồng hồ + Lịch </button>
+					<button id="countdown75ModeButton" type="button" class="primary" onclick="Countdown75.show()" disabled>Đồng hồ đếm ngược</button>
+					<button id="photoclockmodebutton" type="button" class="primary" onclick="PhotoClock.show()" disabled>Đồng hồ+ảnh</button>
+					<button id="todocalendarmodebutton" type="button" class="primary" onclick="syncTime(4)" disabled>Việc cần làm + Lịch </button>
+					<button id="todofullmodebutton" type="button" class="primary" onclick="syncTime(5)" disabled>Việc cần làm toàn màn</button>
+					<button id="legacyclockbutton" type="button" class="primary" onclick="syncTimeLegacy()"
+						style="display:none;">Đồng hồ toàn màn</button>
+					<button id="clearscreenbutton" type="button" class="secondary" onclick="clearScreen()">Xóa màn hình</button>
+				</div>
+				<div class="flex-group right debug">
+					<input type="text" id="cmdTXT" value="" aria-label="Lệnh thiết bị dạng hex" placeholder="Lệnh hex">
+					<button id="sendcmdbutton" type="button" class="primary" onclick="sendcmd()">Gửi lệnh</button>
+				</div>
+			</div>
+			<p id="countdown75QuickStatus" class="photo-quick-status" role="status" aria-live="polite"></p>
+			<a class="photo-editor-link" href="#countdownWorkspace">Đặt ngày kết thúc đếm ngược</a>
+			<p id="photoClockQuickStatus" class="photo-quick-status" role="status" aria-live="polite"></p>
+			<a class="photo-editor-link" href="#photoClockEditor">Chọn hoặc chỉnh ảnh cho Đồng hồ+ảnh</a>
+		</section>
+		</div>
+		<section id="imageWorkspace" class="section image-section" aria-labelledby="imageHeading">
+			<div class="section-heading"><div><p class="section-kicker">ẢNH CỦA BẠN</p><h2 id="imageHeading">Chỉnh sửa và truyền ảnh</h2></div><span class="device-badge">Chỉnh sửa · Xem trước · Gửi </span></div>
+			<p class="section-note">Chọn ảnh, căn chỉnh trong khung rồi bấm Gửi ảnh. Mục này dành cho đồng hồ 7.5 inch đen, trắng, đỏ. </p>
+			<div id="imageDropZone" class="image-drop-zone">
+				<div class="upload-icon" aria-hidden="true">↥</div><div class="upload-copy"><label for="imageFile">Chọn ảnh, hoặc kéo thả vào đây </label><p>PNG / JPG / BMP / WebP · Kéo ảnh để căn khung, phóng to hoặc thu nhỏ tùy ý </p><p id="imageFileName" role="status">Chưa chọn ảnh</p></div>
+				<input type="file" id="imageFile" accept=".png,.jpg,.bmp,.webp,.jpeg" onchange="updateImage()" aria-label="Chọn ảnh cần chỉnh sửa">
+			</div>
+			<div class="flex-container options">
+				<div class="flex-group">
+					<label for="canvasSize">Kích thước ảnh :</label>
+					<select id="canvasSize" onchange="updateCanvasSize()"><option value="7.5_800_480" selected>7.5 inch · 800 × 480</option></select>
+				</div>
+				<div class="flex-group">
+					<label for="ditherMode">Chế độ màu :</label>
+					<select id="ditherMode" onchange="applyDither()"><option value="threeColor" selected>Đen · Trắng · Đỏ</option></select>
+				</div>
+				<div class="flex-group debug">
+					<label for="ditherAlg">Thuật toán tạo hạt :</label>
+					<select id="ditherAlg" onchange="applyDither()">
+						<option value="floydSteinberg">Floyd-Steinberg</option>
+						<option value="atkinson">Atkinson</option>
+						<option value="bayer">Bayer</option>
+						<option value="stucki">Stucki</option>
+						<option value="jarvis">Jarvis-Judice-Ninke</option>
+						<option value="none">Không tạo hạt</option>
+					</select>
+				</div>
+				<div class="flex-group debug">
+					<label for="ditherStrength">Mức tạo hạt :</label>
+					<input type="range" min="0" max="5" step="0.1" value="1.0" id="ditherStrength">
+					<label id="ditherStrengthValue">1.0</label>
+				</div>
+				<div class="flex-group debug">
+					<label for="ditherContrast">Độ tương phản :</label>
+					<input type="range" min="0.5" max="2" step="0.1" value="1.2" id="ditherContrast">
+					<label id="ditherContrastValue">1.2</label>
+				</div>
+				<button id="resetImageAdjustmentsButton" type="button" class="secondary debug">Đặt lại hiệu ứng</button>
+			</div>
+			<div class="flex-container options">
+				<div class="flex-group debug">
+					<label for="mtusize">MTU:</label>
+					<input type="number" id="mtusize" value="20" min="0" max="255">
+					<label for="interleavedcount">Khoảng xác nhận :</label>
+					<input type="number" id="interleavedcount" value="50" min="0" max="500">
+				</div>
+			</div>
+			<div class="status-bar" role="status" aria-live="polite"><b>Trạng thái truyền: </b><span id="status"></span></div>
+			<div class="orientation-hint"><b>Hướng ảnh: </b><span id="orientationBadge">Đang nhận diện ...</span></div>
+			<div class="canvas-container">
+				<div class="canvas-title"></div>
+				<canvas id="canvas" width="800" height="480" aria-label="Vùng chỉnh sửa ảnh"></canvas>
+				<p id="paint-tool-status" class="paint-tool-status" role="status" aria-live="polite"></p>
+			<div class="image75-controls">
+				<label for="image75Fit">Cách đặt ảnh <select id="image75Fit" data-image75-edit><option value="cover">Phủ kín khung</option><option value="contain">Giữ toàn bộ ảnh</option></select></label>
+				<div class="photo-tool-row" aria-label="Căn chỉnh ảnh">
+					<button type="button" data-image75-edit data-image75-action="rotateLeft">Xoay trái</button>
+					<button type="button" data-image75-edit data-image75-action="rotateRight">Xoay phải</button>
+					<button type="button" data-image75-edit data-image75-action="zoomOut" aria-label="Thu nhỏ">−</button>
+					<output id="image75ZoomValue">100%</output>
+					<button type="button" data-image75-edit data-image75-action="zoomIn" aria-label="Phóng to">+</button>
+					<button type="button" data-image75-edit data-image75-action="left" aria-label="Dịch trái">←</button>
+					<button type="button" data-image75-edit data-image75-action="up" aria-label="Dịch lên">↑</button>
+					<button type="button" data-image75-edit data-image75-action="down" aria-label="Dịch xuống">↓</button>
+					<button type="button" data-image75-edit data-image75-action="right" aria-label="Dịch phải">→</button>
+					<button type="button" data-image75-edit data-image75-action="center">Căn giữa</button>
+					<button type="button" data-image75-edit data-image75-action="reset">Đặt lại chỉnh sửa</button>
+				</div>
+				<details class="photo-adjustments"><summary>Độ sáng và màu sắc</summary>
+					<label>Độ sáng <input data-image75-edit id="image75Brightness" type="range" min="-100" max="100" value="0"></label>
+					<label>Tương phản <input data-image75-edit id="image75Contrast" type="range" min="-100" max="100" value="0"></label>
+					<label>Mức nhận màu đỏ <input data-image75-edit id="image75Red" type="range" min="80" max="240" value="120"></label>
+					<label>Mức đen / trắng <input data-image75-edit id="image75BW" type="range" min="50" max="220" value="128"></label>
+				</details>
+				<p id="image75Status" class="section-note" role="status">Kéo trực tiếp trên ảnh để căn vị trí. Chọn Bút vẽ hoặc Chữ nếu muốn thêm nội dung.</p>
+			</div>
+				<div class="workspace-toolbar">
+					<div class="tool-buttons" role="group" aria-label="Công cụ chỉnh sửa">
+						<button id="brush-mode" type="button" title="Bút vẽ" class="tool-button" aria-pressed="false"><span aria-hidden="true">✎</span>Bút vẽ</button>
+						<button id="eraser-mode" type="button" title="Tẩy" class="tool-button" aria-pressed="false"><span aria-hidden="true">▱</span>Tẩy</button>
+						<button id="text-mode" type="button" title="Thêm chữ" class="tool-button" aria-pressed="false"><span aria-hidden="true">T</span>Chữ</button>
+						<button id="schedule-mode" type="button" title="Thời khóa biểu" class="tool-button" aria-pressed="false"><span aria-hidden="true">▦</span>Thời khóa biểu</button>
+					</div>
+					<div class="history-tools" role="group" aria-label="Lịch sử chỉnh sửa">
+						<button id="undo-btn" type="button" title="Hoàn tác (Ctrl+Z)" aria-label="Hoàn tác">↶</button>
+						<button id="redo-btn" type="button" title="Làm lại (Ctrl+Y)" aria-label="Làm lại">↷</button>
+					</div>
+				</div>
+				<p id="paint-tool-hint" class="paint-tool-hint">Chọn công cụ để bắt đầu, Nội dung ảnh được giữ khi đổi công cụ. </p>
+				<div class="tool-panel brush-tools">
+					<div class="tool-panel-heading"><div><h3>Bút vẽ và tẩy</h3><p>Kéo trên ảnh để vẽ, bấm để vẽ chấm tròn. tẩy sẽ tô trắng vị trí đi qua. </p></div><span id="brush-preview" class="brush-preview" aria-hidden="true"></span></div>
+					<div class="tool-fields">
+						<div class="tool-field brush-color-field"><label for="brush-color">Màu bút</label><select id="brush-color"><option value="#000000">Đen</option><option value="#FF0000">Đỏ</option><option value="#FFFF00">Vàng</option><option value="#00FF00">Xanh lá</option><option value="#0000FF">Xanh dương</option><option value="#FFFFFF">Trắng</option></select></div>
+						<div class="tool-field brush-size-field"><label for="brush-size">Độ dày bút</label><input type="number" id="brush-size" value="2" min="1" max="100" step="1"></div>
+						<div class="tool-field eraser-size-field"><label for="eraser-size">Kích thước tẩy</label><input type="number" id="eraser-size" value="16" min="1" max="100" step="1"></div>
+					</div>
+					<div class="tool-presets" role="group" aria-label="Cỡ bút nhanh"><span>Cỡ nhanh</span><button type="button" data-brush-size="2">Mảnh · 2</button><button type="button" data-brush-size="6">Vừa · 6</button><button type="button" data-brush-size="16">Dày · 16</button><button type="button" data-brush-size="32">Rộng · 32</button></div>
+				</div>
+				<div class="tool-panel text-tools">
+					<div class="tool-panel-heading"><div><h3>Trình bày chữ</h3><p>Hỗ trợ nhiều dòng. Thêm rồi bấm vào ảnh để đặt chữ, kéo để đổi vị trí; chọn chữ đã có để sửa tiếp. </p></div></div>
+					<div class="tool-compose">
+						<div class="tool-field tool-content"><label for="text-input">Nội dung chữ</label><textarea id="text-input" rows="3" placeholder="Nhập nội dung, Có thể xuống dòng để nhập nhiều dòng "></textarea></div>
+						<div class="tool-fields">
+							<div class="tool-field"><label for="font-family">Phông chữ</label><select id="font-family"><option value="Arial">Arial</option><option value="Times New Roman">Times New Roman</option><option value="sans-serif">Chữ không chân</option><option value="serif">Chữ có chân</option><option value="monospace">Chữ đơn cách</option></select></div>
+							<div class="tool-field"><label for="font-size">Cỡ chữ</label><input type="number" id="font-size" value="20" min="6" max="100"></div>
+							<div class="tool-field"><label for="text-color">Màu chữ</label><select id="text-color"><option value="#000000">Đen</option><option value="#FF0000">Đỏ</option><option value="#FFFF00">Vàng</option><option value="#00FF00">Xanh lá</option><option value="#0000FF">Xanh dương</option><option value="#FFFFFF">Trắng</option></select></div>
+							<div class="tool-field"><label for="text-align">Căn lề</label><select id="text-align"><option value="left">Căn trái</option><option value="center">Căn giữa</option><option value="right">Căn phải</option></select></div>
+							<div class="tool-field"><label for="text-line-height">Giãn dòng</label><input type="number" id="text-line-height" value="1.35" min="1" max="3" step="0.05"></div>
+							<div class="tool-field"><span class="field-label">Kiểu chữ</span><div class="format-buttons"><button id="text-bold" type="button" title="Đậm" aria-pressed="false"><b>B</b></button><button id="text-italic" type="button" title="Nghiêng" aria-pressed="false"><i>I</i></button></div></div>
+						</div>
+					</div>
+					<div class="tool-actions"><button id="add-text-btn" type="button" class="primary">Thêm chữ</button><button id="cancel-text-btn" type="button" class="secondary">Bỏ chọn</button><button id="delete-text-btn" type="button" class="danger" disabled>Xóa chữ</button></div>
+				</div>
+				<div class="tool-panel schedule-tools">
+					<div class="tool-panel-heading"><div><h3>Thời khóa biểu</h3><p>Đặt số ngày và số tiết, rồi bấm ô để điền môn học. Nội dung dài tự xuống dòng, Bảng được căn theo kích thước ảnh. </p></div><span id="schedule-summary" class="device-badge">Chưa tạo</span></div>
+					<p id="schedule-status" class="field-hint" role="status" aria-live="polite"></p>
+					<div class="tool-fields schedule-config">
+						<div class="tool-field wide-field"><label for="schedule-title">Tiêu đề thời khóa biểu</label><input type="text" id="schedule-title" value="Thời khóa biểu" maxlength="40" placeholder="Có thể để trống"></div>
+						<div class="tool-field"><label for="schedule-preset">Bố cục thường dùng</label><select id="schedule-preset"><option value="week">Thứ Hai đến thứ Sáu</option><option value="full">Cả tuần</option><option value="custom">Tùy chỉnh</option></select></div>
+						<div class="tool-field"><label for="schedule-days">Số ngày mỗi tuần</label><input type="number" id="schedule-days" value="5" min="1" max="7"></div>
+						<div class="tool-field"><label for="schedule-classes">Số tiết mỗi ngày</label><input type="number" id="schedule-classes" value="6" min="1" max="12"></div>
+						<div class="tool-field"><label for="schedule-font-family">Phông chữ</label><select id="schedule-font-family"><option value="Arial">Arial</option><option value="Times New Roman">Times New Roman</option><option value="sans-serif">Chữ không chân</option><option value="serif">Chữ có chân</option><option value="monospace">Chữ đơn cách</option></select></div>
+						<div class="tool-field"><label for="schedule-font-size">Cỡ chữ</label><input type="number" id="schedule-font-size" value="12" min="6" max="32"></div>
+						<div class="tool-field"><label for="schedule-color">Màu chữ</label><select id="schedule-color"><option value="#000000">Đen</option><option value="#FF0000">Đỏ</option><option value="#0000FF">Xanh dương</option></select></div>
+					</div>
+					<div class="tool-actions"><button id="create-schedule-btn" type="button" class="primary">Tạo / Cập nhật thời khóa biểu </button><button id="schedule-fit-btn" type="button" class="secondary">Vừa khung ảnh</button><button id="schedule-example-btn" type="button" class="secondary">Điền mẫu</button><button id="schedule-clear-btn" type="button" class="secondary">Xóa các môn</button><button id="schedule-remove-btn" type="button" class="danger" disabled>Bỏ thời khóa biểu</button></div>
+					<div id="schedule-cell-editor" class="schedule-cell-editor" hidden>
+						<div class="tool-field"><label id="schedule-cell-label" for="schedule-input">Sửa môn học</label><textarea id="schedule-input" rows="3" placeholder="Tên môn học &#10;Phòng học / Giáo viên "></textarea></div>
+						<div class="tool-actions"><button id="schedule-input-confirm-btn" type="button" class="primary">Lưu ô</button><button id="schedule-input-cancel-btn" type="button" class="secondary">Hủy</button><button id="schedule-font-increase-btn" type="button" title="Tăng cỡ chữ ô được chọn">A+</button><button id="schedule-font-decrease-btn" type="button" title="Giảm cỡ chữ ô được chọn">A−</button></div>
+					</div>
+					<details class="tool-details"><summary>Điền nhiều ô</summary><p class="field-hint">Sao chép vùng môn học trong bảng rồi dán vào đây: Mỗi dòng tương ứng một tiết, Mỗi cột ngăn bằng Tab phân cách, lần lượt từ thứ Hai đến Chủ Nhật. Nội dung dán cập nhật các ô tương ứng, các ô khác được giữ nguyên. </p><div class="tool-field"><label for="schedule-bulk-input">Nội dung thời khóa biểu</label><textarea id="schedule-bulk-input" rows="5" placeholder="Ngữ văn &#9;Toán &#9;Tiếng Anh &#9;Vật lý &#9;Thể dục &#10;Toán &#9;Tiếng Anh &#9;Ngữ văn &#9;Hóa học &#9;Mỹ thuật " spellcheck="false"></textarea></div><div class="tool-actions"><button id="schedule-bulk-apply-btn" type="button" class="secondary">Điền vào thời khóa biểu</button></div></details>
+					<details class="tool-details"><summary>Vị trí và kích thước</summary><div class="tool-actions" role="group" aria-label="Vị trí và kích thước bảng"><button id="schedule-move-up-btn" type="button" title="Dịch lên" aria-label="Dịch bảng lên">↑</button><button id="schedule-move-down-btn" type="button" title="Dịch xuống" aria-label="Dịch bảng xuống">↓</button><button id="schedule-move-left-btn" type="button" title="Dịch trái" aria-label="Dịch bảng trái">←</button><button id="schedule-move-right-btn" type="button" title="Dịch phải" aria-label="Dịch bảng phải">→</button><button id="schedule-zoom-in-btn" type="button">Phóng to</button><button id="schedule-zoom-out-btn" type="button">Thu nhỏ</button></div></details>
+				</div>
+				<div class="tool-panel crop-tools">
+					<div class="tool-panel-heading"><div><h3>Cắt ảnh</h3><p>Kéo ảnh để chỉnh vị trí, dùng con lăn hoặc hai ngón để thu/phóng, bấm hoàn tất khi ảnh phủ kín khung. </p></div></div>
+					<div class="tool-actions"><button id="crop-zoom-in" type="button" title="Phóng to" class="secondary">Phóng to</button><button id="crop-zoom-out" type="button" title="Thu nhỏ" class="secondary">Thu nhỏ</button><button id="crop-move-left" type="button" title="Dịch trái" aria-label="Dịch trái">←</button><button id="crop-move-up" type="button" title="Dịch lên" aria-label="Dịch lên">↑</button><button id="crop-move-down" type="button" title="Dịch xuống" aria-label="Dịch xuống">↓</button><button id="crop-move-right" type="button" title="Dịch phải" aria-label="Dịch phải">→</button><button type="button" class="primary" onclick="applyDither()">Hoàn tất cắt ảnh</button></div>
+				</div>
+			</div>
+			<div class="flex-container">
+				<div class="flex-group">
+					<button type="button" class="secondary" onclick="rotateCanvas()">Xoay</button>
+					<button type="button" class="secondary" onclick="mirrorCanvas()">Lật gương (trái/phải )</button>
+					<button type="button" class="secondary" onclick="flipCanvas()">Lật (trên/dưới )</button>
+					<button type="button" class="secondary" onclick="clearCanvas()">Xóa nội dung ảnh</button>
+					<button type="button" class="secondary debug" onclick="downloadDataArray()">Tải mảng dữ liệu</button>
+					<button id="downloadPreviewButton" type="button" class="secondary">Tải ảnh xem trước</button>
+					<button id="sendimgbutton" type="button" class="primary" onclick="sendimg()">Gửi ảnh</button>
+				</div>
+			</div>
+			<div class="image-transfer-feedback">
+				<progress id="imageTransferProgress" max="100" value="0" aria-label="Tiến độ gửi ảnh" style="display:block;width:100%;margin-top:12px"></progress>
+				<p id="imageTransferStatus" role="status" aria-live="polite">Chỉnh ảnh rồi bấm Gửi ảnh. Tiến độ sẽ hiển thị tại đây.</p>
+			</div>
+		</section>
+		<section class="section" aria-label="Đồng hồ và ảnh">
+			<fieldset id="photoClockEditor"><legend>Đồng hồ+ảnh</legend>
+				<p>Ảnh ở nửa trái, đồng hồ ở nửa phải. Ảnh được lưu trên đồng hồ và dùng lại khi khởi động.</p>
+				<label>Chọn ảnh <input id="photoClockFile" type="file" accept="image/*"></label>
+				<p id="photoClockFileName" class="photo-file-name">Chưa chọn ảnh</p>
+				<div class="photo-editor-layout">
+					<div class="photo-editor-preview"><canvas id="photoClockCanvas" width="400" height="480" aria-label="Ảnh sẽ hiển thị trên đồng hồ"></canvas><small>Xem trước ảnh trên đồng hồ</small></div>
+					<div class="photo-editor-controls">
+						<label>Cách đặt ảnh <select id="photoClockFit"><option value="cover">Phủ kín khung</option><option value="contain">Giữ toàn bộ ảnh</option></select></label>
+						<div class="photo-tool-row" aria-label="Xoay và phóng ảnh">
+							<button type="button" data-photo-edit data-photo-action="rotateLeft">Xoay trái</button>
+							<button type="button" data-photo-edit data-photo-action="rotateRight">Xoay phải</button>
+							<button type="button" data-photo-edit data-photo-action="zoomOut" aria-label="Thu nhỏ ảnh">−</button>
+							<output id="photoClockZoomValue" aria-label="Mức phóng ảnh">100%</output>
+							<button type="button" data-photo-edit data-photo-action="zoomIn" aria-label="Phóng to ảnh">+</button>
+						</div>
+						<div class="photo-tool-row" aria-label="Di chuyển ảnh">
+							<button type="button" data-photo-edit data-photo-action="left" aria-label="Dịch ảnh sang trái">←</button>
+							<button type="button" data-photo-edit data-photo-action="up" aria-label="Dịch ảnh lên">↑</button>
+							<button type="button" data-photo-edit data-photo-action="down" aria-label="Dịch ảnh xuống">↓</button>
+							<button type="button" data-photo-edit data-photo-action="right" aria-label="Dịch ảnh sang phải">→</button>
+							<button type="button" data-photo-edit data-photo-action="center">Căn giữa</button>
+						</div>
+						<details class="photo-adjustments"><summary>Độ sáng và màu sắc</summary>
+							<label for="photoClockBrightness">Độ sáng<input data-photo-edit id="photoClockBrightness" type="range" min="-100" max="100" value="0"></label>
+							<label for="photoClockContrast">Tương phản<input data-photo-edit id="photoClockContrast" type="range" min="-100" max="100" value="0"></label>
+							<label for="photoClockRed">Mức nhận màu đỏ<input data-photo-edit id="photoClockRed" type="range" min="80" max="240" value="120"></label>
+							<label for="photoClockBW">Mức đen / trắng<input data-photo-edit id="photoClockBW" type="range" min="50" max="220" value="128"></label>
+						</details>
+						<button type="button" data-photo-edit data-photo-action="reset" class="secondary">Đặt lại chỉnh sửa</button>
+						<p class="dfu-hint">Kéo trực tiếp trên ảnh để đổi vị trí, hoặc dùng các nút mũi tên. Chỉnh ảnh chỉ thay đổi phần xem trước; bấm Lưu mới gửi lên đồng hồ.</p>
+					</div>
+				</div>
+				<button id="photoClockSave" type="button" onclick="PhotoClock.upload()">Lưu ảnh và hiển thị</button>
+				<button id="photoClockShow" type="button" onclick="PhotoClock.show()">Mở ảnh đã lưu</button>
+				<progress id="photoClockProgress" value="0" max="1" style="display:block;width:100%;margin-top:12px"></progress>
+				<p id="photoClockStatus" role="status">Cài đặt đồng hồ trước, sau đó chọn ảnh. Lưu ảnh mới sẽ thay ảnh đồng hồ đã lưu trước đó.</p>
+				<button type="button" class="secondary" onclick="ConsoleUI.openLog()">Xem nhật ký</button>
+			</fieldset>
+		</section>
+		<section id="todoWorkspace" class="section" aria-labelledby="todoCalendarHeading">
+			<div class="section-heading"><div><p class="section-kicker">CÔNG VIỆC</p><h2 id="todoCalendarHeading">Việc cần làm</h2></div><span id="todoCalendarCount" class="device-badge">0 / 32</span></div>
+			<p class="section-note">Thêm công việc, đặt giờ bắt đầu và hạn chót rồi lưu vào đồng hồ. Bạn có thể xem công việc cùng lịch hoặc dùng toàn màn hình. </p>
+			<div class="todo-calendar-workbench">
+				<div class="todo-calendar-editor">
+					<form id="todoCalendarForm" class="todo-calendar-form">
+						<div class="field todo-calendar-text-field"><label for="todoCalendarText">Nội dung công việc</label><input id="todoCalendarText" type="text" placeholder="Ví dụ: Hoàn thành báo cáo tuần " aria-describedby="todoCalendarTextHint"><span id="todoCalendarTextHint" class="field-hint" aria-live="polite">Độ dài nội dung: 0/64. Chữ có dấu chiếm nhiều chỗ hơn. </span></div>
+						<div class="field"><label for="todoCalendarStart">Giờ bắt đầu</label><input id="todoCalendarStart" type="datetime-local" min="2000-01-01T00:00" max="2099-12-31T23:59:59" step="1"></div>
+						<div class="field"><label for="todoCalendarEnd">Hạn chót</label><input id="todoCalendarEnd" type="datetime-local" min="2000-01-01T00:00" max="2099-12-31T23:59:59" step="1"></div>
+						<div class="todo-calendar-flags"><label><input id="todoCalendarResident" type="checkbox"> Luôn hiển thị</label><label><input id="todoCalendarCompleted" type="checkbox"> Đã hoàn tất</label></div>
+						<div class="todo-calendar-edit-actions"><button id="todoCalendarSubmit" type="submit" class="primary">Thêm công việc</button><button id="todoCalendarCancel" type="button" class="secondary" hidden>Hủy sửa</button></div>
+						<p class="field-hint todo-calendar-text-field">Sau khi thêm, sửa, xóa hoặc đánh dấu hoàn tất, bấm Lưu vào thiết bị để cập nhật đồng hồ. </p>
+					</form>
+					<div class="todo-calendar-options">
+						<div class="field todo-calendar-layout-field"><label for="todoCalendarLayout">Bố cục màn hình</label><select id="todoCalendarLayout" aria-describedby="todoCalendarLayoutHint"><option value="4" selected>Công việc + Lịch </option><option value="5">Việc cần làm toàn màn</option></select><span id="todoCalendarLayoutHint" class="field-hint">Công việc bên trái, lịch bên phải. </span></div>
+						<div class="field"><label for="todoCalendarLimit">Số việc hiển thị</label><input id="todoCalendarLimit" type="number" min="1" max="8" step="1" value="5"></div>
+						<div class="field"><label for="todoCalendarLeadMinutes">Hiện trước （phút ）</label><input id="todoCalendarLeadMinutes" type="number" min="0" max="1440" step="1" value="10" aria-describedby="todoCalendarTimingHint"></div>
+						<div class="field"><label for="todoCalendarRetainMinutes">Giữ lại sau hạn （phút ）</label><input id="todoCalendarRetainMinutes" type="number" min="0" max="1440" step="1" value="5" aria-describedby="todoCalendarTimingHint"></div>
+						<span id="todoCalendarTimingHint" class="field-hint todo-calendar-size-hint">Mặc định hiện trước 10 phút, ô vuông chuyển đỏ khi đến giờ; Sau hạn giữ lại 5 phút và gạch ngang, rồi tự ẩn.  </span>
+						<div class="field"><label for="todoCalendarFontSize">Cỡ chữ công việc</label><select id="todoCalendarFontSize" aria-describedby="todoCalendarFontSizeHint"><option value="9">Nhỏ</option><option value="12" selected>Vừa</option><option value="16">Cỡ 16</option><option value="20">Cỡ 20</option><option value="24">Cỡ 24</option><option value="32">Cỡ 32</option></select></div>
+						<fieldset class="todo-calendar-font-style"><legend>Kiểu chữ công việc</legend><label><input id="todoCalendarFontBold" type="checkbox"> Đậm</label><label><input id="todoCalendarFontItalic" type="checkbox"> Nghiêng</label></fieldset>
+						<span id="todoCalendarFontSizeHint" class="field-hint todo-calendar-size-hint">Chọn cỡ chữ phù hợp để dễ đọc công việc. </span>
+						<div class="field todo-calendar-font-field"><label for="todoCalendarFontFamily">Phông công việc</label><select id="todoCalendarFontFamily" aria-describedby="todoCalendarFontHint"><option value="">Mặc định thiết bị</option></select><span id="todoCalendarFontHint" class="field-hint">Chọn kiểu chữ muốn dùng cho nội dung công việc. </span></div>
+					</div>
+					<p class="field-hint">Việc luôn hiển thị được ưu tiên trước; các việc hẹn giờ sắp theo giờ bắt đầu. Khi một việc hoàn tất hoặc hết hạn, đồng hồ tự hiện việc tiếp theo. </p>
+					<div class="todo-calendar-local-actions"><button id="todoCalendarImportPaint" type="button" class="secondary">Nhập danh sách đã tạo</button><button id="todoCalendarExport" type="button" class="secondary">Xuất bản sao</button><label class="todo-calendar-import-label" for="todoCalendarImport">Nhập bản sao<input id="todoCalendarImport" type="file" accept=".json,application/json"></label></div>
+					<p class="field-hint">Có thể nhập lại danh sách đã tạo trong mục chỉnh ảnh. Nội dung quá dài sẽ được chia thành nhiều việc. </p>
+				</div>
+				<aside class="todo-calendar-preview" aria-labelledby="todoCalendarPreviewHeading">
+					<div class="annotation-preview-heading"><h3 id="todoCalendarPreviewHeading">Xem trước hiển thị</h3><span id="todoCalendarPreviewLayout">Việc bên trái · lịch bên phải </span></div>
+					<div id="todoCalendarPreviewScreen" class="todo-calendar-screen" data-layout="split"><div class="todo-calendar-preview-left"><div class="todo-calendar-preview-header"><strong id="todoCalendarPreviewTitle" class="todo-calendar-preview-title">TODO 0/0</strong><span id="todoCalendarPreviewTemperature" class="todo-calendar-preview-temperature" aria-label="Chưa biết nhiệt độ thiết bị"><span class="todo-calendar-temperature-value">—</span><span class="todo-calendar-temperature-unit">℃</span></span></div><div id="todoCalendarPreviewItems" class="todo-calendar-preview-items" data-font="12"></div></div><div id="todoCalendarPreviewCalendar" class="todo-calendar-preview-calendar" aria-label="Xem trước lịch"></div></div>
+					<p id="todoCalendarPreviewSummary" class="field-hint" aria-live="polite"></p>
+					<div class="todo-calendar-preview-controls"><label for="todoCalendarPreviewTime">Giờ xem thử</label><input id="todoCalendarPreviewTime" type="datetime-local" step="1" min="2000-01-01T00:00" max="2099-12-31T23:59:59"><button id="todoCalendarPreviewNow" type="button" class="secondary">Hiện tại</button></div>
+					<p class="field-hint">Để trống để xem theo giờ hiện tại. Đây là hình minh họa; bấm Lưu rồi bật kiểu hiển thị để áp dụng lên đồng hồ. </p>
+				</aside>
+			</div>
+			<div id="todoCalendarList" class="todo-calendar-list" aria-label="Sửa công việc hẹn giờ"></div>
+			<div class="todo-calendar-device-actions"><button id="todoCalendarRead" type="button" class="secondary" data-device-operation disabled>Đọc công việc từ thiết bị</button><button id="todoCalendarSave" type="button" class="primary" data-device-operation disabled>Lưu vào thiết bị</button><button id="todoCalendarActivate" type="button" class="secondary" data-device-operation disabled>Bật việc cần làm +Lịch </button></div>
+			<p class="field-hint">Thêm công việc vào danh sách, bấm Lưu rồi chọn kiểu hiển thị muốn dùng. </p>
+			<p id="todoCalendarStatus" class="field-hint" role="status" aria-live="polite">Danh sách đang sửa được giữ trên trình duyệt này. Đọc từ đồng hồ hoặc nhập bản sao sẽ thay danh sách đang sửa; chỉ bấm Lưu mới cập nhật đồng hồ. </p>
+		</section>
+		<section id="calendarWorkspace" class="section" aria-labelledby="calendarHeading">
+			<div class="section-heading"><div><p class="section-kicker">NGÀY QUAN TRỌNG</p><h2 id="calendarHeading">Đánh dấu ngày</h2></div><span id="calendarAnnotationCount" class="device-badge">0 / 64</span></div>
+			<p class="section-note">Dùng chấm đỏ nhắc ngày quan trọng, hoặc thêm nhãn ngắn. Chỉnh sửa ở đây trước, rồi lưu vào lịch thiết bị. </p>
+			<div class="annotation-workbench">
+				<div class="annotation-editor">
+					<div class="annotation-panel-heading"><h3 id="calendarAnnotationEditorTitle">Thêm đánh dấu</h3><p id="calendarAnnotationEditorNote">Mỗi ngày chỉ có một đánh dấu, Thêm lại để cập nhật nội dung. </p></div>
+					<div class="annotation-form">
+						<div class="field"><label for="calendarAnnotationDate">Ngày đánh dấu</label><input id="calendarAnnotationDate" type="date" min="2000-01-01" max="2099-12-31"></div>
+						<div class="field label-field"><label for="calendarAnnotationLabel">Nội dung đánh dấu <span class="label-optional">Không bắt buộc</span></label><input id="calendarAnnotationLabel" type="text" placeholder="Ví dụ: Sinh nhật của mẹ" aria-describedby="calendarAnnotationLabelHint"><span id="calendarAnnotationLabelHint" class="field-hint" aria-live="polite">Độ dài nội dung: 0/40. Nhãn dài sẽ rút gọn để vừa ô lịch.</span></div>
+						<div class="field"><label for="calendarAnnotationPosition">Vị trí hiển thị</label><select id="calendarAnnotationPosition"><option value="0" selected>Dưới ngày</option><option value="1">Góc trên bên phải</option></select></div>
+						<div class="field"><label for="calendarAnnotationFontSize">Cỡ chữ nhãn</label><select id="calendarAnnotationFontSize"><option value="0" selected>Theo lịch</option><option value="9">Nhỏ</option><option value="12">Lớn</option></select></div>
+						<div class="field"><label for="calendarAnnotationColor">Màu chữ</label><select id="calendarAnnotationColor" aria-describedby="calendarAnnotationColorHint"><option value="0" selected>Đen</option><option value="1">Trắng</option><option value="2">Đỏ</option></select><span id="calendarAnnotationColorHint" class="field-hint annotation-color-hint" role="status" aria-live="polite" hidden></span></div>
+					</div>
+					<div class="annotation-edit-actions"><button id="calendarAnnotationSubmit" type="button" class="primary" onclick="CalendarAnnotations.addOrUpdate()">Thêm đánh dấu</button><button id="calendarAnnotationCancel" type="button" class="secondary" onclick="CalendarAnnotations.cancelEdit()" hidden>Hủy sửa</button></div>
+				</div>
+				<aside id="calendarAnnotationPreview" class="annotation-preview" data-position="below" data-color="black" data-font="follow" data-today="false" aria-labelledby="annotationPreviewHeading">
+					<div class="annotation-preview-heading"><h3 id="annotationPreviewHeading">Minh họa hiển thị</h3><span>Một ngày</span></div>
+					<div class="annotation-day-card" aria-label="Minh họa vị trí nhãn">
+						<div class="annotation-day-meta"><span id="calendarAnnotationPreviewMonth">Chọn ngày</span><span id="calendarAnnotationPreviewWeekday"></span></div>
+						<div class="annotation-day-content"><strong id="calendarAnnotationPreviewDate" class="annotation-day-number">—</strong><div class="annotation-day-caption"><span id="calendarAnnotationPreviewLabel" class="annotation-preview-label" hidden></span><span id="calendarAnnotationPreviewLunar" class="annotation-preview-lunar">Âm lịch / Ngày lễ </span></div></div>
+						<span id="calendarAnnotationPreviewDot" class="annotation-preview-dot" aria-label="Chấm đỏ"></span>
+					</div>
+					<p id="calendarAnnotationPreviewNote" class="annotation-preview-note">Khi để nhãn trống, chỉ hiện chấm đỏ. </p>
+					<p class="annotation-preview-caption">Đây là minh họa vị trí; Bố cục thực tế theo lịch trên thiết bị. </p>
+				</aside>
+			</div>
+			<p id="calendarAnnotationStatus" class="annotation-status" role="status" aria-live="polite"></p>
+			<div class="annotation-device-panel">
+				<div><h3>Đồng bộ vào thiết bị</h3><p>Sau khi thêm hoặc sửa đánh dấu, bấm lưu, để áp dụng danh sách lên lịch thiết bị. </p></div>
+				<div class="annotation-device-actions"><button data-device-operation type="button" class="primary" onclick="CalendarAnnotations.save()">Lưu vào thiết bị</button><button data-device-operation type="button" class="secondary" onclick="CalendarAnnotations.loadFromDevice()">Đọc từ thiết bị</button></div>
+			</div>
+			<div class="annotation-list-heading"><h3>Danh sách đánh dấu</h3><span id="calendarAnnotationsSummary">Chưa có đánh dấu</span></div>
+			<div class="table-scroll annotation-list" tabindex="0" role="region" aria-label="Danh sách đánh dấu ngày">
+				<table class="anno-table"><caption class="sr-only">Các ngày đã đánh dấu</caption><thead><tr><th scope="col">Ngày</th><th scope="col">Nội dung nhãn</th><th scope="col">Thiết lập hiển thị</th><th scope="col">Thao tác</th></tr></thead><tbody id="calendarAnnotationsList"></tbody></table>
+			</div>
+			<details class="help-details annotation-management"><summary>Sao lưu và quản lý</summary><p class="dfu-hint">Lưu một bản sao trước khi đổi thiết bị hoặc cài lại đồng hồ. </p><div class="annotation-management-actions"><button data-device-operation type="button" class="secondary" onclick="exportMigrationBundle()">Tải bản sao lưu</button><button data-device-operation type="button" class="danger" onclick="CalendarAnnotations.clearDevice()">Xóa đánh dấu trên thiết bị</button></div></details>
+			<details class="help-details annotation-rules"><summary>Quy tắc hiển thị nhãn</summary><ul><li>Viết tên ngắn gọn để dễ đọc trong ô lịch. Bộ đếm bên cạnh giúp kiểm tra độ dài trước khi lưu. </li><li>Nhãn dưới ngày thay dòng âm lịch hoặc ngày lễ và hiện chấm đỏ. </li><li>Nhãn góc trên phải giữ dòng ngày lễ và âm lịch; để trống chỉ hiện chấm đỏ. </li><li>Ngày hiện tại có nền đỏ phía dưới: nên dùng chữ trắng hoặc đen. Chữ trắng trên nền trắng có thể khó nhìn. </li></ul><p class="dfu-hint">Danh sách tự đọc sau khi kết nối. Có thể lưu tối đa 64 ngày; tên quá dài sẽ được rút gọn để vừa ô lịch. </p></details>
+		</section>
+		<section id="countdownWorkspace" class="section" aria-labelledby="countdownHeading">
+			<div class="section-heading"><div><p class="section-kicker">NGÀY MONG ĐỢI</p><h2 id="countdownHeading">Đồng hồ đếm ngược</h2></div></div>
+			<div class="countdown-settings">
+				<p>Chọn ngày kết thúc và tên sự kiện, rồi bấm Lưu và bật đếm ngược. Đồng hồ tự cập nhật số ngày còn lại; khi đến hạn sẽ hiện 0 ngày.</p>
+				<label>Ngày kết thúc <input id="countdown75Date" type="date" min="2000-01-01" max="2099-12-31" value="2027-01-01"></label>
+				<label>Tên sự kiện <input id="countdown75Label" type="text" maxlength="16" value="SU KIEN" placeholder="TET 2027"></label>
+				<p>Nhập tên ngắn gọn, tối đa 16 ký tự không dấu.</p>
+				<button id="countdown75Save" type="button" class="primary" onclick="Countdown75.apply()">Lưu và bật đếm ngược</button>
+				<button id="countdown75Read" type="button" class="secondary" onclick="Countdown75.load()">Đọc ngày đang lưu</button>
+				<p id="countdown75Status" role="status">Cài đặt đồng hồ trước khi lưu đếm ngược lần đầu.</p>
+			</div>
+		</section>
+		<section id="externalResources" class="section">
+			<div class="section-heading"><div><p class="section-kicker">CÀI ĐẶT</p><h2>Cài đặt đồng hồ</h2></div><span class="device-badge">Đồng hồ 7.5</span></div>
+			<p class="section-note">Kết nối đồng hồ, chọn kiểu chữ rồi bấm Cài đặt đồng hồ. Dữ liệu cần thiết đã có sẵn, bạn không cần chọn tệp riêng.</p>
+			<div class="external-resource-actions">
+				<label for="resourceVietnameseFamily">Kiểu chữ</label>
+				<select id="resourceVietnameseFamily"><option value="times">Times New Roman</option><option value="arial">Arial</option></select>
+				<button id="externalResourceInstall" type="button" class="primary" onclick="ClockSetup.install()" disabled>Cài đặt đồng hồ</button>
+			</div>
+			<p class="dfu-hint">Chỉ cần cài lần đầu, hoặc khi muốn cập nhật dữ liệu và đổi kiểu chữ. Giữ kết nối và không tháo pin trong lúc cài.</p>
+			<details class="help-details"><summary>Sao lưu và hỗ trợ</summary>
+			<div class="external-resource-actions">
+				<label for="externalResourceFolder" class="external-resource-picker debug">Chọn thư mục dữ liệu<input id="externalResourceFolder" class="picker-input" type="file" accept=".ers" multiple webkitdirectory directory aria-label="Chọn thư mục dữ liệu "></label>
+				<button id="externalResourceRefresh" type="button" class="secondary" onclick="ExternalResourceInstaller.refresh()" disabled>Kiểm tra dữ liệu</button>
+				<button id="externalResourceReadback" type="button" class="secondary" onclick="ExternalResourceInstaller.readback()" disabled>Đọc dữ liệu để sao lưu</button>
+				<button id="externalResourceSave" type="button" class="secondary" onclick="ExternalResourceInstaller.saveReadback()" disabled>Lưu về máy</button>
+				<button id="externalResourceOffline" type="button" class="secondary" onclick="ExternalResourceInstaller.runOffline()" disabled>Áp dụng và ngắt kết nối</button>
+			</div>
+			<div class="checkbox-options"><label><input id="externalResourceAutoOffline" type="checkbox" checked> Tự ngắt kết nối sau khi cài xong</label>
+			<label><input id="externalResourceForce" type="checkbox"> Cài lại cả dữ liệu đang có</label>
+			</div>
+			<p class="dfu-hint">Đợi cài đặt hoàn tất trước khi chọn chế độ khác. Đồng hồ vẫn chạy sau khi ngắt kết nối. </p>
+			<div id="externalResourceBundle" class="resource-panel resource-bundle-panel debug">
+				<div class="resource-panel-heading"><h3>Gói tài nguyên chuẩn bị cài</h3><span class="resource-state">Chưa chọn</span></div>
+				<p class="resource-panel-note">Chọn thư mục tài nguyên, hoặc tạo gói trong trình sửa, để xem phiên bản và dung lượng. </p>
+			</div>
+			<div class="resource-dashboard debug">
+				<div id="externalResourceUsage" class="resource-panel flash-panel">
+					<div class="resource-panel-heading"><h3>Bộ nhớ đồng hồ</h3><span class="resource-state">Chưa đọc</span></div>
+					<div class="flash-metrics">
+						<div class="flash-metric"><span class="metric-label">Tổng dung lượng</span><strong class="flash-metric-value">—</strong></div>
+						<div class="flash-metric"><span class="metric-label">Dung lượng tài nguyên</span><strong class="flash-metric-value">—</strong></div>
+						<div class="flash-metric"><span class="metric-label">Dung lượng còn trống</span><strong class="flash-metric-value">—</strong></div>
+					</div>
+					<p class="resource-panel-note">Kết nối để đọc dung lượng thực tế; Nạp gói tài nguyên để xem dung lượng dự kiến. </p>
+				</div>
+				<div id="deviceResourceVersions" class="resource-panel resource-versions-panel">
+					<div class="resource-panel-heading"><h3>Phiên bản tài nguyên trên thiết bị</h3><span class="resource-state">Chờ kết nối</span></div>
+					<p class="resource-panel-note">Kết nối để xem phiên bản và kết quả kiểm tra các phần, và so với gói chuẩn bị cài. </p>
+				</div>
+			</div>
+			</details>
+			<div id="externalResourceStatus" class="dfu-hint" role="status" aria-live="polite">Kết nối đồng hồ để cài đặt.</div>
+			<progress id="externalResourceProgress" max="1" value="0" aria-label="Tiến độ cài đặt"></progress>
+			<p id="externalResourceReadbackStatus" class="dfu-hint" role="status">Đọc dữ liệu rồi bấm Lưu về máy để giữ một bản sao. </p>
+			<details class="resource-editor debug">
+				<summary>Chỉnh sửa và tạo tài nguyên</summary>
+				<p>Lịch và bố cục được tạo trong web, không cần biên dịch lại phần mềm. Nạp mẫu hoặc thư mục tài nguyên trước, rồi chỉnh sửa JSON; Sau khi tạo có thể cài trực tiếp. Xem trước hiển thị vị trí các thành phần, không thay thế bố cục thực tế trên màn. </p>
+				<div class="external-resource-actions">
+					<button type="button" onclick="ExternalResourceEditor.loadDefault()">Nạp mẫu mặc định</button>
+					<label class="external-resource-picker">Nhập dự án tài nguyên<input id="resourceProjectImport" class="picker-input" type="file" accept=".json" aria-label="Nhập JSON Dự án tài nguyên "></label>
+					<button type="button" onclick="ExternalResourceEditor.exportProject()">Xuất toàn bộ dự án</button>
+				</div>
+				<label for="resourceCalendarSource">Dữ liệu lịch: Ngày lễ, Lịch nghỉ/làm bù, chữ và bảng tính năm </label>
+				<p class="dfu-hint">Bộ lịch mặc định: Việt Nam 2025–2027, âm lịch UTC+7. holidays để trống, không có ngày làm bù/nghỉ bù Trung Quốc. Ngày kỷ niệm không đồng nghĩa ngày nghỉ làm. Muốn mở rộng năm phải bổ sung bảng tính lịch tương ứng.</p>
+				<textarea id="resourceCalendarSource" rows="12" spellcheck="false" aria-label="Tài nguyên lịch JSON"></textarea>
+				<label for="resourceLayoutSource">Bố cục: 19 tọa độ các thành phần cố định, kích thước và ô phông </label>
+				<textarea id="resourceLayoutSource" rows="12" spellcheck="false" aria-label="Tài nguyên bố cục JSON"></textarea>
+				<div class="external-resource-actions">
+					<select id="resourcePreviewMode" aria-label="Chế độ xem trước" onchange="ExternalResourceEditor.preview()"><option value="1">Lịch</option><option value="2">Chia màn</option><option value="3">Đồng hồ</option></select>
+					<button type="button" onclick="ExternalResourceEditor.preview()">Xem bố cục</button>
+				</div>
+				<canvas id="resourceLayoutPreview" width="800" height="480" aria-label="Minh họa bố cục thiết bị"></canvas>
+				<details><summary>Thay dữ liệu phông （Không bắt buộc ）</summary>
+					<p class="dfu-hint">Không chọn để giữ phông hiện tại. Hỗ trợ dữ liệu có kích thước phù hợp ô phông u8g2 .bin Tệp; TTF/BDF cần chuyển thành dữ liệu điểm ảnh trước. </p>
+					<label>Nội dung đậm 20 px <input id="resourceFont0" type="file" accept=".bin"></label>
+					<label>Nội dung đậm 24 px <input id="resourceFont1" type="file" accept=".bin"></label>
+					<label>Chữ số HELVB18 <input id="resourceFont2" type="file" accept=".bin"></label>
+					<label>Tiêu đề đậm 20 px <input id="resourceFont4" type="file" accept=".bin"></label>
+					<label>Đậm 24 px <input id="resourceFont5" type="file" accept=".bin"></label>
+				</details>
+				<div class="external-resource-actions">
+					<button type="button" class="primary" onclick="ExternalResourceEditor.generate()">Tạo và đưa vào vùng cài</button>
+					<select id="resourceDownloadPart" aria-label="Loại tài nguyên tải về"><option value="5">Lịch</option><option value="6">Bố cục</option><option value="7">Phông chữ</option><option value="1">Bảng phân vùng</option><option value="2">Cấu hình xuất xưởng</option><option value="3">Đánh dấu xuất xưởng</option></select>
+					<button type="button" onclick="ExternalResourceEditor.download()">Tải về ERS</button>
+				</div>
+				<div id="resourceEditorStatus" class="external-resource-message" role="status">Hãy nạp mẫu hoặc chọn thư mục tài nguyên. </div>
+			</details>
+		</section>
+	</main>
+	<div id="deviceSelectModal" class="device-modal" style="display:none;">
+		<div class="device-modal-content" role="dialog" aria-modal="true" aria-labelledby="deviceModalTitle">
+			<div class="device-modal-header">
+				<h3 id="deviceModalTitle">Chọn thiết bị Bluetooth</h3>
+			</div>
+			<div id="deviceModalHint" class="device-modal-hint"></div>
+			<div id="deviceModalList" class="device-modal-list"></div>
+			<div class="device-modal-actions">
+				<button id="deviceModalRefresh" type="button" class="primary">Quét lại</button>
+				<button id="deviceModalCancel" type="button" class="secondary">Hủy</button>
+			</div>
+		</div>
+	</div>
+	<div id="toast" class="toast-message" role="status" aria-live="polite" style="display:none;"></div>
+	<script type="text/javascript" src="js/dithering.js?v=5.9.6"></script>
+	<script type="text/javascript" src="js/paint.js?v=5.9.6"></script>
+	<script src="js/paint_schedule.js?v=5.9.6"></script>
+	<script type="text/javascript" src="js/crop.js?v=20261005a"></script>
+	<script type="text/javascript" src="js/ble_transfer.js?v=20260922a"></script>
+	<script type="text/javascript" src="js/calendar_annotations.js?v=original-vi-5.9-public"></script>
+	<script type="text/javascript" src="js/resource_store.js?v=original-vi-5.3-countdown"></script>
+	<script src="js/resource_archive.js?v=20261004a"></script>
+	<script type="text/javascript" src="js/resource_builder.js?v=original-vi-5.2-font20"></script>
+	<script src="js/font_builder.js?v=original-vi-5.2-font20"></script>
+	<script src="js/font_sync.js?v=20261005h"></script>
+	<script src="js/todo_sync.js?v=20261005h"></script>
+	<script src="resources/bundled-projects.js?v=original-vi-5.3-countdown"></script>
+	<script type="text/javascript" src="js/resource_installer.js?v=original-vi-5.9.3-customer"></script>
+	<script src="js/todo_calendar.js?v=original-vi-5.9.6"></script>
+	<script type="text/javascript" src="js/resource_editor.js?v=original-vi-5.3-countdown"></script>
+	<script src="js/clock_setup.js?v=original-vi-4"></script>
+	<script src="js/countdown75.js?v=original-vi-5.9.3-customer"></script>
+	<script src="../../clock-image-processing.js?v=5.9.7"></script>
+	<script src="js/photo_editor.js?v=original-vi-5.9.7"></script>
+	<script src="js/photo_clock.js?v=original-vi-5.9.8-log"></script>
+	<script type="text/javascript" src="js/console_ui.js?v=5.9.8-log"></script>
+	<script src="js/image_transfer_ui.js?v=5.9.6"></script>
+	<script type="text/javascript" src="js/main.js?v=original-vi-5.9.6-image"></script>
+	<script src="js/image75_editor.js?v=original-vi-5.9.6"></script>
+</body>
+
+</html>

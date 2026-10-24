@@ -1,0 +1,524 @@
+{
+  "year_min": 2025,
+  "year_max": 2027,
+  "holiday_year": 2026,
+  "month_names": [
+    "--",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12"
+  ],
+  "leap_names": [
+    "",
+    " nhuận"
+  ],
+  "date_names": [
+    "--",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16",
+    "17",
+    "18",
+    "19",
+    "20",
+    "21",
+    "22",
+    "23",
+    "24",
+    "25",
+    "26",
+    "27",
+    "28",
+    "29",
+    "30"
+  ],
+  "weekday_names": [
+    "CN",
+    "Thứ 2",
+    "Thứ 3",
+    "Thứ 4",
+    "Thứ 5",
+    "Thứ 6",
+    "Thứ 7"
+  ],
+  "zodiac_names": [
+    "Khỉ",
+    "Gà",
+    "Chó",
+    "Lợn",
+    "Chuột",
+    "Trâu",
+    "Hổ",
+    "Thỏ",
+    "Rồng",
+    "Rắn",
+    "Ngựa",
+    "Dê"
+  ],
+  "stem_names": [
+    "Canh",
+    "Tân",
+    "Nhâm",
+    "Quý",
+    "Giáp",
+    "Ất",
+    "Bính",
+    "Đinh",
+    "Mậu",
+    "Kỷ"
+  ],
+  "branch_names": [
+    "Thân",
+    "Dậu",
+    "Tuất",
+    "Hợi",
+    "Tý",
+    "Sửu",
+    "Dần",
+    "Mão",
+    "Thìn",
+    "Tỵ",
+    "Ngọ",
+    "Mùi"
+  ],
+  "jieqi_names": [
+    "Tiểu Hàn",
+    "Đại Hàn",
+    "Lập Xuân",
+    "Vũ Thủy",
+    "Kinh Trập",
+    "Xuân Phân",
+    "Thanh Minh",
+    "Cốc Vũ",
+    "Lập Hạ",
+    "Tiểu Mãn",
+    "Mang Chủng",
+    "Hạ Chí",
+    "Tiểu Thử",
+    "Đại Thử",
+    "Lập Thu",
+    "Xử Thử",
+    "Bạch Lộ",
+    "Thu Phân",
+    "Hàn Lộ",
+    "Sương Giáng",
+    "Lập Đông",
+    "Tiểu Tuyết",
+    "Đại Tuyết",
+    "Đông Chí"
+  ],
+  "lunar_month_days": [
+    2024,
+    2412,
+    54446,
+    5276,
+    6732
+  ],
+  "solar_new_year": [
+    2024,
+    1036362,
+    1036861,
+    1037393,
+    1037894
+  ],
+  "jieqi_year_bits": [
+    15,
+    239,
+    219,
+    190,
+    166,
+    153,
+    156,
+    162,
+    152,
+    128,
+    0,
+    24
+  ],
+  "jieqi_base_days": [
+    6,
+    20,
+    4,
+    19,
+    6,
+    21,
+    5,
+    20,
+    6,
+    21,
+    6,
+    21,
+    7,
+    23,
+    8,
+    23,
+    8,
+    23,
+    8,
+    24,
+    8,
+    22,
+    7,
+    22
+  ],
+  "solar_festivals": [
+    {
+      "month": 1,
+      "day": 1,
+      "name": "Tết DL"
+    },
+    {
+      "month": 2,
+      "day": 14,
+      "name": "Valentine"
+    },
+    {
+      "month": 3,
+      "day": 8,
+      "name": "Phụ nữ"
+    },
+    {
+      "month": 3,
+      "day": 12,
+      "name": "Trồng cây"
+    },
+    {
+      "month": 4,
+      "day": 1,
+      "name": "Cá tháng 4"
+    },
+    {
+      "month": 5,
+      "day": 1,
+      "name": "Lao động"
+    },
+    {
+      "month": 5,
+      "day": 4,
+      "name": "Thanh niên"
+    },
+    {
+      "month": 6,
+      "day": 1,
+      "name": "Thiếu nhi"
+    },
+    {
+      "month": 7,
+      "day": 1,
+      "name": "Lập Đảng"
+    },
+    {
+      "month": 8,
+      "day": 1,
+      "name": "Lập Quân"
+    },
+    {
+      "month": 9,
+      "day": 10,
+      "name": "Nhà giáo"
+    },
+    {
+      "month": 10,
+      "day": 1,
+      "name": "Quốc khánh"
+    },
+    {
+      "month": 11,
+      "day": 1,
+      "name": "Halloween"
+    },
+    {
+      "month": 12,
+      "day": 24,
+      "name": "Đêm Noel"
+    },
+    {
+      "month": 12,
+      "day": 25,
+      "name": "Giáng sinh"
+    }
+  ],
+  "lunar_festivals": [
+    {
+      "month": 1,
+      "day": 1,
+      "name": "Tết"
+    },
+    {
+      "month": 1,
+      "day": 15,
+      "name": "Nguyên tiêu"
+    },
+    {
+      "month": 2,
+      "day": 2,
+      "name": "Long đầu"
+    },
+    {
+      "month": 5,
+      "day": 5,
+      "name": "Đoan Ngọ"
+    },
+    {
+      "month": 7,
+      "day": 7,
+      "name": "Thất tịch"
+    },
+    {
+      "month": 7,
+      "day": 15,
+      "name": "Trung nguyên"
+    },
+    {
+      "month": 8,
+      "day": 15,
+      "name": "Trung thu"
+    },
+    {
+      "month": 9,
+      "day": 9,
+      "name": "Trùng cửu"
+    },
+    {
+      "month": 10,
+      "day": 1,
+      "name": "Hàn y"
+    },
+    {
+      "month": 12,
+      "day": 8,
+      "name": "Lạp Bát"
+    },
+    {
+      "month": 12,
+      "day": 30,
+      "name": "Giao thừa"
+    }
+  ],
+  "holidays": [
+    {
+      "month": 1,
+      "day": 1,
+      "work": false
+    },
+    {
+      "month": 1,
+      "day": 2,
+      "work": false
+    },
+    {
+      "month": 1,
+      "day": 3,
+      "work": false
+    },
+    {
+      "month": 1,
+      "day": 4,
+      "work": true
+    },
+    {
+      "month": 2,
+      "day": 14,
+      "work": true
+    },
+    {
+      "month": 2,
+      "day": 15,
+      "work": false
+    },
+    {
+      "month": 2,
+      "day": 16,
+      "work": false
+    },
+    {
+      "month": 2,
+      "day": 17,
+      "work": false
+    },
+    {
+      "month": 2,
+      "day": 18,
+      "work": false
+    },
+    {
+      "month": 2,
+      "day": 19,
+      "work": false
+    },
+    {
+      "month": 2,
+      "day": 20,
+      "work": false
+    },
+    {
+      "month": 2,
+      "day": 21,
+      "work": false
+    },
+    {
+      "month": 2,
+      "day": 22,
+      "work": false
+    },
+    {
+      "month": 2,
+      "day": 23,
+      "work": false
+    },
+    {
+      "month": 2,
+      "day": 28,
+      "work": true
+    },
+    {
+      "month": 4,
+      "day": 4,
+      "work": false
+    },
+    {
+      "month": 4,
+      "day": 5,
+      "work": false
+    },
+    {
+      "month": 4,
+      "day": 6,
+      "work": false
+    },
+    {
+      "month": 5,
+      "day": 1,
+      "work": false
+    },
+    {
+      "month": 5,
+      "day": 2,
+      "work": false
+    },
+    {
+      "month": 5,
+      "day": 3,
+      "work": false
+    },
+    {
+      "month": 5,
+      "day": 4,
+      "work": false
+    },
+    {
+      "month": 5,
+      "day": 5,
+      "work": false
+    },
+    {
+      "month": 5,
+      "day": 9,
+      "work": true
+    },
+    {
+      "month": 6,
+      "day": 19,
+      "work": false
+    },
+    {
+      "month": 6,
+      "day": 20,
+      "work": false
+    },
+    {
+      "month": 6,
+      "day": 21,
+      "work": false
+    },
+    {
+      "month": 9,
+      "day": 25,
+      "work": false
+    },
+    {
+      "month": 9,
+      "day": 26,
+      "work": false
+    },
+    {
+      "month": 9,
+      "day": 27,
+      "work": false
+    },
+    {
+      "month": 9,
+      "day": 20,
+      "work": true
+    },
+    {
+      "month": 10,
+      "day": 1,
+      "work": false
+    },
+    {
+      "month": 10,
+      "day": 2,
+      "work": false
+    },
+    {
+      "month": 10,
+      "day": 3,
+      "work": false
+    },
+    {
+      "month": 10,
+      "day": 4,
+      "work": false
+    },
+    {
+      "month": 10,
+      "day": 5,
+      "work": false
+    },
+    {
+      "month": 10,
+      "day": 6,
+      "work": false
+    },
+    {
+      "month": 10,
+      "day": 7,
+      "work": false
+    },
+    {
+      "month": 10,
+      "day": 10,
+      "work": true
+    }
+  ],
+  "special_festival_names": [
+    "Giao thừa",
+    "Lễ Mẹ",
+    "Lễ Cha",
+    "Tạ ơn",
+    "Thanh Minh"
+  ]
+}

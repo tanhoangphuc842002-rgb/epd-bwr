@@ -1,0 +1,151 @@
+{
+  "format": "EPD-VN-HOLIDAYS-1",
+  "years": [
+    2025,
+    2035
+  ],
+  "timezone": 7,
+  "note": "Ngày lễ/kỷ niệm không đồng nghĩa lịch nghỉ làm. Ngày âm lịch theo Việt Nam UTC+7, không lặp tháng nhuận. Ô lịch dùng tên ngắn; dòng sự kiện dùng tên đầy đủ.",
+  "solar": [
+    {
+      "month": 1,
+      "day": 1,
+      "name": "Tết Dương lịch",
+      "label": "Tết Tây"
+    },
+    {
+      "month": 3,
+      "day": 8,
+      "name": "Quốc tế Phụ nữ",
+      "label": "Phụ nữ"
+    },
+    {
+      "month": 4,
+      "day": 30,
+      "name": "Giải phóng miền Nam",
+      "label": "30/4"
+    },
+    {
+      "month": 5,
+      "day": 1,
+      "name": "Quốc tế Lao động",
+      "label": "Lao động"
+    },
+    {
+      "month": 6,
+      "day": 1,
+      "name": "Quốc tế Thiếu nhi",
+      "label": "T.nhi"
+    },
+    {
+      "month": 6,
+      "day": 28,
+      "name": "Gia đình Việt Nam",
+      "label": "Gia đình"
+    },
+    {
+      "month": 7,
+      "day": 27,
+      "name": "Thương binh Liệt sĩ",
+      "label": "TB - LS"
+    },
+    {
+      "month": 9,
+      "day": 2,
+      "name": "Quốc khánh",
+      "label": "Q.khánh"
+    },
+    {
+      "month": 10,
+      "day": 20,
+      "name": "Ngày phụ nữ Việt Nam",
+      "label": "PN VN"
+    },
+    {
+      "month": 11,
+      "day": 20,
+      "name": "Ngày nhà giáo Việt Nam",
+      "label": "Nhà giáo"
+    },
+    {
+      "month": 11,
+      "day": 24,
+      "name": "Ngày Văn hóa Việt Nam",
+      "label": "Văn hóa"
+    },
+    {
+      "month": 12,
+      "day": 22,
+      "name": "Ngày Quân đội",
+      "label": "Quân đội"
+    },
+    {
+      "month": 12,
+      "day": 24,
+      "name": "Đêm Giáng sinh",
+      "label": "Đêm Noel"
+    },
+    {
+      "month": 12,
+      "day": 25,
+      "name": "Lễ Giáng sinh",
+      "label": "Noel"
+    }
+  ],
+  "lunar": [
+    {
+      "month": 12,
+      "day": 23,
+      "name": "Ông Công Ông Táo",
+      "label": "Ông Táo"
+    },
+    {
+      "month": 1,
+      "day": 1,
+      "name": "Tết Nguyên Đán",
+      "label": "Tết"
+    },
+    {
+      "month": 1,
+      "day": 2,
+      "name": "Tết Nguyên Đán",
+      "label": "Tết"
+    },
+    {
+      "month": 1,
+      "day": 3,
+      "name": "Tết Nguyên Đán",
+      "label": "Tết"
+    },
+    {
+      "month": 3,
+      "day": 10,
+      "name": "Giỗ Tổ Hùng Vương",
+      "label": "Giỗ Tổ"
+    },
+    {
+      "month": 5,
+      "day": 5,
+      "name": "Tết Đoan Ngọ",
+      "label": "Đ.Ngọ"
+    },
+    {
+      "month": 7,
+      "day": 15,
+      "name": "Lễ Vu Lan",
+      "label": "Vu Lan"
+    },
+    {
+      "month": 8,
+      "day": 15,
+      "name": "Tết Trung Thu",
+      "label": "T.thu"
+    },
+    {
+      "month": 12,
+      "day": 30,
+      "name": "Giao thừa",
+      "label": "Giao thừa"
+    }
+  ]
+}
