@@ -10,12 +10,12 @@ const rows=[
 let busy=false,versionKey='';
 function device(){
  if(typeof deviceProtocol==='undefined'||deviceProtocol!==PROTOCOL_NRF52||!gattServer?.connected||!nrf52ModelDetected||nrf52ModelId!==2||!epdCharacteristic)return null;
- const id=({213:'ce213',214:'noce213',215:'ce290',216:'noce290',217:'ce213-up3',218:'noce213-up3',219:'ce213-up3',220:'noce213-up3',221:'ce290',222:'noce290',223:'ce213-up3',224:'noce213-up3',229:'noce213-up3',233:'noce213-up3',225:'ce290',230:'ce290',234:'ce290',226:'noce290',231:'noce290',235:'noce290',227:'ce213-up3',228:'ce213-up3',232:'ce213-up3'})[nrf52FirmwareVersion],big=nrf52PanelProfile===0x29;
- if(!id||!(big?[215,216,221,222,225,226,230,231,234,235]:nrf52PanelProfile===0x21?[213,214,217,218,219,220,223,224,227,228,229,232,233]:[]).includes(nrf52FirmwareVersion))return null;
+ const id=({213:'ce213',214:'noce213',215:'ce290',216:'noce290',217:'ce213-up3',218:'noce213-up3',219:'ce213-up3',220:'noce213-up3',221:'ce290',222:'noce290',223:'ce213-up3',224:'noce213-up3',229:'noce213-up3',233:'noce213-up3',237:'noce213-up3',243:'noce213-up3',225:'ce290',230:'ce290',234:'ce290',238:'ce290',244:'ce290',226:'noce290',231:'noce290',235:'noce290',239:'noce290',241:'noce290',245:'noce290',227:'ce213-up3',228:'ce213-up3',232:'ce213-up3',236:'ce213-up3',242:'ce213-up3'})[nrf52FirmwareVersion],big=nrf52PanelProfile===0x29;
+ if(!id||!(big?[215,216,221,222,225,226,230,231,234,235,238,239,244,241,245]:nrf52PanelProfile===0x21?[213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243]:[]).includes(nrf52FirmwareVersion))return null;
  return{key:[bleDevice?.id,nrf52PanelProfile,nrf52FirmwareVersion].join('|'),id,big,ch:epdCharacteristic};
 }
 function blocked(){return !!(window.VNDataBusy?.()||window.EpdDfuBusy?.()||window.EpdAutoUpdate?.busy?.()||window.countdownOperationBusy||(typeof clockImageUploadBusy!=='undefined'&&clockImageUploadBusy));}
-function preview(){const d=device(),n=Number($('calendar-face-select').value),row=rows[n];if(!d||!row)return;$('calendar-face-preview').src='face-previews/calendar-'+(n+1)+'.png';$('calendar-face-preview').alt=row.name+' — hình minh họa';$('calendar-face-description').textContent=row.description;}
+function preview(){const d=device(),n=Number($('calendar-face-select').value),row=rows[n];if(!d||!row)return;const dir=window.EpdWebsiteI18n?.current()==='en'?'face-previews/en/':'face-previews/';$('calendar-face-preview').src=dir+'calendar-'+(n+1)+'.png';$('calendar-face-preview').alt=row.name+' — hình minh họa';$('calendar-face-description').textContent=row.description;}
 function refresh(){
  const d=device();$('calendar-face-controls').hidden=!d;
  if(!d){$('calendar-face-availability').textContent=typeof gattServer==='undefined'||!gattServer?.connected?'Kết nối đồng hồ để xem những giao diện lịch phù hợp.':'Đồng hồ này vẫn dùng nút Chuyển sang chế độ lịch phía trên. Cập nhật phần mềm có hỗ trợ để chọn trực tiếp.';versionKey='';return;}
@@ -36,5 +36,5 @@ async function apply(){
  finally{busy=false;refresh();}
 }
 $('calendar-face-select').addEventListener('change',preview);$('calendar-face-apply').addEventListener('click',apply);
-window.CalendarFacePicker={refresh,apply,supported:()=>!!device()};refresh();setInterval(refresh,500);
+window.CalendarFacePicker={refresh,refreshPreview:preview,apply,supported:()=>!!device()};refresh();setInterval(refresh,500);
 })();

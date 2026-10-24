@@ -1,6 +1,8 @@
 # Hướng dẫn dùng đồng hồ mực điện tử
 
-Web v61.50: hàng thứ lớn trong mode lịch và tháng tiếng Anh viết tắt cần firmware mới tương thích. Chọn English ở đầu trang để đổi ngôn ngữ điều khiển. Thanh tiến trình đổi ngôn ngữ đồng hồ hiện ngay dưới nút Áp dụng. Ngôn ngữ trang web và ngôn ngữ hiển thị trên đồng hồ là hai lựa chọn riêng.
+Web v61.51: hàng thứ lớn trong mode lịch và tháng tiếng Anh viết tắt cần firmware mới tương thích. Chọn English ở đầu trang để đổi ngôn ngữ điều khiển. Thanh tiến trình đổi ngôn ngữ đồng hồ hiện ngay dưới nút Áp dụng. Ngôn ngữ trang web và ngôn ngữ hiển thị trên đồng hồ là hai lựa chọn riêng.
+
+Dữ liệu ngày nhắc mới: 24/11 — Ngày Văn hóa Việt Nam; 24/12 — Đêm Giáng sinh; 25/12 — Lễ Giáng sinh. Kết nối rồi vào Cập nhật phần mềm → Cài đặt đồng hồ để cập nhật. Muốn hiển thị tên tháng tiếng Anh đầy đủ ở các vùng lịch rộng, hãy cập nhật phần mềm phù hợp trước.
 
 ## English quick start
 

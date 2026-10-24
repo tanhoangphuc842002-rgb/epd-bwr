@@ -12,13 +12,17 @@ function configure(base,extra){
  shortParts=new RegExp('(^|[^\\p{L}\\p{N}])('+Object.keys(en).filter(s=>s.length>=2&&s.length<4&&/[À-ỹĐđ]/.test(s)).map(escape).join('|')+')(?=$|[^\\p{L}\\p{N}])','gu');
 }
 function current(){try{return localStorage.getItem('app-language')==='en'?'en':'vi';}catch(_){return'vi';}}
+function navigationCopy(value,lang){
+ if(lang==='en')return value.replace(/^Software update$/,'Settings').replace(/Software update(?=\s*→|\s+first\.)/g,'Settings');
+ return value.replace(/^Cập nhật phần mềm$/,'Cài đặt').replace(/Cập nhật phần mềm(?=\s*→)/g,'Cài đặt').replace(/mục Cập nhật phần mềm/g,'mục Cài đặt');
+}
 function translate(text,lang=current()){
  if(typeof text!=='string')return text;
  const key=normalize(text),map=lang==='en'?en:vi;
  let value=map[key];
- if(value===undefined&&lang!=='en')return text;
+ if(value===undefined&&lang!=='en')return navigationCopy(text,lang);
  if(value===undefined)value=lang==='en'&&parts?key.replace(parts,s=>en[s]).replace(shortParts,(match,gap,s)=>gap+en[s]):key;
- return text.match(/^\s*/)[0]+value+text.match(/\s*$/)[0];
+ return text.match(/^\s*/)[0]+navigationCopy(value,lang)+text.match(/\s*$/)[0];
 }
 function ignored(element){return !element||skipTags.has(element.tagName)||!!element.closest('[data-no-i18n],#daily-quote-list,#daily-quote-author-preview');}
 function textNode(node,lang=current()){
@@ -44,6 +48,9 @@ function apply(lang=current()){
  lang=lang==='en'?'en':'vi';try{localStorage.setItem('app-language',lang);}catch(_){}
  document.documentElement.lang=lang;document.title=translate('E-Paper Tag - Bluetooth Controller',lang);
  const selector=document.getElementById('language-selector');if(selector)selector.value=lang;
+ // Refresh only illustration URLs: choosing a website language never writes to the clock.
+ window.ClockFacePicker?.refreshPreview?.();
+ window.CalendarFacePicker?.refreshPreview?.();
  subtree(document.body,lang);
 }
 function observe(){

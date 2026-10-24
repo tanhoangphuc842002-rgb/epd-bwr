@@ -63,6 +63,26 @@
             background-color: #e0e0e0;
         }
 
+        .clock75-direct-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            background-color: #4a6ee0;
+            color: white;
+            margin: 5px;
+            border-radius: 8px;
+            min-height: 44px;
+            box-sizing: border-box;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .clock75-direct-link:hover,
+        .clock75-direct-link:focus-visible {
+            background-color: #3a5ecf;
+            color: white;
+        }
+
         .tab-button.active {
             background-color: #fff;
             border-bottom: 3px solid #4a6ee0;
@@ -978,7 +998,10 @@
     <script src="website-en-1.js?v=904fa24bcf58"></script>
     <script src="website-en-2.js?v=912dc4029ee7"></script>
     <script src="website-en-3.js?v=34d64829e8a5"></script>
-    <script src="website-i18n.js?v=ec8f3e081885"></script>
+    <script src="website-en-clock-album.js?v=20261024"></script>
+    <script src="website-i18n.js?v=20261024-clock-album"></script>
+    <script src="clock-image-processing.js?v=5.9.7"></script>
+    <script src="shared-battery.js?v=5.9.7"></script>
     <script>
         const APP_TRANSLATIONS = {
             vi: {
@@ -986,6 +1009,12 @@
                 "Language selector": "Bộ chọn ngôn ngữ",
                 "Language:": "Ngôn ngữ:",
                 "E-Paper Settings": "Cài đặt màn hình E-Paper",
+                "Battery voltage": "Điện áp pin",
+                "Not connected": "Chưa kết nối",
+                "Not reported by this clock.": "Đồng hồ chưa gửi điện áp.",
+                "Voltage appears when the clock sends a measurement.": "Điện áp sẽ hiện khi đồng hồ gửi số đo.",
+                "Measured by the connected clock.": "Số đo do đồng hồ đang kết nối gửi về.",
+                "Connect a clock to view its battery voltage.": "Kết nối đồng hồ để xem điện áp pin.",
                 "Countdown Module": "Bộ đếm ngược",
                 "Image Transfer": "Truyền ảnh",
                 "Template Designer": "Thiết kế mẫu",
@@ -1276,7 +1305,8 @@
             <button id="clock-image-tab-button" class="tab-button" data-tab="tab-clock-image">Đồng hồ và ảnh</button>
             <button class="tab-button" data-tab="tab-vn-todo">Việc cần làm</button>
             <button class="tab-button" data-tab="tab-date-marks" style="min-width:200px">Đánh dấu ngày tháng</button>
-            <button id="dfu-tab-button" class="tab-button" data-tab="tab-dfu">Cập nhật phần mềm</button>
+            <a id="clock75-original-button" class="tab-button clock75-direct-link" href="clock75/html/index.html?v=github11-direct75-5.9.8">Đồng hồ 7.5</a>
+            <button id="dfu-tab-button" class="tab-button" data-tab="tab-dfu">Settings</button>
             <button class="tab-button" data-tab="tab-led-effects">Đèn / hiệu ứng</button>
         </div>
     </div>
@@ -1298,6 +1328,11 @@
             </select>
             <button type="button" onclick="document.getElementById('log').innerHTML = '';">Clear Logs</button>
             <span id="device-protocol">Device: not connected</span>
+        </div>
+        <div id="shared-battery" style="padding:12px 16px;margin:12px 0;border:1px solid #d8e1eb;border-radius:10px;background:#f5f8fc;">
+            <div>Battery voltage</div>
+            <strong id="shared-battery-value" role="status" aria-live="polite">Not connected</strong>
+            <div id="shared-battery-hint" style="font-size:13px;color:#52637a;">Connect a clock to view its battery voltage.</div>
         </div>
 
         
@@ -1571,9 +1606,9 @@
         </div>
         <div class="button-group">
             <label>Độ sáng <input id="clock-image-brightness" type="range" min="-100" max="100" value="0" oninput="renderClockImage()"></label>
-            <label>Tương phản <input id="clock-image-contrast" type="range" min="-100" max="100" value="15" oninput="renderClockImage()"></label>
-            <label>Ngưỡng đỏ <input id="clock-image-red-threshold" type="range" min="80" max="240" value="150" oninput="renderClockImage()"></label>
-            <label>Ngưỡng đen/trắng <input id="clock-image-bw-threshold" type="range" min="50" max="220" value="145" oninput="renderClockImage()"></label>
+            <label>Tương phản <input id="clock-image-contrast" type="range" min="-100" max="100" value="0" oninput="renderClockImage()"></label>
+            <label>Ngưỡng đỏ <input id="clock-image-red-threshold" type="range" min="80" max="240" value="120" oninput="renderClockImage()"></label>
+            <label>Ngưỡng đen/trắng <input id="clock-image-bw-threshold" type="range" min="50" max="220" value="128" oninput="renderClockImage()"></label>
         </div>
         <div id="clock-image-canvas-box" style="max-width:100%; overflow:auto;">
             <canvas id="clock-image-canvas" width="400" height="480" style="border:1px solid #222; max-width:100%; height:auto;"></canvas>
@@ -1660,6 +1695,18 @@
             <progress id="clock-image-progress" max="100" value="0" style="width:min(500px,100%);"></progress>
             <span id="clock-image-status">Kết nối đồng hồ để chọn ảnh và tải lên màn hình.</span>
         </div>
+        <section id="clock-album-controls" style="margin-top:20px;padding:16px;border:1px solid #b9c7d8;border-radius:12px">
+          <style>#clock-album-controls .button-group{display:flex;gap:8px;flex-wrap:wrap}#clock-album-controls button{width:auto;flex:0 1 auto;margin:4px 0;padding:10px 16px}#clock-album-controls p{margin:10px 0}#clock-album-controls progress{display:block}#clock-album-status{padding:10px;background:#edf3f9;border-radius:8px;color:#16304e}</style>
+          <h3>Đồng hồ và ảnh luân phiên</h3>
+          <p>Dùng chung 8 ô với Album ảnh. Chọn và chỉnh ảnh ở trên, lưu vào một ô, rồi chọn thời gian đổi ảnh. Đồng hồ vẫn chạy khi không kết nối web.</p>
+          <p><label for="clock-album-slot">Ô ảnh</label> <select id="clock-album-slot"><option value="0">Ảnh 1</option><option value="1">Ảnh 2</option><option value="2">Ảnh 3</option><option value="3">Ảnh 4</option><option value="4">Ảnh 5</option><option value="5">Ảnh 6</option><option value="6">Ảnh 7</option><option value="7">Ảnh 8</option></select></p>
+          <div class="button-group"><button id="clock-album-read" type="button">Đọc ảnh đã lưu</button><button id="clock-album-save" type="button">Lưu ảnh đang chỉnh</button><button id="clock-album-show" type="button">Hiển thị ảnh đã chọn và giờ</button></div>
+          <p id="clock-album-slots" role="status">Kết nối đồng hồ để đọc các ô ảnh đã lưu.</p>
+          <p><label for="clock-album-interval">Đổi ảnh sau mỗi</label> <input id="clock-album-interval" type="number" min="1" max="1440" value="30" style="width:95px"> phút.</p>
+          <div class="button-group"><button id="clock-album-start" type="button">Lưu và bắt đầu luân phiên</button><button id="clock-album-hold" type="button">Giữ nguyên ảnh hiện tại</button></div>
+          <progress id="clock-album-progress" max="100" value="0" style="width:min(500px,100%)" aria-label="Tiến độ lưu ảnh"></progress>
+          <p id="clock-album-status" role="status">Cập nhật phần mềm đồng hồ trước khi dùng chức năng này. Lưu vào ô đã có ảnh sẽ thay ảnh trong ô đó; các ô khác được giữ nguyên.</p>
+        </section>
     </div>
 
     <div id="tab-date-marks" class="tab-content">
@@ -2135,7 +2182,7 @@
    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabButtons = document.querySelectorAll('.tab-button[data-tab]');
             const tabContents = document.querySelectorAll('.tab-content');
             tabButtons[0].classList.add('active');
             tabContents[0].classList.add('active');
@@ -2151,9 +2198,9 @@
         });
         
 // Inline tab switching (initTabs was in missing utils.js)
-document.querySelectorAll('.tab-button').forEach(function(btn) {
+document.querySelectorAll('.tab-button[data-tab]').forEach(function(btn) {
     btn.addEventListener('click', function() {
-        document.querySelectorAll('.tab-button').forEach(function(b) { b.classList.remove('active'); });
+        document.querySelectorAll('.tab-button[data-tab]').forEach(function(b) { b.classList.remove('active'); });
         document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
         btn.classList.add('active');
         var tab = document.getElementById(btn.getAttribute('data-tab'));
@@ -2734,7 +2781,8 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
                 for (let x = 0; x < canvas.width; x++) {
                     const index = (canvas.width * 4 * y) + x * 4;
                     if (type !== 'bwr') {
-                        buffer.push(imageData.data[index] > 0 && imageData.data[index + 1] > 0 && imageData.data[index + 2] > 0 ? 1 : 0);
+                        const isRed = imageData.data[index] > 160 && imageData.data[index] > imageData.data[index + 1] && imageData.data[index] > imageData.data[index + 2];
+                        buffer.push((type === 'bwr-black' && isRed) || (imageData.data[index] > 0 && imageData.data[index + 1] > 0 && imageData.data[index + 2] > 0) ? 1 : 0);
                     } else {
                         buffer.push(imageData.data[index] > 0 && imageData.data[index + 1] === 0 && imageData.data[index + 2] === 0 ? 1 : 0);
                     }
@@ -2759,7 +2807,8 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
     for (let y = 0; y < canvas.height; y++) {
       const index = (canvas.width * 4 * y) + x * 4;
       if (type !== 'bwr') {
-        buffer.push(imageData.data[index] > 0 && imageData.data[index+1] > 0 && imageData.data[index+2] > 0 ? 1 : 0);
+        const isRed = imageData.data[index] > 160 && imageData.data[index] > imageData.data[index+1] && imageData.data[index] > imageData.data[index+2];
+        buffer.push((type === 'bwr-black' && isRed) || (imageData.data[index] > 0 && imageData.data[index+1] > 0 && imageData.data[index+2] > 0) ? 1 : 0);
       } else {
         buffer.push(imageData.data[index] > 0 && imageData.data[index+1] === 0 && imageData.data[index+2] === 0 ? 1 : 0);
       }
@@ -3020,6 +3069,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             });
         }
         function resetVariables() {
+            window.SharedBattery?.setConnected(false);
             finishSleepConfirmation(false);
             if (window.LedEffectsUi) window.LedEffectsUi.reset();
             if (window.EpdDesigner) window.EpdDesigner.reset();
@@ -3124,12 +3174,12 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             // 2.13 CE v19.2 reports panel profile 0x21 and app version 0x2B.
             if (nrf52PanelProfile === 0x21) return nrf52FirmwareVersion >= 0x2B;
             // The compatible 2.9 release reports model 2 and app version 0x22.
-            return (nrf52FirmwareVersion >= 0x22 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235].includes(nrf52FirmwareVersion);
+            return (nrf52FirmwareVersion >= 0x22 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245].includes(nrf52FirmwareVersion);
         }
         function nrf52WeekStartAckSupported() {
             return nrf52ModelDetected && nrf52ModelId === 2 &&
                 nrf52PanelProfile !== 0x21 &&
-                ((nrf52FirmwareVersion >= 0x23 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235].includes(nrf52FirmwareVersion));
+                ((nrf52FirmwareVersion >= 0x23 && nrf52FirmwareVersion < 39) || [61,67,133,134,135,136,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245].includes(nrf52FirmwareVersion));
         }
         function waitForNrf52WeekStartAck(weekStart, timeoutMs = 8000) {
             if (nrf52WeekStartAckWaiter) {
@@ -3258,7 +3308,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         }
         async function sendNrf52Mode(mode) {
             const previousMode = nrf52DisplayMode;
-            const nativeCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29);
+            const nativeCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29);
             const actualMode = mode & (nativeCalendar ? 0x3f : 0x7f);
             // Save the calendar layout before SET_TIME triggers a redraw. The
             // firmware writes flash only when the value actually changes.
@@ -3277,12 +3327,12 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             await sendCommand(packet);
             nrf52DisplayMode = nativeCalendar && actualMode === 1 && !(mode & 0x40)
                 ? (previousMode === 1 ? 9 : previousMode === 9 ? (nrf52PanelProfile === 0x29 ? 5 : 7) : 1)
-                : actualMode === 2 && ((nrf52PanelProfile === 0x21 && [209,210,213,214,217,218,219,220,223,224,227,228,229,232,233].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x29 && [211,212,215,216,221,222,225,226,230,231,234,235].includes(nrf52FirmwareVersion)))
+                : actualMode === 2 && ((nrf52PanelProfile === 0x21 && [209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x29 && [211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245].includes(nrf52FirmwareVersion)))
                     ? ((mode & 0x40) ? 2 : ((nrf52PanelProfile === 0x29 ? [2,3,4,10,11,12,13,2] : [2,3,4,5,10,11,12,2])[(nrf52PanelProfile === 0x29 ? [2,3,4,10,11,12,13] : [2,3,4,5,10,11,12]).indexOf(previousMode)+1] || 2))
-                : actualMode === 2 && ((nrf52PanelProfile === 0x21 && [205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x29 && [207,208,211,212,215,216,221,222,225,226,230,231,234,235].includes(nrf52FirmwareVersion)))
+                : actualMode === 2 && ((nrf52PanelProfile === 0x21 && [205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x29 && [207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245].includes(nrf52FirmwareVersion)))
                     ? ((mode & 0x40) ? 2 : ((nrf52PanelProfile === 0x29 ? [2,3,4,10,11,12,13,2] : [2,3,4,5,10,11,12,2])[(nrf52PanelProfile === 0x29 ? [2,3,4,10,11,12,13] : [2,3,4,5,10,11,12]).indexOf(previousMode)+1] || 2))
-                : actualMode === 2 && ((nrf52PanelProfile === 0x29 && [157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x21 && [151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233].includes(nrf52FirmwareVersion)))
-                    ? (previousMode === 2 ? 3 : previousMode === 3 ? 4 : previousMode === 4 ? (nrf52PanelProfile === 0x29 ? 10 : 5) : previousMode === 11 && nrf52PanelProfile === 0x29 && [183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235].includes(nrf52FirmwareVersion) ? 12 : previousMode === 10 && nrf52PanelProfile === 0x29 && [167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235].includes(nrf52FirmwareVersion) ? 11 : previousMode === 10 && nrf52PanelProfile === 0x21 && [178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233].includes(nrf52FirmwareVersion) ? 11 : previousMode === 5 && nrf52PanelProfile === 0x21 && [159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233].includes(nrf52FirmwareVersion) ? 10 : 2)
+                : actualMode === 2 && ((nrf52PanelProfile === 0x29 && [157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245].includes(nrf52FirmwareVersion)) || (nrf52PanelProfile === 0x21 && [151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243].includes(nrf52FirmwareVersion)))
+                    ? (previousMode === 2 ? 3 : previousMode === 3 ? 4 : previousMode === 4 ? (nrf52PanelProfile === 0x29 ? 10 : 5) : previousMode === 11 && nrf52PanelProfile === 0x29 && [183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245].includes(nrf52FirmwareVersion) ? 12 : previousMode === 10 && nrf52PanelProfile === 0x29 && [167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245].includes(nrf52FirmwareVersion) ? 11 : previousMode === 10 && nrf52PanelProfile === 0x21 && [178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243].includes(nrf52FirmwareVersion) ? 11 : previousMode === 5 && nrf52PanelProfile === 0x21 && [159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243].includes(nrf52FirmwareVersion) ? 10 : 2)
                     : (actualMode === 2 && previousMode === 2) ? 3 : actualMode;
             addLog(`nRF52 mode ${nrf52DisplayMode} command sent`);
         }
@@ -3399,7 +3449,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             // pixels, row by row.
             const converter = (is420 || is750Bwr) ? canvas2bytes : canvas2bytes_bw;
             const hasRedPlane = is420Bwr || is750Bwr || is290 || (!is420Bw1619 && nrf52ModelId === 2);
-            const black = converter(canvas);
+            const black = converter(canvas, hasRedPlane ? 'bwr-black' : 'bw');
             await sendNrf52ImagePlane(black, true, 0, hasRedPlane ? 48 : 95);
             if (hasRedPlane) {
                 // The BWR converter uses 1 for red pixels, while the
@@ -3598,6 +3648,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         }
 
         function updateClockImageAvailability() {
+            window.SmallClockAlbum?.controls(false);
             const button = document.getElementById('clock-image-tab-button');
             const uploadButton = document.getElementById('clock-image-upload-button');
             const status = document.getElementById('clock-image-status');
@@ -3774,9 +3825,9 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             const redThreshold = document.getElementById('clock-image-red-threshold');
             const bwThreshold = document.getElementById('clock-image-bw-threshold');
             if (brightness) brightness.value = 0;
-            if (contrast) contrast.value = 15;
-            if (redThreshold) redThreshold.value = 150;
-            if (bwThreshold) bwThreshold.value = 145;
+            if (contrast) contrast.value = 0;
+            if (redThreshold) redThreshold.value = 120;
+            if (bwThreshold) bwThreshold.value = 128;
             renderClockImage();
         }
 
@@ -3784,29 +3835,11 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             const canvas = ctx.canvas;
             const brightness = applyAdjustments ? (parseInt(document.getElementById('clock-image-brightness').value, 10) || 0) : 0;
             const contrastValue = applyAdjustments ? (parseInt(document.getElementById('clock-image-contrast').value, 10) || 0) : 0;
-            const redThreshold = parseInt(document.getElementById('clock-image-red-threshold').value, 10) || 150;
-            const bwThreshold = parseInt(document.getElementById('clock-image-bw-threshold').value, 10) || 145;
-            const contrast = (259 * (contrastValue + 255)) / (255 * (259 - contrastValue));
+            const redThreshold = parseInt(document.getElementById('clock-image-red-threshold').value, 10) || 120;
+            const bwThreshold = parseInt(document.getElementById('clock-image-bw-threshold').value, 10) || 128;
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const pixels = imageData.data;
-            for (let i = 0; i < pixels.length; i += 4) {
-                let r = contrast * (pixels[i] - 128) + 128 + brightness * 2.55;
-                let g = contrast * (pixels[i + 1] - 128) + 128 + brightness * 2.55;
-                let b = contrast * (pixels[i + 2] - 128) + 128 + brightness * 2.55;
-                r = Math.max(0, Math.min(255, r));
-                g = Math.max(0, Math.min(255, g));
-                b = Math.max(0, Math.min(255, b));
-                const red = r >= redThreshold && r - Math.max(g, b) >= 20;
-                const luma = 0.299 * r + 0.587 * g + 0.114 * b;
-                if (red) {
-                    pixels[i] = 255; pixels[i + 1] = 0; pixels[i + 2] = 0;
-                } else if (luma < bwThreshold) {
-                    pixels[i] = 0; pixels[i + 1] = 0; pixels[i + 2] = 0;
-                } else {
-                    pixels[i] = 255; pixels[i + 1] = 255; pixels[i + 2] = 255;
-                }
-                pixels[i + 3] = 255;
-            }
+            imageData.data.set(window.EpdClockImageProcessing.process(imageData.data, canvas.width, canvas.height,
+                {brightness, contrast:contrastValue, redThreshold, bwThreshold}, applyAdjustments, applyAdjustments));
             ctx.putImageData(imageData, 0, 0);
         }
 
@@ -3888,7 +3921,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
 
             // Use the same proven column-first conversion and WRITE_IMAGE
             // transport as the normal 2.13/2.9-inch full-screen uploader.
-            const black = canvas2bytes_bw(fullCanvas);
+            const black = canvas2bytes_bw(fullCanvas, 'bwr-black');
             const red = canvas2bytes_bw(fullCanvas, 'bwr').map(byte => byte ^ 0xff);
             return { black, red };
         }
@@ -3922,7 +3955,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         }
 
         async function uploadNrf290RegionalClockImage(canvas, target, clockImageMode) {
-            const black = canvas2bytes_bw(canvas);
+            const black = canvas2bytes_bw(canvas, 'bwr-black');
             const red = canvas2bytes_bw(canvas, 'bwr').map(byte => byte ^ 0xff);
             const expectedBytes = target.width * target.height / 8;
             if (canvas.width !== 194 || canvas.height !== 128 ||
@@ -4419,12 +4452,12 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             }
             if(canvas.width==296){
                 
-                 await sendBufferData(bytesToHex(canvas2bytes_bw(canvas)), 'bw')
+                 await sendBufferData(bytesToHex(canvas2bytes_bw(canvas, 'bwr-black')), 'bw')
                  await sendBufferData(bytesToHex(canvas2bytes_bw(canvas, 'bwr')), 'bwr')
             }else if(canvas.width==250 ||canvas.width==212){
                  await sendBufferData(bytesToHex(canvas2bytes_bw(canvas)), 'bw')
             }else{
-                await sendBufferData(bytesToHex(canvas2bytes(canvas)), 'bw')
+                await sendBufferData(bytesToHex(canvas2bytes(canvas, 'bwr-black')), 'bw')
                 await sendBufferData(bytesToHex(canvas2bytes(canvas, 'bwr')), 'bwr')
             }
             
@@ -4436,7 +4469,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
         async function setTime() {
             if (window.countdownOperationBusy) return;
             if (deviceProtocol === PROTOCOL_NRF52) {
-                const keepCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21 && [1,7,9].includes(nrf52DisplayMode)) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29 && [1,5,9].includes(nrf52DisplayMode));
+                const keepCalendar = ([141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x21 && [1,7,9].includes(nrf52DisplayMode)) || ([145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245].includes(nrf52FirmwareVersion) && nrf52PanelProfile === 0x29 && [1,5,9].includes(nrf52DisplayMode));
                 await sendNrf52Mode(nrf52DisplayMode | (keepCalendar ? 0x40 : 0));
                 return;
             }
@@ -5024,6 +5057,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             if (resource.length >= 3 && resource[0] === 0xEA && resource[1] === 0x56 && resource[2] === 0x4E) return;
             const value = event.target.value;
             const data = new Uint8Array(value.buffer, value.byteOffset, value.byteLength);
+            if (event.target === epdCharacteristic && window.SharedBattery?.notification(data)) return;
             if (window.EpdDesigner && window.EpdDesigner.onNotification(data)) return;
             if (window.handleCountdownNotification && window.handleCountdownNotification(data)) return;
             if (data.length === 3 && data[0] === NRF52_CMD_SET_WEEK_START &&
@@ -5216,6 +5250,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
             await delay(80);
             await sendPendingWeekStartAfterDetection();
             await readSleepSchedule();
+            await window.SmallClockBattery?.read();
             addLog('> nRF52 connected; display initialized.');
         }
         async function reConnect() {
@@ -5244,6 +5279,7 @@ document.querySelectorAll('.tab-button').forEach(function(btn) {
                 document.getElementById("connectbutton").textContent = t('Connecting...');
                 addLog(t("Connecting: ") + bleDevice.name);
                 gattServer = await bleDevice.gatt.connect();
+                window.SharedBattery?.setConnected(true);
                 addLog('> GATT server found');
                 try {
                     await connectNrf52();
@@ -6785,10 +6821,11 @@ function toggleSwitch(e) {
 <script src="secure-dfu.js?v=29ecdcf208d6"></script>
 <script src="ota-verifier.js?v=531f216ef5de"></script>
 <script src="ota-dual-update.js?v=25c9650ac4aa"></script>
-<script src="ota-auto-update.js?v=c0346c203532"></script>
-<script src="countdown-nrf52.js?v=fc5f43fa9142"></script>
+<script src="update-entry.js?v=github11-direct75-5.9.4"></script>
+<script src="ota-auto-update.js?v=20261024-clock-album"></script>
+<script src="countdown-nrf52.js?v=20261024-clock-album"></script>
 <script src="countdown-da14585.js?v=db312a00c536"></script>
-<script src="led-effects.js?v=3b8a559da2ce"></script>
+<script src="led-effects.js?v=20261024-clock-album"></script>
 <script src="ble-write-queue.js?v=3a9376f9bbe0"></script>
 <script src="vn-font-data.js?v=8c4bba3d7ba3"></script>
 <script src="face5-font-data.js?v=cda1a34f4245"></script>
@@ -6796,12 +6833,13 @@ function toggleSwitch(e) {
     <script src="face23-sans22-data.js?v=d99f2719fb87"></script>
     <script src="face4-sans36-data.js?v=0bd3fb195566"></script><script src="face6-flip-data.js?v=40153a160b08"></script><script src="face6-dark-top-data.js?v=240e9ac16b14"></script><script src="face6-freesans-white-data.js?v=d0fc9fc6ca1e"></script><script src="face6-white-213-data.js?v=2684c121fc8d"></script><script src="face1-retro-213-data.js?v=2c2a8d4881e4"></script><script src="face1-retro-290-data.js?v=2f1ba7fc3a78"></script><script src="face6-white-290-data.js?v=cd037f540c37"></script><script src="face6-290-data.js?v=b3c450ea251e"></script>
     <script src="sans290-data.js?v=d8ee1cdd678e"></script><script src="sans290-classic-data.js?v=2286d7b11b96"></script><script src="sans290-bold42-data.js?v=6483e04596db"></script>
-    <script src="language-290-resources-data.js?v=82420958b15a"></script>
-<script src="language-resources-data.js?v=c3e7c8eb2e30"></script>
-<script src="vn-operation.js?v=fd5ea3484992"></script><script src="vn-todo.js?v=b74df1979cc2"></script><script src="date-marks.js?v=99726c830663"></script><script src="daily-quotes-data.js?v=568ad63762f4"></script><script src="calendar-month-213-data.js?v=dcd75adc3ac6"></script><script src="calendar-month-290-data.js?v=2078a8947689"></script><script src="outline-213-data.js?v=5c4fb5adf44d"></script><script src="outline-290-data.js?v=3699020f18cf"></script><script src="serif-213-data.js?v=98f6c0a699b4"></script><script src="serif-290-data.js?v=e4d8e2ad66a8"></script><script src="daily-quotes.js?v=de19dda59f11"></script><script src="daily-quote-panel.js?v=9cb7b1b77c9c"></script>
-<script src="photo-album.js?v=90e6623a343f"></script>
-<script src="clock-face-picker.js?v=7dc809197ad9"></script>
-<script src="calendar-face-picker.js?v=c4bd46bb270a"></script>
+    <script src="language-290-resources-data.js?v=661f4d1a113c"></script>
+<script src="language-resources-data.js?v=8ddd70576c6b"></script>
+<script src="vn-operation.js?v=fd5ea3484992"></script><script src="vn-todo.js?v=20261024-clock-album"></script><script src="date-marks.js?v=20261024-clock-album"></script><script src="daily-quotes-data.js?v=568ad63762f4"></script><script src="calendar-month-213-data.js?v=1c1356dbf5e0"></script><script src="calendar-month-290-data.js?v=ce56a0844659"></script><script src="outline-213-data.js?v=5c4fb5adf44d"></script><script src="outline-290-data.js?v=3699020f18cf"></script><script src="serif-213-data.js?v=98f6c0a699b4"></script><script src="serif-290-data.js?v=e4d8e2ad66a8"></script><script src="daily-quotes.js?v=20261024-clock-album"></script><script src="daily-quote-panel.js?v=20261024-clock-album"></script>
+<script src="photo-album.js?v=20261024-clock-album"></script>
+<script src="clock-image-album.js?v=20261024"></script>
+<script src="clock-face-picker.js?v=20261024-clock-album"></script>
+<script src="calendar-face-picker.js?v=20261024-clock-album"></script>
 <script src="event-clock-data.js?v=1277c0f499c0"></script>
 <script src="event-clock-290-data.js?v=06efe3c71fc0"></script>
 <!-- Unified clock setup is part of the normal settings panel. -->

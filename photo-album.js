@@ -4,11 +4,11 @@
 const $=id=>document.getElementById(id),T=window.VNTransport;
 let busy=false,mask=0,consentKey=null;
 const u32=n=>{const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,n,true);return b;};
-function say(s){$('photo-status').textContent=s;if(typeof addLog==='function')addLog('Album ảnh: '+s);}
-function supported(){return window.VNCountdownSupport?.()&&gattServer?.connected&&((nrf52PanelProfile===0x21&&[128,129,130,131,132,137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233].includes(nrf52FirmwareVersion))||(nrf52PanelProfile===0x29&&[135,136,145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235].includes(nrf52FirmwareVersion)));}
+function say(s){$('photo-status').textContent=s;const other=$('clock-album-status');if(other)other.textContent=s;if(typeof addLog==='function')addLog('Album ảnh: '+s);}
+function supported(){return window.VNCountdownSupport?.()&&gattServer?.connected&&((nrf52PanelProfile===0x21&&[128,129,130,131,132,137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243].includes(nrf52FirmwareVersion))||(nrf52PanelProfile===0x29&&[135,136,145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245].includes(nrf52FirmwareVersion)));}
 function geometry(){return nrf52PanelProfile===0x29?{width:296,photo:0x30000,span:0x6000,step:0x3000,schedule:0x2e000}:{width:250,photo:0x40000,span:0x4000,step:0x2000,schedule:0x3e000};}
 function assertConnection(){if(!supported())throw Error('Đồng hồ này chưa hỗ trợ lưu nhiều ảnh. Bạn vẫn có thể dùng mục tải ảnh thông thường.');}
-function controls(v){busy=v;for(const x of document.querySelectorAll('#photo-album-controls button,#photo-album-controls input,#photo-album-controls select'))x.disabled=v;}
+function controls(v){busy=v;window.SmallClockAlbum?.controls(v);for(const x of document.querySelectorAll('#photo-album-controls button,#photo-album-controls input,#photo-album-controls select'))x.disabled=v;}
 async function action(fn){
  if(busy)return;controls(true);$('photo-progress').value=0;
  try{assertConnection();await T.run(fn,v=>$('photo-progress').value=v);}
@@ -30,7 +30,7 @@ async function caps(loadSchedule=true){
  mask=r[7];
  for(let i=0;i<8;i++)$('photo-state-'+i).textContent='Ảnh '+(i+1)+': '+(mask&(1<<i)?'đã lưu':'chưa có ảnh');
  if(loadSchedule){
-  $('photo-cycle-mode').value=String(r[8]);$('photo-interval').value=String((r[9]|r[10]<<8)||30);
+  $('photo-cycle-mode').value=String(r[8]>=3?0:r[8]);$('photo-interval').value=String((r[9]|r[10]<<8)||30);
   const base=new DataView(r.buffer,r.byteOffset).getUint32(12,true);
   let bytes=new Uint8Array(20);bytes.fill(255,4);
   if(base){const start=geometry().schedule;if(base!==start&&base!==start+0x1000)throw Error('Vùng lưu lịch không phù hợp.');bytes=await T.read(base+16,20);}
@@ -59,10 +59,10 @@ function planes(canvas){
  }
  return b;
 }
-async function upload(begin,body,bytes){
+async function upload(begin,body,bytes,onProgress=()=>{}){
  const r=await T.probe();if(r[8])throw Error('Đang có phiên truyền chưa hoàn tất. Kết nối lại và đọc trạng thái.');
  await T.request(begin,body);const chunk=r[9]-1;
- for(let pos=0;pos<bytes.length;pos+=chunk){await T.request(18,[pos&255,pos>>8,...bytes.slice(pos,pos+chunk)]);$('photo-progress').value=Math.min(pos+chunk,bytes.length)/bytes.length*100;}
+ for(let pos=0;pos<bytes.length;pos+=chunk){await T.request(18,[pos&255,pos>>8,...bytes.slice(pos,pos+chunk)]);$('photo-progress').value=Math.min(pos+chunk,bytes.length)/bytes.length*100;onProgress($('photo-progress').value);}
  await T.request(19);
 }
 async function verify(base,bytes,magic){
@@ -93,7 +93,7 @@ async function saveSchedule(stop=false){
  await upload(20,[...u32(0xc0decafe),...u32(T.crc32(b))],b);
  const r=await caps(false),base=new DataView(r.buffer,r.byteOffset).getUint32(12,true);
  const start=geometry().schedule;if(base!==start&&base!==start+0x1000)throw Error('Không nhận được lịch đã lưu.');
- await verify(base,b,0x31534856);await caps(true);$('photo-progress').value=100;
+ await verify(base,b,0x31534856);if(!b[1]&&nrf52DisplayMode===14)await sendNrf52Mode(0);await caps(true);$('photo-progress').value=100;
  say(b[1]?'Đã lưu lịch và bật tự đổi ảnh. Bạn có thể ngắt kết nối web. Chuyển sang mode đồng hồ/lịch sẽ tạm dừng album.':'Đã tắt tự đổi ảnh; ảnh hiện tại vẫn giữ trên màn.');
 }
 $('photo-choose').onclick=()=>{$('image_file').click();$('canvas-box').scrollIntoView({behavior:'smooth',block:'center'});};
@@ -123,12 +123,13 @@ window.PhotoAlbumBeforeDirectUpload=async()=>{
  if(busy||window.VNDataBusy?.()||window.EpdDfuBusy?.()){alert('Đồng hồ đang xử lý. Hãy chờ hoàn tất rồi tải ảnh.');return false;}
  try{return await T.run(async()=>{
   const r=await caps(false);
-  if(r[8]){
-   $('photo-cycle-mode').value=String(r[8]);modeChanged();
-   const message='Đồng hồ đang bật chế độ tự đổi ảnh. Bạn cần bấm Tắt tự đổi ảnh trong mục Album ảnh trước khi tải ảnh trực tiếp.';
+  if(r[8]&&r[8]!==5){
+   $('photo-cycle-mode').value=String(r[8]>=3?0:r[8]);modeChanged();
+   const message='Đồng hồ đang bật chế độ tự đổi ảnh. Chọn Giữ nguyên ảnh hiện tại trong Đồng hồ và ảnh, hoặc Tắt tự đổi ảnh trong Album ảnh trước khi tải ảnh trực tiếp.';
    say(message);alert(message);$('photo-album-controls').scrollIntoView({behavior:'smooth',block:'center'});return false;
   }return true;
  });}catch(e){say('Chưa kiểm tra được tự đổi ảnh: '+e.message);alert('Chưa đọc được trạng thái album. Hãy kiểm tra kết nối rồi thử lại.');return false;}
 };
+window.PhotoAlbumShared={action,caps,geometry,permitWrite,upload,verify,planes,say,u32,busy:()=>busy,get mask(){return mask;}};
 window.PhotoAlbumTrial={planes,schedule,get mask(){return mask;}};
 })();
