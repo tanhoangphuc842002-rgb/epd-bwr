@@ -3,25 +3,34 @@
  const node=typeof module!=='undefined'&&module.exports;
  const store=node?require('./resource_store'):root.EPDResourceStore;
  const builder=node?require('./resource_builder'):root.EPDResourceBuilder;
- function encode(date,label){
+ function normalizeLabel(label){
+  if(typeof label!=='string')throw Error('Hãy nhập tên sự kiện.');
+  const s=label.normalize('NFC').trim(),bytes=new TextEncoder().encode(s);
+  if(Array.from(s).length>20||bytes.length>60)throw Error('Tên sự kiện tối đa 20 ký tự có dấu.');
+  if(/[\p{Control}\p{Format}\p{Surrogate}]/u.test(label)||Array.from(label).some(c=>c.codePointAt(0)>0xffff||c.codePointAt(0)>=0xfffe))throw Error('Tên sự kiện không hỗ trợ biểu tượng hoặc ký tự ẩn.');
+  return s;
+ }
+ function encode(date,label,legacy=false){
   if(typeof date!=='string'||!/^20\d\d-\d\d-\d\d$/.test(date))throw new Error('Chọn ngày đích trong khoảng 2000–2099.');
   const t=Date.parse(date+'T00:00:00Z');
   if(!Number.isFinite(t)||new Date(t).toISOString().slice(0,10)!==date)throw new Error('Ngày đích không hợp lệ.');
-  if(typeof label!=='string'||!/^[\x20-\x7e]{0,16}$/.test(label))throw new Error('Tên sự kiện tối đa 16 ký tự không dấu. Hãy rút gọn tên rồi thử lại.');
-  const data=new Uint8Array(24),v=new DataView(data.buffer);v.setUint32(0,t/86400000,true);
+  label=normalizeLabel(label);
+  if(legacy&&!/^[\x20-\x7e]{0,16}$/.test(label))throw Error('Cập nhật phần mềm đồng hồ lên v5.21 để lưu tên sự kiện tiếng Việt có dấu.');
+  const data=new Uint8Array(legacy?24:68),v=new DataView(data.buffer);v.setUint32(0,t/86400000,true);
   data.set(new TextEncoder().encode(label),4);
-  const payload=new Uint8Array(40),p=new DataView(payload.buffer);
+  const payload=new Uint8Array(16+data.length),p=new DataView(payload.buffer);
   p.setUint32(0,0x314e4443,true);p.setUint16(4,1,true);p.setUint16(6,16,true);
   p.setUint16(8,data.length,true);p.setUint32(12,store.crc32(data),true);payload.set(data,16);
   return payload;
  }
  function decode(payload){
-  if(!(payload instanceof Uint8Array)||payload.length!==40)throw new Error('Dữ liệu đếm ngược không hợp lệ.');
+  if(!(payload instanceof Uint8Array)||![40,84].includes(payload.length))throw new Error('Dữ liệu đếm ngược không hợp lệ.');
   const v=new DataView(payload.buffer,payload.byteOffset,payload.byteLength),d=payload.subarray(16);
-  if(v.getUint32(0,true)!==0x314e4443||v.getUint16(4,true)!==1||v.getUint16(6,true)!==16||v.getUint16(8,true)!==24||v.getUint16(10,true)||v.getUint32(12,true)!==store.crc32(d)||d[20]||d[21]||d[22]||d[23])throw new Error('Dữ liệu đếm ngược bị lỗi hoặc chưa được cài.');
+  const legacy=payload.length===40,max=legacy?16:60,end=d.indexOf(0,4);
+  if(v.getUint32(0,true)!==0x314e4443||v.getUint16(4,true)!==1||v.getUint16(6,true)!==16||v.getUint16(8,true)!==d.length||v.getUint16(10,true)||v.getUint32(12,true)!==store.crc32(d)||end<4||end>4+max||d.subarray(end).some(x=>x))throw new Error('Dữ liệu đếm ngược bị lỗi hoặc chưa được cài.');
   const day=v.getUint32(16,true);if(day<10957||day>=47482)throw new Error('Ngày đích ngoài phạm vi.');
-  const label=new TextDecoder('utf-8',{fatal:true}).decode(d.subarray(4,20)).split('\0')[0];
-  const date=new Date(day*86400000).toISOString().slice(0,10);encode(date,label);return {date,label};
+  const label=new TextDecoder('utf-8',{fatal:true}).decode(d.subarray(4,end));
+  const date=new Date(day*86400000).toISOString().slice(0,10);encode(date,label,legacy);return {date,label};
  }
  async function save(client,payload,check=()=>{},onWrite=()=>{}){
   decode(payload);const status=store.parseStatus(await client.status());check();
@@ -35,7 +44,7 @@
   try{
    entered=true;onWrite();await client.upload(bytes,()=>check(),parts);check();
    const info=await client.inspect(10);check();
-   if(info.code||info.crc!==pack.crc||info.length!==40||info.revision!==pack.revision)throw new Error('Đồng hồ chưa xác nhận lưu thành công.');
+   if(info.code||info.crc!==pack.crc||info.length!==payload.length||info.revision!==pack.revision)throw new Error('Đồng hồ chưa xác nhận lưu thành công.');
    await client.leave();check();entered=false;
   }catch(error){
    if(entered&&!client.closed){
@@ -68,7 +77,8 @@
   try{
    if(typeof appVersion==='undefined'||appVersion<0x3e||typeof gattServer==='undefined'||!gattServer?.connected)throw new Error('Hãy kết nối đồng hồ 7.5 có hỗ trợ đếm ngược.');
    if(action==='apply'){
-    const payload=encode(root.document.getElementById('countdown75Date').value,root.document.getElementById('countdown75Label').value.trim());
+    const label=normalizeLabel(root.document.getElementById('countdown75Label').value),payload=encode(root.document.getElementById('countdown75Date').value,label,appVersion<0x52);
+    if(label&&root.ExternalResourceInstaller.ensureFonts)await root.ExternalResourceInstaller.ensureFonts([{slot:4,text:label}],null,report);
     report('Đang lưu ngày đích và tên sự kiện…');
     await root.ExternalResourceInstaller.countdownOperation((client,check,write)=>save(client,payload,check,write));
     if(!await root.sendTimeCommand(8,'Đếm ngược'))throw new Error('Đã lưu nhưng chưa bật được chế độ. Hãy thử lại.');
@@ -86,6 +96,6 @@
    }
   }catch(e){report(e.message);}finally{busy=false;controls();}
  }
- const api={encode,decode,save,read,controls,apply:()=>act('apply'),load:()=>act('load'),show:()=>act('show')};
+ const api={normalizeLabel,encode,decode,save,read,controls,apply:()=>act('apply'),load:()=>act('load'),show:()=>act('show')};
  if(node)module.exports=api;else{root.Countdown75=api;controls();}
 })(globalThis);

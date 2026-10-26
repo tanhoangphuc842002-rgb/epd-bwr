@@ -555,6 +555,12 @@
       }
       const initializing = current.status.code === 4;
       let packages = api.installationPlan(selected, current.status.code, current.partitions);
+      const clockUI=packages.find(item=>item.pack.id===6);
+      if(clockUI?.pack.revision>=9&&(typeof appVersion==='undefined'||appVersion<0x54))throw Error('Cập nhật phần mềm đồng hồ lên v5.22 trước khi cài dữ liệu lịch năm.');
+      if(clockUI?.pack.revision>=7&&(typeof appVersion==='undefined'||appVersion<0x48))throw Error('Hãy cập nhật phần mềm đồng hồ lên bản v5.16 trước khi cài bộ dữ liệu mới.');
+      if(clockUI?.pack.revision>=6&&(typeof appVersion==='undefined'||appVersion<0x47))throw Error('Hãy cập nhật phần mềm đồng hồ lên bản v5.15 trước khi cài bộ dữ liệu mới.');
+      if(clockUI?.pack.payload.length>9464&&(typeof appVersion==='undefined'||appVersion<0x46))throw Error('Hãy cập nhật phần mềm đồng hồ lên bản v5.14 trước khi cài bộ dữ liệu mới.');
+      if(clockUI?.pack.payload.length>396&&(typeof appVersion==='undefined'||appVersion<0x44))throw Error('Hãy cập nhật phần mềm đồng hồ lên bản v5.12 trước khi cài bộ dữ liệu mới.');
       if (!initializing && root.EPDFontSync) {
         const fontItem = packages.find(item => item.pack.id === 7);
         if (fontItem) {
@@ -640,8 +646,10 @@
         try { await deviceWrite(session, connection, Uint8Array.of(0x91)); }
         catch (_) { /* Legacy reset may close GATT before the write settles. */ }
       }
+      return true;
     } catch (error) {
       if (client === session) report(error.message, true);
+      return false;
     } finally {
       if (entered && client === session) {
         try { await session.leave(); } catch (_) { /* Disconnect cleanup also exits the session. */ }

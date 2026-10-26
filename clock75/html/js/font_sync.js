@@ -15,6 +15,8 @@
 
   function updatedPackage(original, nextFonts, partitions) {
     if (original.revision === 0xffffffff) throw new Error('字体资源版本已用尽，请先重新安装资源');
+    const rounded=builder.decodeFonts(original.payload).rounded;
+    if(rounded)nextFonts.rounded=rounded;
     const bytes = builder.wrap(PARTITION, builder.encodeFonts(nextFonts), original.revision + 1);
     store.validateTarget(store.parsePackage(bytes), partitions);
     return bytes;

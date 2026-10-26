@@ -41,7 +41,7 @@ body.theme-dark {
     --shadow: 0 4px 24px rgba(0, 0, 0, .08);
 }
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 100px; }
+html { scroll-behavior: smooth; scroll-padding-top: 0; }
 body { margin: 0; background: var(--bg-color); color: var(--text-color); font: 14px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; touch-action: manipulation; }
 a { color: var(--accent-text); }
 button, input, select, textarea { font: inherit; }
@@ -83,8 +83,9 @@ p { margin-bottom: 12px; }
 .page-kicker, .section-kicker { margin: 0 0 4px; font-size: 10px; font-weight: 700; letter-spacing: 1.6px; color: var(--muted-color); }
 .page-subtitle { color: var(--muted-color); margin: 6px 0 0; font-size: 13px; }
 .page-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.workspace-nav { position: sticky; top: 12px; z-index: 20; display: flex; gap: 4px; padding: 6px; margin-bottom: 24px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--section-bg); box-shadow: var(--shadow); overflow-x: auto; scrollbar-width: none; }
-.workspace-nav::-webkit-scrollbar { display: none; }
+.workspace-nav { position: sticky; top: 12px; z-index: 20; display: flex; flex-wrap: wrap; gap: 4px; padding: 6px; margin-bottom: 24px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--section-bg); box-shadow: var(--shadow); overflow: visible; }
+.workspace-selector { display: none; }
+.section, #deviceConnection, #imageWorkspace, #photoClockEditor { scroll-margin-top: calc(var(--workspace-nav-height, 96px) + 24px); }
 .workspace-nav a { flex-shrink: 0; padding: 10px 22px; border-radius: 8px; color: var(--muted-color); font-weight: 550; text-decoration: none; }
 .workspace-nav a:hover { background: var(--surface-soft); color: var(--text-color); }
 .workspace-nav a.active { background: var(--accent-bg); color: var(--accent-text); }
@@ -639,3 +640,24 @@ progress::-webkit-progress-value { border-radius: 10px; background: var(--primar
     html { scroll-behavior: auto; }
     *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+@media (max-width: 700px) {
+ .workspace-nav { display: block; }
+ .workspace-nav a { display: none; }
+ .workspace-selector { display: flex; align-items: center; gap: 10px; padding: 4px; font-size: 13px; }
+ .workspace-selector select { flex: 1; min-width: 0; width: 100%; }
+}
+
+/* Artwork previews are the exact monochrome pixels sent to the clock. */
+.art75-gallery { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:18px 0; }
+.art75-card { position:relative; display:flex; flex-direction:column; gap:8px; padding:10px; border:2px solid var(--border-color); border-radius:12px; cursor:pointer; background:var(--section-bg); }
+.art75-card:has(input:checked) { border-color:var(--primary-color); background:var(--accent-bg); }
+.art75-card input { align-self:flex-start; }
+.art75-card img { display:block; width:100%; height:auto; background:white; border-radius:6px; }
+.art75-card span { font-weight:650; }
+#art75Place { width:240px; }
+@media(max-width:700px) { .art75-gallery { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+
+.art75-upload{margin:24px 0;padding:16px;border:1px solid var(--border,#dbe3ee);border-radius:12px}
+#art75UploadPreview{display:block;width:480px;max-width:100%;height:auto;aspect-ratio:480/208;background:white;border:1px solid #dbe3ee;margin:16px 0}
+#art75UploadFile{display:block;max-width:100%;margin:8px 0}

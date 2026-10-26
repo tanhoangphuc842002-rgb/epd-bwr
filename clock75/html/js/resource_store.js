@@ -153,7 +153,7 @@
             });
             const result = await Promise.all([answer, written]);
             const reply = result[0];
-            if (reply[3] !== 0 && !allowStatus) throw Object.assign(new Error(`设备返回：${statusName(reply[3])}`), { device: true, code: reply[3] });
+            if (reply[3] !== 0 && !allowStatus) throw Object.assign(new Error(`设备返回：${statusName(reply[3])}`), { device: true, code: reply[3], operation: op });
             return reply;
           } catch (error) {
             if (this.closed || error.device || attempt === 2) throw error;

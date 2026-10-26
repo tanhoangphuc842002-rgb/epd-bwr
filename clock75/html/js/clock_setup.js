@@ -19,15 +19,18 @@
   async function install() {
     if (preparing || installer().busy() || root.DeviceOperations?.current) return;
     preparing = true; family().disabled = true; installer().controls();
+    const auto=$('externalResourceAutoOffline'),withArt=typeof appVersion!=='undefined'&&[0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59].includes(appVersion),offline=!!auto?.checked;
+    if(withArt&&auto)auto.checked=false;
     try {
       message('Đang chuẩn bị bộ cài đồng hồ. Giữ kết nối Bluetooth và không đóng trang.');
       if (!await root.ExternalResourceEditor.loadDefault()) {
         message('Không chuẩn bị được bộ cài. Chưa ghi dữ liệu vào đồng hồ.');
         return;
       }
-      await installer().install();
+      const ok=await installer().install();
+      if(ok&&withArt){await root.ArtClock75.installDefault();if(offline)await installer().runOffline();}
     } catch (error) { message(`Cài đặt chưa hoàn tất: ${error.message}`); }
-    finally { preparing = false; family().disabled = false; installer().controls(); }
+    finally { if(withArt&&auto)auto.checked=offline;preparing = false; family().disabled = false; installer().controls(); }
   }
   root.ClockSetup = { install, load, busy: () => preparing };
   family().addEventListener('change', load);

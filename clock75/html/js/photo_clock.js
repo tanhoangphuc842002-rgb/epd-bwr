@@ -72,7 +72,7 @@
  function controls(force=false){
   if(node)return;
   const locked=force||busy||loading||!!root.DeviceOperations?.current;
-  const supported=typeof appVersion!=='undefined'&&[0x40,0x41].includes(appVersion)&&typeof gattServer!=='undefined'&&!!gattServer?.connected;
+  const supported=typeof appVersion!=='undefined'&&[0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59].includes(appVersion)&&typeof gattServer!=='undefined'&&!!gattServer?.connected;
   for(const id of ['photoClockFile','photoClockFit'])$(id).disabled=locked;
   for(const element of root.document.querySelectorAll('[data-photo-edit]'))element.disabled=locked||!bitmap;
   $('photoClockSave').disabled=locked||!supported||!bitmap;
@@ -116,17 +116,31 @@
  async function act(upload){
   if(busy)return;
   if(loading)return;
+  if(upload&&root.Album75){try{if(!await root.Album75.beforeDirect(1))return;}catch(e){report('Chưa kiểm tra được album: '+e.message);return;}}
   busy=true;controls();
   try{
-   if(typeof appVersion==='undefined'||![0x40,0x41].includes(appVersion)||typeof gattServer==='undefined'||!gattServer?.connected)throw new Error('Hãy kết nối đồng hồ 7.5 có hỗ trợ Đồng hồ + ảnh.');
+   if(typeof appVersion==='undefined'||![0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59].includes(appVersion)||typeof gattServer==='undefined'||!gattServer?.connected)throw new Error('Hãy kết nối đồng hồ 7.5 có hỗ trợ Đồng hồ + ảnh.');
    if(upload){
     if(!bitmap)throw new Error('Chọn một ảnh trước.');
     if(frameRequest){root.cancelAnimationFrame(frameRequest);frameRequest=0;}preview();
     const payload=imagePayload($('photoClockCanvas').getContext('2d').getImageData(0,0,400,480).data);
     report('Đang lưu ảnh. Giữ kết nối và không tháo pin.');$('photoClockProgress').value=0;
-    await root.ExternalResourceInstaller.countdownOperation((client,check,write)=>save(client,payload,check,write,(n,total)=>{$('photoClockProgress').value=n/total;},stage=>report(stage+'…')));
+    const saved=await root.ExternalResourceInstaller.countdownOperation(async(client,check,write)=>{
+     if(appVersion>=0x43){if(!await root.Album75.confirmReplace(client,1,0,check))return false;}
+     else{
+      let occupied=false;const parts=await client.partitions();check();
+      if(parts.some(p=>p.id===PHOTO)){const info=await client.inspect(PHOTO);check();if(info.code&&![1,3,4].includes(info.code))throw Error('Chưa kiểm tra được ảnh đã lưu.');occupied=!info.code;}
+      if(occupied&&!root.confirm('Thay ảnh Đồng hồ+ảnh đang lưu? Các dữ liệu khác được giữ nguyên.'))return false;
+     }
+     check();
+     if(appVersion>=0x43)await root.Album75.save(client,1,0,payload,check,write,(n,total)=>{$('photoClockProgress').value=n/total;});
+     else await save(client,payload,check,write,(n,total)=>{$('photoClockProgress').value=n/total;},stage=>report(stage+'…'));
+     return true;
+    });
+    if(saved===false){report('Đã hủy. Ảnh đang lưu được giữ nguyên.');return;}
    }else{
     await root.ExternalResourceInstaller.countdownOperation(async(client,check)=>{
+     if(appVersion>=0x43){const m=await root.Album75.masks(client);check();if(!m[1])throw Error('Chưa có ảnh đã lưu.');return;}
      const status=store.parseStatus(await client.status());check();
      if(status.code||status.active||status.entered)throw new Error('Đồng hồ chưa sẵn sàng. Hãy kết nối lại.');
      const parts=await client.partitions();check();
@@ -144,7 +158,7 @@
   }
   finally{busy=false;controls();}
  }
- const api={imagePayload,photoPartitions,tablePayload,save,controls,change,upload:()=>act(true),show:()=>act(false)};
+ const api={imagePayload,photoPartitions,tablePayload,save,controls,change,upload:()=>act(true),show:()=>act(false),hasImage:()=>!!bitmap,flush(){if(frameRequest){root.cancelAnimationFrame(frameRequest);frameRequest=0;}preview();}};
  if(node)module.exports=api;
  else{
   root.PhotoClock=api;

@@ -8,8 +8,9 @@
 	<title>Bộ điều khiển đồng hồ 7.5</title>
 	<link rel="shortcut icon" type="image/png" href="favicon.png">
 	<meta name="theme-color" content="#2563eb">
-	<link rel="stylesheet" href="css/main.css?v=5.9.8-log">
-	<link rel="stylesheet" href="css/photo-clock.css?v=5.9.3">
+	<link rel="stylesheet" href="css/main.css?v=61.75-custom-art-vi">
+	<link rel="stylesheet" href="css/photo-clock.css?v=61.80">
+	<link rel="stylesheet" href="css/album75.css?v=5.20.1-approtect75">
 </head>
 
 <body>
@@ -28,9 +29,13 @@
 			</div>
 		</header>
 		<nav id="workspaceNav" class="workspace-nav" aria-label="Điều hướng">
+ <label class="workspace-selector" for="workspaceSectionSelect">Chọn chức năng<select id="workspaceSectionSelect" aria-label="Chọn chức năng"></select></label>
 			<a class="active" href="#deviceConnection" aria-current="location">Kết nối thiết bị</a>
 			<a href="#imageWorkspace">Chỉnh sửa và truyền ảnh</a>
 			<a href="#photoClockEditor">Đồng hồ+ảnh</a>
+			<a href="#season75Workspace">Đồng hồ bốn mùa</a>
+			<a href="#art75Workspace">Đồng hồ tranh</a>
+			<a href="#quote75Workspace">Danh ngôn mỗi ngày</a>
 			<a href="#todoWorkspace">Việc cần làm</a>
 			<a href="#calendarWorkspace">Đánh dấu ngày</a>
 			<a href="#countdownWorkspace">Đồng hồ đếm ngược</a>
@@ -98,9 +103,14 @@
 				</div>
 				<div class="flex-group mode-actions">
 					<button id="calendarmodebutton" type="button" class="primary" onclick="syncTime(1)">Chế độ lịch</button>
+					<button id="year75Mode" type="button" class="primary" onclick="YearCalendar75.show()" data-device-operation disabled>Lịch năm</button>
 					<button id="clockmodebutton" type="button" class="primary" onclick="syncTime(2)">Đồng hồ + Lịch </button>
+					<button id="rounded75Mode" type="button" class="primary" onclick="RoundedClock75.show()" data-device-operation disabled>Đồng hồ lịch 2</button>
 					<button id="countdown75ModeButton" type="button" class="primary" onclick="Countdown75.show()" disabled>Đồng hồ đếm ngược</button>
 					<button id="photoclockmodebutton" type="button" class="primary" onclick="PhotoClock.show()" disabled>Đồng hồ+ảnh</button>
+					<button id="season75Mode" type="button" class="primary" onclick="Season75.install()" disabled>Đồng hồ bốn mùa</button>
+					<button id="art75Mode" data-art75 type="button" class="primary" onclick="ArtClock75.open()" disabled>Đồng hồ tranh</button>
+						<button id="quote75Mode" data-quote75 type="button" class="primary" onclick="Quote75.open()" disabled>Đồng hồ lịch xé</button>
 					<button id="todocalendarmodebutton" type="button" class="primary" onclick="syncTime(4)" disabled>Việc cần làm + Lịch </button>
 					<button id="todofullmodebutton" type="button" class="primary" onclick="syncTime(5)" disabled>Việc cần làm toàn màn</button>
 					<button id="legacyclockbutton" type="button" class="primary" onclick="syncTimeLegacy()"
@@ -113,6 +123,8 @@
 				</div>
 			</div>
 			<p id="countdown75QuickStatus" class="photo-quick-status" role="status" aria-live="polite"></p>
+			<p id="rounded75Status" class="photo-quick-status" role="status" aria-live="polite"></p>
+			<p id="year75Status" class="photo-quick-status" role="status" aria-live="polite"></p>
 			<a class="photo-editor-link" href="#countdownWorkspace">Đặt ngày kết thúc đếm ngược</a>
 			<p id="photoClockQuickStatus" class="photo-quick-status" role="status" aria-live="polite"></p>
 			<a class="photo-editor-link" href="#photoClockEditor">Chọn hoặc chỉnh ảnh cho Đồng hồ+ảnh</a>
@@ -271,10 +283,17 @@
 				<progress id="imageTransferProgress" max="100" value="0" aria-label="Tiến độ gửi ảnh" style="display:block;width:100%;margin-top:12px"></progress>
 				<p id="imageTransferStatus" role="status" aria-live="polite">Chỉnh ảnh rồi bấm Gửi ảnh. Tiến độ sẽ hiển thị tại đây.</p>
 			</div>
+			<fieldset class="album75-panel"><legend>Album ảnh tự đổi</legend><p id="album75-0-limit">Tối đa hai ảnh toàn màn, tùy dung lượng ảnh sau khi nén. Chọn ảnh và chỉnh ở trên rồi lưu từng ô. Đồng hồ tự đổi ảnh khi đóng web.</p>
+			<label>Ô ảnh <select data-album75 id="album75-0-slot"><option value="0">Ảnh 1</option><option value="2">Ảnh 2</option></select></label>
+			<button data-album75 type="button" onclick="Album75.read(0)">Đọc ảnh đã lưu</button><button data-album75 type="button" onclick="Album75.saveCurrent(0)">Lưu ảnh đang chỉnh</button>
+			<button data-album75 type="button" onclick="Album75.remove(0)">Xóa ảnh đã chọn</button>
+			<label>Đổi ảnh sau mỗi <input data-album75 id="album75-0-minutes" type="number" min="1" max="1440" value="30"> phút</label>
+			<button data-album75 type="button" onclick="Album75.choose(0,true)">Bắt đầu luân phiên</button><button data-album75 type="button" onclick="Album75.choose(0,false)">Giữ ảnh đã chọn</button>
+			<progress id="album75-0-progress" max="1" value="0" style="display:block;width:100%"></progress><p id="album75-0-status" role="status">Cập nhật đồng hồ trước khi sử dụng album.</p></fieldset>
 		</section>
 		<section class="section" aria-label="Đồng hồ và ảnh">
 			<fieldset id="photoClockEditor"><legend>Đồng hồ+ảnh</legend>
-				<p>Ảnh ở nửa trái, đồng hồ ở nửa phải. Ảnh được lưu trên đồng hồ và dùng lại khi khởi động.</p>
+				<p>Đồng hồ ở nửa trái, ảnh ở nửa phải. Ảnh được lưu trên đồng hồ và dùng lại khi khởi động.</p>
 				<label>Chọn ảnh <input id="photoClockFile" type="file" accept="image/*"></label>
 				<p id="photoClockFileName" class="photo-file-name">Chưa chọn ảnh</p>
 				<div class="photo-editor-layout">
@@ -310,7 +329,61 @@
 				<progress id="photoClockProgress" value="0" max="1" style="display:block;width:100%;margin-top:12px"></progress>
 				<p id="photoClockStatus" role="status">Cài đặt đồng hồ trước, sau đó chọn ảnh. Lưu ảnh mới sẽ thay ảnh đồng hồ đã lưu trước đó.</p>
 				<button type="button" class="secondary" onclick="ConsoleUI.openLog()">Xem nhật ký</button>
+				<fieldset class="album75-panel"><legend>Đồng hồ và ảnh luân phiên</legend><p id="album75-1-limit">Giờ bên trái, ảnh bên phải. Lưu tối đa hai ảnh tùy dung lượng ảnh sau khi nén. Ảnh đồng hồ cũ được giữ ở ô số 1.</p>
+				<label>Ô ảnh <select data-album75 id="album75-1-slot"><option value="0">Ảnh 1</option><option value="2">Ảnh 2</option></select></label>
+				<button data-album75 type="button" onclick="Album75.read(1)">Đọc ảnh đã lưu</button><button data-album75 type="button" onclick="Album75.saveCurrent(1)">Lưu ảnh đang chỉnh</button>
+				<button data-album75 type="button" onclick="Album75.remove(1)">Xóa ảnh đã chọn</button>
+				<label>Đổi ảnh sau mỗi <input data-album75 id="album75-1-minutes" type="number" min="1" max="1440" value="30"> phút</label>
+				<button data-album75 type="button" onclick="Album75.choose(1,true)">Bắt đầu luân phiên</button><button data-album75 type="button" onclick="Album75.choose(1,false)">Giữ ảnh đã chọn</button>
+				<progress id="album75-1-progress" max="1" value="0" style="display:block;width:100%"></progress><p id="album75-1-status" role="status">Cập nhật đồng hồ trước khi sử dụng album.</p></fieldset>
 			</fieldset>
+		</section>
+
+		<section id="season75Workspace" class="section" aria-labelledby="season75Heading">
+ <div class="section-heading"><div><p class="section-kicker">TRANH THEO MÙA</p><h2 id="season75Heading">Đồng hồ bốn mùa</h2></div></div>
+ <p>Giờ lớn, tờ lịch nhỏ và tranh phong cảnh. Chọn một mùa yêu thích, hoặc để tranh tự đổi vào Lập Xuân, Lập Hạ, Lập Thu và Lập Đông.</p>
+ <p>Cài một lần trước khi sử dụng. Bộ ảnh dùng chung bộ nhớ với album: mỗi mục Truyền ảnh và Đồng hồ+ảnh còn tối đa hai ảnh, tùy dung lượng sau khi nén. Nếu đã có ảnh, hãy kiểm tra bản sao tải về trước khi đồng ý sắp xếp lại.</p>
+ <div class="flex-container">
+ <label for="season75Choice">Mùa hiển thị</label>
+ <select id="season75Choice" disabled><option value="0">Tự động theo tiết khí</option><option value="1">Mùa Xuân</option><option value="2">Mùa Hạ</option><option value="3">Mùa Thu</option><option value="4">Mùa Đông</option></select>
+ <button id="season75Apply" type="button" disabled onclick="Season75.apply()">Áp dụng và xem đồng hồ</button>
+ <button id="season75Read" type="button" class="secondary" disabled onclick="Season75.read()">Đọc lựa chọn đã lưu</button>
+ </div><p class="field-hint">Chọn một mùa để giữ tranh yêu thích quanh năm, hoặc chọn Tự động để tranh đổi theo tiết khí. Lựa chọn được giữ sau khi đóng web và thay pin.</p>
+ <button id="season75Install" class="primary" type="button" onclick="Season75.install()" disabled>Cài ảnh và xem đồng hồ bốn mùa</button>
+ <button id="season75Stop" class="secondary" type="button" onclick="Season75.stop()" disabled>Dừng và ngắt kết nối</button>
+ <progress id="season75Progress" value="0" max="1" style="display:block;width:100%;margin-top:12px" aria-label="Tiến độ cài ảnh bốn mùa"></progress>
+ <p id="season75Status" role="status" aria-live="polite">Kết nối đồng hồ và cập nhật phần mềm để sử dụng.</p>
+</section>
+<section id="art75Workspace" class="section" aria-labelledby="art75Heading">
+ <div class="section-heading"><div><p class="section-kicker">TRANH CỦA BẠN</p><h2 id="art75Heading">Đồng hồ tranh</h2></div></div>
+ <p class="section-note">Chọn một tranh đen trắng trong kho, rồi bấm Lưu tranh và hiển thị. Đồng hồ lưu một tranh đang dùng; lưu tranh khác sẽ thay bức trước đó. Giờ và lịch bên phải vẫn tự cập nhật.</p>
+ <div class="flex-container"><button id="art75Previous" type="button" class="secondary" onclick="ArtClock75.previous()">Trang trước</button><output id="art75Page" aria-live="polite">Trang 1</output><button id="art75Next" type="button" class="secondary" onclick="ArtClock75.next()">Trang sau</button></div>
+ <div id="art75Gallery" class="art75-gallery" role="group" aria-label="Kho tranh"></div>
+ <p id="art75ChoiceName" class="field-hint" aria-live="polite"></p><div class="flex-container"><button id="art75Save" type="button" onclick="ArtClock75.saveSelected()" disabled>Lưu tranh và hiển thị</button><button id="art75Open" class="secondary" type="button" onclick="ArtClock75.open()" disabled>Mở tranh đã lưu</button></div>
+ <fieldset class="art75-upload"><legend>Dùng ảnh của bạn</legend>
+  <p class="field-hint">Chọn ảnh JPG, PNG hoặc WebP, tối đa 10 MB. Nên dùng ảnh ngang 480 × 208 px, hoặc 960 × 416 px, cùng tỷ lệ khoảng 2,31:1. Ảnh có kích thước khác vẫn dùng được; chọn Giữ toàn bộ ảnh hoặc Phủ kín khung để căn lại. Ảnh tự chuyển sang đen trắng. Lưu ảnh này sẽ thay tranh đang dùng trên đồng hồ.</p>
+  <label for="art75UploadFile">Ảnh của bạn</label><input id="art75UploadFile" type="file" accept="image/jpeg,image/png,image/webp">
+  <canvas id="art75UploadPreview" width="480" height="208" aria-label="Xem trước ảnh riêng đen trắng, 480 × 208"></canvas>
+  <div class="flex-container"><label for="art75UploadFit">Cách đặt ảnh</label><select id="art75UploadFit" disabled><option value="contain">Giữ toàn bộ ảnh</option><option value="cover">Phủ kín khung</option></select><button id="art75UploadSave" type="button" onclick="ArtUpload75.save()" disabled>Lưu ảnh riêng và hiển thị</button></div>
+  <p id="art75UploadStatus" class="field-hint" role="status" aria-live="polite">Khung tranh 480 × 208. Ảnh được xử lý ngay trong trình duyệt, rồi gửi đến đồng hồ khi bạn bấm lưu.</p>
+ </fieldset>
+ <progress id="art75Progress" value="0" max="1" style="display:block;width:100%;margin:12px 0" aria-label="Tiến độ lưu tranh"></progress>
+ <fieldset class="tool-details"><legend>Vị trí hiển thị</legend><div class="flex-container"><label for="art75Place">Vị trí</label><input id="art75Place" type="text" maxlength="20" placeholder="Ví dụ: Hà Nội" disabled><button id="art75SavePlace" type="button" onclick="ArtClock75.saveLocation()" disabled>Lưu vị trí</button><button id="art75ReadPlace" class="secondary" type="button" onclick="ArtClock75.readLocation()" disabled>Đọc vị trí đã lưu</button></div><p class="field-hint">Tối đa 20 ký tự có dấu. Để trống rồi bấm Lưu vị trí nếu muốn bỏ tên. Vị trí dùng chung với Đồng hồ lịch xé; nhiệt độ bên cạnh được đo tại đồng hồ.</p></fieldset>
+ <p id="art75Status" role="status" aria-live="polite">Chọn tranh để xem trước. Kết nối đồng hồ để lưu tranh hoặc vị trí.</p><button id="art75Stop" class="secondary" type="button" onclick="ArtClock75.stop()" disabled>Dừng và ngắt kết nối</button>
+ </section>
+ <section id="quote75Workspace" class="section" aria-labelledby="quote75Heading">
+			<div class="section-heading"><div><p class="section-kicker">MỖI NGÀY MỘT CÂU</p><h2 id="quote75Heading">Danh ngôn mỗi ngày</h2></div></div>
+			<p class="section-note">Xem giờ cùng lịch xé và một câu danh ngôn tự đổi mỗi ngày. Có sẵn 100 câu; bạn cũng có thể lưu tối đa 50 câu của mình.</p>
+			<fieldset><legend>Địa điểm hiển thị</legend><label for="quote75Place">Địa điểm</label><input id="quote75Place" data-place75 type="text" maxlength="20" placeholder="Ví dụ: Hà Nội"><p class="section-note">Tối đa 20 ký tự có dấu. Để trống nếu không muốn hiện tên địa điểm. Nhiệt độ bên cạnh được đo tại đồng hồ.</p><div class="flex-group"><button type="button" data-place75 onclick="Quote75.saveLocation()">Lưu địa điểm</button><button type="button" data-place75 class="secondary" onclick="Quote75.loadLocation()">Đọc địa điểm đã lưu</button></div></fieldset>
+			<div class="flex-group"><label for="quote75Source">Nguồn danh ngôn</label><select id="quote75Source" data-quote75><option value="0">100 câu có sẵn</option><option value="1">Câu riêng của tôi</option><option value="2" disabled>Cả hai nguồn</option></select><button data-quote75 type="button" onclick="Quote75.apply()">Áp dụng</button></div>
+			<div id="quote75Personal" hidden>
+				<p class="section-note">Mỗi dòng là một câu, tối đa 80 ký tự mỗi câu. Có thể nhập hoặc dán nhiều câu rồi lưu một lần. Câu dài sẽ được rút gọn để vừa hai dòng.</p>
+				<label for="quote75Text">Các câu của bạn</label><textarea id="quote75Text" data-quote75 rows="7" style="display:block;width:100%;box-sizing:border-box" placeholder="Viết một câu trên mỗi dòng"></textarea>
+				<div class="flex-group"><button data-quote75 type="button" onclick="Quote75.load()">Đọc câu đã lưu</button><button data-quote75 type="button" onclick="Quote75.saveText()">Lưu và sử dụng</button><button data-quote75 type="button" class="secondary" onclick="Quote75.saveText(true)">Xóa câu riêng</button></div>
+			</div>
+			<progress id="quote75Progress" value="0" max="1" style="display:block;width:100%;margin-top:12px" aria-label="Tiến độ lưu danh ngôn"></progress>
+			<p id="quote75Status" role="status" aria-live="polite">Kết nối đồng hồ để chọn nguồn danh ngôn. Cả hai nguồn dùng được sau khi đọc hoặc lưu ít nhất một câu riêng.</p>
+			<button id="quote75Stop" type="button" class="secondary" onclick="Quote75.stop()" disabled>Dừng và ngắt kết nối</button>
 		</section>
 		<section id="todoWorkspace" class="section" aria-labelledby="todoCalendarHeading">
 			<div class="section-heading"><div><p class="section-kicker">CÔNG VIỆC</p><h2 id="todoCalendarHeading">Việc cần làm</h2></div><span id="todoCalendarCount" class="device-badge">0 / 32</span></div>
@@ -396,8 +469,8 @@
 			<div class="countdown-settings">
 				<p>Chọn ngày kết thúc và tên sự kiện, rồi bấm Lưu và bật đếm ngược. Đồng hồ tự cập nhật số ngày còn lại; khi đến hạn sẽ hiện 0 ngày.</p>
 				<label>Ngày kết thúc <input id="countdown75Date" type="date" min="2000-01-01" max="2099-12-31" value="2027-01-01"></label>
-				<label>Tên sự kiện <input id="countdown75Label" type="text" maxlength="16" value="SU KIEN" placeholder="TET 2027"></label>
-				<p>Nhập tên ngắn gọn, tối đa 16 ký tự không dấu.</p>
+				<label>Tên sự kiện <input id="countdown75Label" type="text" value="Sự kiện" placeholder="Ví dụ: Ngày cưới" aria-describedby="countdown75LabelHint"></label>
+				<p id="countdown75LabelHint" class="field-hint">Tối đa 20 ký tự có dấu. Hãy viết ngắn để vừa khung; tên dài sẽ được rút gọn khi hiển thị. Cập nhật phần mềm đồng hồ nếu được yêu cầu.</p>
 				<button id="countdown75Save" type="button" class="primary" onclick="Countdown75.apply()">Lưu và bật đếm ngược</button>
 				<button id="countdown75Read" type="button" class="secondary" onclick="Countdown75.load()">Đọc ngày đang lưu</button>
 				<p id="countdown75Status" role="status">Cài đặt đồng hồ trước khi lưu đếm ngược lần đầu.</p>
@@ -415,6 +488,7 @@
 			<details class="help-details"><summary>Sao lưu và hỗ trợ</summary>
 			<div class="external-resource-actions">
 				<label for="externalResourceFolder" class="external-resource-picker debug">Chọn thư mục dữ liệu<input id="externalResourceFolder" class="picker-input" type="file" accept=".ers" multiple webkitdirectory directory aria-label="Chọn thư mục dữ liệu "></label>
+				<button id="art75Report" data-art75 type="button" class="secondary" onclick="ArtClock75.downloadReport()" disabled>Tải tệp kiểm tra font</button>
 				<button id="externalResourceRefresh" type="button" class="secondary" onclick="ExternalResourceInstaller.refresh()" disabled>Kiểm tra dữ liệu</button>
 				<button id="externalResourceReadback" type="button" class="secondary" onclick="ExternalResourceInstaller.readback()" disabled>Đọc dữ liệu để sao lưu</button>
 				<button id="externalResourceSave" type="button" class="secondary" onclick="ExternalResourceInstaller.saveReadback()" disabled>Lưu về máy</button>
@@ -502,25 +576,36 @@
 	<script type="text/javascript" src="js/crop.js?v=20261005a"></script>
 	<script type="text/javascript" src="js/ble_transfer.js?v=20260922a"></script>
 	<script type="text/javascript" src="js/calendar_annotations.js?v=original-vi-5.9-public"></script>
-	<script type="text/javascript" src="js/resource_store.js?v=original-vi-5.3-countdown"></script>
+	<script type="text/javascript" src="js/resource_store.js?v=61.74.1-approtect75"></script>
 	<script src="js/resource_archive.js?v=20261004a"></script>
-	<script type="text/javascript" src="js/resource_builder.js?v=original-vi-5.2-font20"></script>
+	<script type="text/javascript" src="js/resource_builder.js?v=61.82.2"></script>
 	<script src="js/font_builder.js?v=original-vi-5.2-font20"></script>
-	<script src="js/font_sync.js?v=20261005h"></script>
+	<script src="js/font_sync.js?v=61.82.2"></script>
 	<script src="js/todo_sync.js?v=20261005h"></script>
-	<script src="resources/bundled-projects.js?v=original-vi-5.3-countdown"></script>
-	<script type="text/javascript" src="js/resource_installer.js?v=original-vi-5.9.3-customer"></script>
+	<script src="resources/bundled-projects.js?v=61.82.2"></script>
+	<script type="text/javascript" src="js/resource_installer.js?v=61.76.1-boot-fix"></script>
 	<script src="js/todo_calendar.js?v=original-vi-5.9.6"></script>
 	<script type="text/javascript" src="js/resource_editor.js?v=original-vi-5.3-countdown"></script>
-	<script src="js/clock_setup.js?v=original-vi-4"></script>
-	<script src="js/countdown75.js?v=original-vi-5.9.3-customer"></script>
+	<script src="js/clock_setup.js?v=61.82.2"></script>
+	<script src="js/countdown75.js?v=61.75-custom-art-vi"></script>
 	<script src="../../clock-image-processing.js?v=5.9.7"></script>
 	<script src="js/photo_editor.js?v=original-vi-5.9.7"></script>
-	<script src="js/photo_clock.js?v=original-vi-5.9.8-log"></script>
-	<script type="text/javascript" src="js/console_ui.js?v=5.9.8-log"></script>
+	<script src="js/photo_clock.js?v=61.82.2"></script>
+	<script type="text/javascript" src="js/console_ui.js?v=5.20.1c-approtect75"></script>
 	<script src="js/image_transfer_ui.js?v=5.9.6"></script>
-	<script type="text/javascript" src="js/main.js?v=original-vi-5.9.6-image"></script>
+	<script type="text/javascript" src="js/main.js?v=61.82.2"></script>
 	<script src="js/image75_editor.js?v=original-vi-5.9.6"></script>
+	<script src="js/photo_codec75.js?v=original-vi-5.11"></script>
+	<script src="js/album75.js?v=61.82.2"></script>
+	<script src="js/year_calendar75.js?v=61.82.2"></script>
+<script src="js/quote75.js?v=61.82.2"></script>
+<script src="resources/art-landscape-data.js?v=5.17"></script>
+<script src="resources/art-gallery-data.js?v=61.75"></script>
+<script src="js/art_clock75.js?v=61.82.2"></script>
+ <script src="js/art_upload75.js?v=61.75-custom-art-vi"></script>
+<script src="resources/season-data.js?v=5.20.1-approtect75"></script>
+<script src="js/season75.js?v=61.82.2"></script>
+<script src="js/rounded_clock75.js?v=61.82.2"></script>
 </body>
 
 </html>

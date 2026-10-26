@@ -500,6 +500,7 @@ async function syncTimeOnConnect(owner = null) {
 }
 
 function displayModeName(mode) {
+  if (mode === 12) return 'Lịch năm';
   if (mode === 1) return '日历模式';
   if (mode === 3) return '全屏时钟';
   if (mode === 4) return '待办事项+日历';
@@ -573,6 +574,7 @@ function convertUC8159(blackWhiteData, redWhiteData) {
 }
 
 async function sendimg() {
+  if(window.Album75){try{if(!await window.Album75.beforeDirect(0))return false;}catch(e){addLog('Chưa kiểm tra được album: '+e.message);return false;}}
   return runDeviceOperation('image', async owner => {
     window.ImageTransferUI?.start(owner);
     try {
@@ -857,8 +859,14 @@ function updateButtonStatus(forceDisabled = false) {
     if (todo) todo.disabled = !!status || !Number.isInteger(appVersion) || appVersion < minimum;
   }
   const photoClockButton=document.getElementById('photoclockmodebutton');
-  if(photoClockButton)photoClockButton.disabled=!!status||![0x40,0x41].includes(appVersion);
+  if(photoClockButton)photoClockButton.disabled=!!status||![0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59].includes(appVersion);
   if(window.PhotoClock?.controls)window.PhotoClock.controls(forceDisabled);
+  if(window.Album75?.controls)window.Album75.controls(forceDisabled);
+  if(window.Quote75?.controls)window.Quote75.controls(forceDisabled);
+  window.ArtClock75?.controls(forceDisabled);
+  window.Season75?.controls(forceDisabled);
+  window.YearCalendar75?.controls(forceDisabled);
+  window.RoundedClock75?.controls(forceDisabled);
   if(window.Countdown75?.controls)window.Countdown75.controls(forceDisabled);
   if(window.Image75Editor?.controls)window.Image75Editor.controls(forceDisabled);
   if (window.TodoCalendar?.controls) window.TodoCalendar.controls(forceDisabled);
@@ -920,6 +928,8 @@ async function openDfuPage() {
   }
   const handoff = {
     source: 'index',
+    original75: [0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59].includes(appVersion),
+    appVersion: appVersion,
     fromUrl: window.location.pathname,
     createdAt: Date.now(),
     hadConnectedDevice: !!(bleDevice && bleDevice.gatt && bleDevice.gatt.connected),

@@ -157,6 +157,28 @@
           c.height > 282 || span > c.width || 20 * scale + 4 > c.height) fail(`组件 ${c.id} 的时钟几何不兼容`);
     }
   }
+  function timeFontGeometry(bytes,index=0) {
+    if(!(bytes instanceof Uint8Array)||bytes.length<148)fail('Bộ số giờ chưa đầy đủ');
+    const v=view(bytes),signed=n=>n>127?n-256:n;
+    if(v.getUint32(0,true)!==0x31474654||bytes[4]!==1||bytes[5]!==11||bytes[6]!==48||bytes[7]||v.getUint32(12,true)||v.getUint32(8,true)!==bytes.length-148)fail('Bộ số giờ không hợp lệ');
+    let next=0,advance=0,top=127,bottom=-128,span=0;
+    for(let i=0;i<11;i++){
+      const at=16+i*12,w=bytes[at+4],h=bytes[at+5],a=bytes[at+6],x=signed(bytes[at+7]),y=signed(bytes[at+8]),n=Math.ceil(w*h/8);
+      if(!w||w>(index?112:80)||!h||h>(index?160:120)||!a||a>(index?128:100)||x<0||x>24||x+w>a||y< -128||y>32||bytes.slice(at+9,at+12).some(n=>n)||v.getUint32(at,true)!==next||n>bytes.length-148-next)fail('Kích thước chữ số giờ không hợp lệ');
+      next+=n;if(i<10){if(i&&a!==advance)fail('Các chữ số phải có cùng bước tiến');advance=a;top=Math.min(top,y);bottom=Math.max(bottom,y+h);}else{span=4*advance+a;if(h>bottom-top)fail('Dấu hai chấm quá cao');}
+    }
+    if(next!==bytes.length-148||bottom<=top||bottom-top>(index?164:150)||(index<2&&span>(index?472:384))||(index===2&&2*advance>244)||(index===3&&span>408))fail('Bộ số giờ vượt khung');
+    return {span,height:bottom-top,top};
+  }
+  function validateFaceAssets(bytes){
+    if(!(bytes instanceof Uint8Array)||bytes.length<64)fail('Dữ liệu mặt đồng hồ chưa đầy đủ');const v=view(bytes);
+    if(v.getUint32(0,true)!==0x31534146||v.getUint16(4,true)!==1||![4,6,9].includes(v.getUint16(6,true))||v.getUint32(8,true)!==bytes.length||v.getUint32(12,true))fail('Dữ liệu mặt đồng hồ không hợp lệ');
+    const count=v.getUint16(6,true);let end=16+count*12;for(let i=0;i<count;i++){const p=16+i*12,at=v.getUint32(p+4,true),n=v.getUint32(p+8,true);if(v.getUint16(p,true)!==i+1||v.getUint16(p+2,true)||at!==end||n<8||at+n>bytes.length)fail('Chỉ mục tài nguyên mặt đồng hồ bị lỗi');const b=bytes.subarray(at,at+n);end=at+n;
+      if(i<2)timeFontGeometry(b,i+1);
+      else if(i===2||i>=4){if(n<23||!b[0]||b[0]===255||b[9]>64||b[10]>64||b.slice(2,9).some(x=>x<1||x>8))fail('Font thứ không hợp lệ');}
+      else if(new DataView(b.buffer,b.byteOffset,b.byteLength).getUint32(0,true)!==0x314b4251||b[4]!==1||b[5]!==100||b[6]||b[7])fail('Kho danh ngôn không hợp lệ');
+    }if(end!==bytes.length)fail('Tài nguyên mặt đồng hồ có dữ liệu thừa');
+  }
   function encodeUI(model) {
     const components = list(model.components, 19, 'components'), bytes = new Uint8Array(396), v = view(bytes);
     v.setUint32(0, 0x31524955, true);
@@ -167,11 +189,12 @@
       bytes.set([c.mode, c.id, c.kind, c.flags, ...c.fonts, 0], at);
       fields.forEach((key, j) => v.setInt16(at + 8 + j * 2, c[key], true));
     });
+    if(model.timeFont){const font=timeFontGeometry(model.timeFont),c=components[11];if(c.width<font.span||c.height<font.height)fail('Khung giờ nhỏ hơn bộ chữ số');if(model.faceAssets)validateFaceAssets(model.faceAssets);const out=new Uint8Array(bytes.length+model.timeFont.length+(model.faceAssets?.length||0));out.set(bytes);out.set(model.timeFont,396);if(model.faceAssets)out.set(model.faceAssets,396+model.timeFont.length);return out;}
     return bytes;
   }
   function decodeUI(bytes) {
     const v = view(bytes);
-    if (bytes.length !== 396 || v.getUint32(0, true) !== 0x31524955 ||
+    if (bytes.length < 396 || v.getUint32(0, true) !== 0x31524955 ||
         [1,19,800,480,20,0].some((n, i) => v.getUint16(4 + 2 * i, true) !== n)) fail('不支持的 UIR1 资源');
     const model = { components: Array.from({ length: 19 }, (_, i) => {
       const at = 16 + 20 * i;
@@ -179,6 +202,7 @@
       const c = { mode: bytes[at], id: bytes[at + 1], kind: bytes[at + 2], flags: bytes[at + 3], fonts: Array.from(bytes.subarray(at + 4, at + 7)) };
       fields.forEach((key, j) => { c[key] = v.getInt16(at + 8 + j * 2, true); }); return c;
     }) };
+    if(bytes.length>396){if(bytes.length<544)fail('Font giờ thiếu dữ liệu');const n=148+v.getUint32(404,true);if(n>bytes.length-396)fail('Font giờ thiếu dữ liệu');model.timeFont=bytes.slice(396,396+n);if(396+n<bytes.length)model.faceAssets=bytes.slice(396+n);}
     encodeUI(model); return model;
   }
 
@@ -241,6 +265,11 @@
       validateFont(font, slot); return font;
     });
     if (count >= 4) fonts.customKey = v.getUint32(68, true);
+    if(bytes.length>=end+12&&v.getUint32(bytes.length-12,true)===0x31444e52){
+      const at=v.getUint32(bytes.length-8,true),n=v.getUint32(bytes.length-4,true);
+      if(at!==end||n!==bytes.length-12-at)fail('Dữ liệu chữ số bo tròn chưa hợp lệ');
+      fonts.rounded=bytes.slice(at,at+n);timeFontGeometry(fonts.rounded,3);
+    }
     return fonts;
   }
   function encodeFonts(fonts) {
@@ -249,13 +278,17 @@
     if (fonts.length >= 4) integer(fonts.customKey, 1, 0xffffffff, '待办字体标识');
     fonts.forEach(validateFont);
     const directorySize = 8 + fonts.length * 16;
-    const bytes = new Uint8Array(directorySize + fonts.reduce((n, b) => n + b.length, 0)), v = view(bytes);
+    if(fonts.rounded)timeFontGeometry(fonts.rounded,3);
+    const baseSize=directorySize+fonts.reduce((n,b)=>n+b.length,0);
+    const bytes = new Uint8Array(baseSize+(fonts.rounded?fonts.rounded.length+12:0)), v = view(bytes);
     v.setUint32(0, 0x314b5046, true); v.setUint16(4, 1, true); v.setUint16(6, fonts.length, true);
     let offset = directorySize;
     fonts.forEach((b, i) => {
       [offset, b.length, store.crc32(b), i === 3 ? fonts.customKey : 0].forEach((n, j) => v.setUint32(8 + i * 16 + j * 4, n, true));
       bytes.set(b, offset); offset += b.length;
-    }); return bytes;
+    });
+    if(fonts.rounded){bytes.set(fonts.rounded,baseSize);v.setUint32(bytes.length-12,0x31444e52,true);v.setUint32(bytes.length-8,baseSize,true);v.setUint32(bytes.length-4,fonts.rounded.length,true);}
+    return bytes;
   }
   function fontKey(family, sourceSlot) {
     integer(sourceSlot, 0, 1, '待办基础字号');

@@ -126,7 +126,15 @@
       return section ? { link, section, id } : null;
     }).filter(Boolean);
     if (!items.length) return;
+    const selector = byId('workspaceSectionSelect');
+    if(selector && getDocument()?.createElement){
+      for(const item of items){const option=getDocument().createElement('option');option.value=item.id;option.textContent=item.link.textContent;selector.appendChild(option);}
+      selector.addEventListener('change',()=>{global.location.hash=selector.value;byId(selector.value)?.scrollIntoView?.({block:'start',behavior:'auto'});activate(selector.value);});
+    }
+    const updateOffset=()=>{if(nav.getBoundingClientRect && getDocument()?.documentElement?.style)getDocument().documentElement.style.setProperty('--workspace-nav-height',nav.getBoundingClientRect().height+'px');};
+    updateOffset();global.addEventListener?.('resize',updateOffset);
     const activate = id => {
+      if(selector)selector.value=id;
       for (const item of items) {
         const selected = item.id === id;
         setClass(item.link, 'active', selected);
@@ -138,9 +146,11 @@
       let current = items[0];
       for (const item of items) {
         if (typeof item.section.getBoundingClientRect !== 'function') return;
-        if (item.section.getBoundingClientRect().top <= 120) current = item;
+        if (item.section.getBoundingClientRect().top <= (nav.getBoundingClientRect?.().bottom||108)+24) current = item;
         else break;
       }
+      const doc=getDocument();
+      if(doc?.documentElement && global.innerHeight+global.scrollY>=doc.documentElement.scrollHeight-2) current=items[items.length-1];
       activate(current.id);
     };
     const activateHash = () => {
@@ -153,6 +163,8 @@
       if (item.link.addEventListener) item.link.addEventListener('click', () => activate(item.id));
     });
     activateHash();
+    global.requestAnimationFrame?.(()=>{updateOffset();let id='';try{id=decodeURIComponent(global.location?.hash?.slice(1)||'');}catch(_){}if(items.some(item=>item.id===id))byId(id)?.scrollIntoView?.({block:'start',behavior:'auto'});});
+    global.addEventListener?.('load',()=>{let id='';try{id=decodeURIComponent(global.location?.hash?.slice(1)||'');}catch(_){}if(items.some(item=>item.id===id))byId(id)?.scrollIntoView?.({block:'start',behavior:'auto'});});
     if (global.addEventListener) global.addEventListener('hashchange', activateHash);
     if (global.addEventListener) {
       let updatePending = false;
