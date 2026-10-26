@@ -21,18 +21,25 @@
   return builder.wrap(18,payload,1);
  }
  const api={WIDTH,HEIGHT,monochrome,packageImage};if(node){module.exports=api;return;}
- const $=id=>document.getElementById(id);let image=null,bytes=null,token=0,preparing=false;
+ const $=id=>document.getElementById(id),editor=root.PhotoClockEditor;
+ const defaults=()=>({...editor.defaults(),fit:'contain'});
+ let image=null,bytes=null,token=0,preparing=false,locked=false,settings=defaults();
  function say(text){$('art75UploadStatus').textContent=text;}
- function controls(locked=false,unsupported=false){
+ function controls(operationLocked=false,unsupported=false){
+  locked=operationLocked;
   $('art75UploadFile').disabled=locked||preparing;$('art75UploadFit').disabled=locked||preparing||!image;
+  for(const b of document.querySelectorAll('[data-art-edit]'))b.disabled=locked||preparing||!image;
+  $('art75UploadClear').disabled=locked||preparing||!image;
   $('art75UploadSave').disabled=locked||preparing||unsupported||!bytes;
  }
  function repaint(){
   bytes=null;const canvas=$('art75UploadPreview'),context=canvas.getContext('2d',{willReadFrequently:true});
   context.fillStyle='white';context.fillRect(0,0,WIDTH,HEIGHT);
   if(!image)return;
-  const fit=$('art75UploadFit').value,scale=(fit==='cover'?Math.max:Math.min)(WIDTH/image.naturalWidth,HEIGHT/image.naturalHeight);
-  const w=image.naturalWidth*scale,h=image.naturalHeight*scale;context.drawImage(image,(WIDTH-w)/2,(HEIGHT-h)/2,w,h);
+  const p=editor.placement(image.naturalWidth,image.naturalHeight,settings,WIDTH,HEIGHT);
+  context.save();context.translate(p.x,p.y);context.rotate(p.angle);context.drawImage(image,-p.width/2,-p.height/2,p.width,p.height);context.restore();
+  // Quantize once, directly from the cropped original pixels. Both preview
+  // and upload consume these same monochrome bits; never re-dither a preview.
   const pixels=context.getImageData(0,0,WIDTH,HEIGHT),bits=monochrome(pixels.data);
   for(let i=0;i<WIDTH*HEIGHT;i++){const v=bits[i>>3]&(128>>(i&7))?255:0;pixels.data[i*4]=pixels.data[i*4+1]=pixels.data[i*4+2]=v;pixels.data[i*4+3]=255;}
   context.putImageData(pixels,0,0);bytes=packageImage(bits);say('Ảnh đen trắng đã sẵn sàng. Đây là khung tranh sẽ lưu lên đồng hồ.');
@@ -47,10 +54,33 @@
    try{
     const next=new Image();await new Promise((resolve,reject)=>{next.onload=resolve;next.onerror=()=>reject(Error('Không đọc được ảnh này. Hãy chọn ảnh khác.'));next.src=url;});
     if(current!==token)return;if(!next.naturalWidth||next.naturalWidth*next.naturalHeight>32000000)throw Error('Ảnh quá lớn. Hãy chọn ảnh dưới 32 triệu điểm ảnh.');
-    image=next;repaint();
+    image=next;settings=defaults();$('art75UploadFit').value=settings.fit;repaint();
    }finally{URL.revokeObjectURL(url);}
   }catch(e){image=null;bytes=null;say(e.message);}finally{if(current===token){preparing=false;root.ArtClock75.controls();}}
  }
- root.ArtUpload75={...api,controls,choose,fit:()=>{repaint();root.ArtClock75.controls();},save:()=>{if(bytes&&!preparing)return root.ArtClock75.saveCustom(bytes.slice());}};
+ function action(name){
+  if(!image||preparing||locked)return;
+  if(name==='reset')settings=defaults();
+  else if(name==='cover'||name==='contain'){settings.fit=name;settings.zoom=1;settings.x=settings.y=0;}
+  else if(name==='zoomIn')settings.zoom=editor.clamp(settings.zoom*1.12,.2,8);
+  else if(name==='zoomOut')settings.zoom=editor.clamp(settings.zoom/1.12,.2,8);
+  else if(name==='left')settings.x=editor.clamp(settings.x-12,-800,800);
+  else if(name==='right')settings.x=editor.clamp(settings.x+12,-800,800);
+  else if(name==='up')settings.y=editor.clamp(settings.y-12,-800,800);
+  else if(name==='down')settings.y=editor.clamp(settings.y+12,-800,800);
+  else if(name==='rotate')settings.rotation=(settings.rotation+90)%360;
+  $('art75UploadFit').value=settings.fit;repaint();root.ArtClock75.controls();
+ }
+ function clear(){
+  if(locked||preparing)return;
+  ++token;image=null;bytes=null;drag=null;settings=defaults();$('art75UploadFile').value='';$('art75UploadFit').value=settings.fit;
+  repaint();say('Đã xóa ảnh đang chọn trên web. Chọn ảnh khác để căn chỉnh.');root.ArtClock75.controls();
+ }
+ root.ArtUpload75={...api,controls,choose,action,clear,fit:()=>action($('art75UploadFit').value),save:()=>{if(bytes&&!preparing&&!locked)return root.ArtClock75.saveCustom(bytes.slice());}};
+ for(const b of document.querySelectorAll('[data-art-edit]'))b.addEventListener('click',()=>action(b.dataset.artEdit));
+ let drag=null;const canvas=$('art75UploadPreview');canvas.style.touchAction='none';
+ canvas.addEventListener('pointerdown',e=>{if(!image||preparing||locked)return;drag={x:e.clientX,y:e.clientY,sx:settings.x,sy:settings.y};canvas.setPointerCapture(e.pointerId);});
+ canvas.addEventListener('pointermove',e=>{if(!drag||preparing||locked)return;const scale=WIDTH/canvas.getBoundingClientRect().width;settings.x=editor.clamp(drag.sx+(e.clientX-drag.x)*scale,-800,800);settings.y=editor.clamp(drag.sy+(e.clientY-drag.y)*scale,-800,800);repaint();});
+ for(const event of ['pointerup','pointercancel'])canvas.addEventListener(event,()=>{drag=null;});
  $('art75UploadFile').addEventListener('change',choose);$('art75UploadFit').addEventListener('change',root.ArtUpload75.fit);root.ArtClock75.controls();
 })(globalThis);

@@ -661,3 +661,5 @@ progress::-webkit-progress-value { border-radius: 10px; background: var(--primar
 .art75-upload{margin:24px 0;padding:16px;border:1px solid var(--border,#dbe3ee);border-radius:12px}
 #art75UploadPreview{display:block;width:480px;max-width:100%;height:auto;aspect-ratio:480/208;background:white;border:1px solid #dbe3ee;margin:16px 0}
 #art75UploadFile{display:block;max-width:100%;margin:8px 0}
+
+.season-edit-tools{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}.season-edit-tools button{width:auto;min-width:36px;padding:6px 10px;font-size:13px}.season-edit-tools button:disabled{opacity:.5}

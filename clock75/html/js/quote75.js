@@ -50,7 +50,7 @@
   const start=396+148+new DataView(primary.buffer,primary.byteOffset).getUint32(8,true);
   if(start+64>info.length)throw Error('Hãy cập nhật dữ liệu đồng hồ trước.');
   const head=await client.readRange(p.offset+32+start,16);check();const count=head[6];
-  if(![70,65,83,49,1,0].every((x,i)=>head[i]===x)||![4,6,9].includes(count)||head[7]||start+16+count*12>info.length)throw Error('Hãy cập nhật dữ liệu đồng hồ trước.');
+  if(![70,65,83,49,1,0].every((x,i)=>head[i]===x)||![4,6,9,10].includes(count)||head[7]||start+16+count*12>info.length)throw Error('Hãy cập nhật dữ liệu đồng hồ trước.');
   const h=await client.readRange(p.offset+32+start,16+count*12),v=new DataView(h.buffer,h.byteOffset);check();
   if(v.getUint32(8,true)!==info.length-start||v.getUint32(12,true))throw Error('Hãy cập nhật dữ liệu đồng hồ trước.');
   let at=16+count*12;for(let i=0;i<count;i++){const r=16+i*12,n=v.getUint32(r+8,true);if(v.getUint16(r,true)!==i+1||v.getUint16(r+2,true)||v.getUint32(r+4,true)!==at||n>info.length-start-at)throw Error('Bộ dữ liệu đồng hồ chưa đầy đủ.');at+=n;}
@@ -124,13 +124,13 @@
  }
  const api={encode,decode,layout,ready,read,choose,save,placeText,place,readPlace,savePlace};if(node){module.exports=api;return;}
  const $=id=>document.getElementById(id);let busy=false,savedCount=null;
- const supported=()=>typeof appVersion!=='undefined'&&[0x46,0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A].includes(appVersion)&&typeof gattServer!=='undefined'&&!!gattServer?.connected;
+ const supported=()=>typeof appVersion!=='undefined'&&[0x46,0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A,0x5B,0x5C].includes(appVersion)&&typeof gattServer!=='undefined'&&!!gattServer?.connected;
  function say(text){$('quote75Status').textContent=text;root.addLog?.('Danh ngôn: '+text);}
  function controls(force=false){
   if(!supported())savedCount=null;
   const locked=force||busy||!!root.DeviceOperations?.current||!supported();
   for(const el of document.querySelectorAll('[data-quote75]'))el.disabled=locked;
-  for(const el of document.querySelectorAll('[data-place75]'))el.disabled=locked||![0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A].includes(appVersion);
+  for(const el of document.querySelectorAll('[data-place75]'))el.disabled=locked||![0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A,0x5B,0x5C].includes(appVersion);
   $('quote75Source').options[2].disabled=savedCount===0||savedCount===null;
   $('quote75Personal').hidden=$('quote75Source').value==='0';
   $('quote75Stop').disabled=!busy;
@@ -155,7 +155,7 @@
  });}
  async function open(){return action(async()=>{await root.ExternalResourceInstaller.countdownOperation((c,check)=>ready(c,check));await show();say('Đã mở đồng hồ lịch xé. Mỗi ngày tự đổi một câu.');});}
  async function locationAction(save){return action(async()=>{
-  if(![0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A].includes(appVersion))throw Error('Cập nhật phần mềm đồng hồ để lưu địa điểm.');
+  if(![0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A,0x5B,0x5C].includes(appVersion))throw Error('Cập nhật phần mềm đồng hồ để lưu địa điểm.');
   if(save){const text=placeText($('quote75Place').value);say('Đang lưu địa điểm…');await root.ExternalResourceInstaller.countdownOperation((c,check,write)=>savePlace(c,text,check,write));$('quote75Place').value=text;if($('art75Place'))$('art75Place').value=text;await show();say(text?'Đã lưu địa điểm: '+text+'.':'Đã bỏ tên địa điểm.');}
   else{const text=await root.ExternalResourceInstaller.countdownOperation((c,check)=>readPlace(c,check));$('quote75Place').value=text;if($('art75Place'))$('art75Place').value=text;say(text?'Địa điểm đang lưu: '+text+'.':'Chưa đặt địa điểm.');}
  });}

@@ -859,7 +859,7 @@ function updateButtonStatus(forceDisabled = false) {
     if (todo) todo.disabled = !!status || !Number.isInteger(appVersion) || appVersion < minimum;
   }
   const photoClockButton=document.getElementById('photoclockmodebutton');
-  if(photoClockButton)photoClockButton.disabled=!!status||![0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A].includes(appVersion);
+  if(photoClockButton)photoClockButton.disabled=!!status||![0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A,0x5B,0x5C].includes(appVersion);
   if(window.PhotoClock?.controls)window.PhotoClock.controls(forceDisabled);
   if(window.Album75?.controls)window.Album75.controls(forceDisabled);
   if(window.Quote75?.controls)window.Quote75.controls(forceDisabled);
@@ -928,7 +928,7 @@ async function openDfuPage() {
   }
   const handoff = {
     source: 'index',
-    original75: [0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A].includes(appVersion),
+    original75: [0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A,0x5B,0x5C].includes(appVersion),
     appVersion: appVersion,
     fromUrl: window.location.pathname,
     createdAt: Date.now(),
@@ -1153,7 +1153,7 @@ async function requestBleDevice() {
   if (!enableDeviceFilter) {
     addLog('设备过滤已关闭，打开系统蓝牙选择窗口(全部设备)');
     return await navigator.bluetooth.requestDevice({
-      optionalServices: ['62750001-d828-918d-fb46-b6c11c675aec'],
+      optionalServices: ['62750001-d828-918d-fb46-b6c11c675aec', '0000fe59-0000-1000-8000-00805f9b34fb'],
       acceptAllDevices: true
     });
   }
@@ -1162,7 +1162,7 @@ async function requestBleDevice() {
   if (scanResult.status === 'unsupported') {
     addLog(`当前浏览器不支持信号扫描排序，退回系统窗口并仅筛选 ${EPD_DEVICE_NAME_PREFIX} 设备`);
     return await navigator.bluetooth.requestDevice({
-      optionalServices: ['62750001-d828-918d-fb46-b6c11c675aec'],
+      optionalServices: ['62750001-d828-918d-fb46-b6c11c675aec', '0000fe59-0000-1000-8000-00805f9b34fb'],
       filters: [{ namePrefix: EPD_DEVICE_NAME_PREFIX }]
     });
   }

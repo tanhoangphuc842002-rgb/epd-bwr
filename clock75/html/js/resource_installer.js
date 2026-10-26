@@ -556,6 +556,7 @@
       const initializing = current.status.code === 4;
       let packages = api.installationPlan(selected, current.status.code, current.partitions);
       const clockUI=packages.find(item=>item.pack.id===6);
+      if(clockUI?.pack.revision>=10&&(typeof appVersion==='undefined'||appVersion<0x5B))throw Error('Cập nhật phần mềm đồng hồ lên v5.24 trước khi cài dữ liệu mới.');
       if(clockUI?.pack.revision>=9&&(typeof appVersion==='undefined'||appVersion<0x54))throw Error('Cập nhật phần mềm đồng hồ lên v5.22 trước khi cài dữ liệu lịch năm.');
       if(clockUI?.pack.revision>=7&&(typeof appVersion==='undefined'||appVersion<0x48))throw Error('Hãy cập nhật phần mềm đồng hồ lên bản v5.16 trước khi cài bộ dữ liệu mới.');
       if(clockUI?.pack.revision>=6&&(typeof appVersion==='undefined'||appVersion<0x47))throw Error('Hãy cập nhật phần mềm đồng hồ lên bản v5.15 trước khi cài bộ dữ liệu mới.');

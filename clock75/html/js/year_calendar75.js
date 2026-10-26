@@ -1,6 +1,6 @@
 (function(root){
  'use strict';const $=id=>document.getElementById(id);let busy=false;
- function supported(){return typeof appVersion!=='undefined'&&[0x54,0x55,0x56,0x57,0x58,0x59,0x5A].includes(appVersion)&&typeof gattServer!=='undefined'&&!!gattServer?.connected;}
+ function supported(){return typeof appVersion!=='undefined'&&[0x54,0x55,0x56,0x57,0x58,0x59,0x5A,0x5B,0x5C].includes(appVersion)&&typeof gattServer!=='undefined'&&!!gattServer?.connected;}
  function controls(force=false){if($('year75Mode'))$('year75Mode').disabled=force||busy||!!root.DeviceOperations?.current||!supported();}
  function say(text){$('year75Status').textContent=text;root.addLog?.('Lịch năm: '+text);}
  async function show(){
@@ -14,7 +14,7 @@
     if(part&&!info.code&&info.revision>=9){
      const primary=await client.readRange(part.offset+32+396,16);check();
      const next=396+148+new DataView(primary.buffer,primary.byteOffset).getUint32(8,true);
-     if(next+16<=info.length){const head=await client.readRange(part.offset+32+next,16);check();installed=[70,65,83,49,1,0,9,0].every((v,i)=>head[i]===v);}
+     if(next+16<=info.length){const head=await client.readRange(part.offset+32+next,16);check();installed=[70,65,83,49,1,0].every((v,i)=>head[i]===v)&&[9,10].includes(head[6])&&!head[7];}
     }
     if(!installed)throw Error('Vào Cài đặt đồng hồ và bấm Cài đặt đồng hồ để bổ sung dữ liệu lịch năm.');
    });

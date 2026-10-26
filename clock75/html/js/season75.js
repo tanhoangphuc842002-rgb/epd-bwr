@@ -103,10 +103,39 @@
    return value;
   }finally{if(entered&&!client.closed){try{await client.request(5);await client.leave();}catch(_){}}}
  }
- const api={asset,layout,plan,ensure,readSelection,saveSelection};if(node){module.exports=api;return;}
+ function unpack(bytes){const p=asset(bytes),b=p.payload.slice();b[0]=80;return codec.unpack(b,800);}
+ function replacement(bytes,index,image){
+  if(!Number.isInteger(index)||index<0||index>3)throw Error('Hãy chọn mùa cần thay ảnh.');
+  const p=asset(bytes),images=unpack(bytes);if(p.revision===0xffffffff)throw Error('Phiên bản ảnh không hợp lệ.');
+  images[index]=codec.decode(image,800);const payload=codec.pack(images,800);payload[0]=83;
+  if(payload.length+32>target.size)throw Error('Ảnh có quá nhiều chi tiết để lưu cùng ba mùa còn lại. Hãy giảm chi tiết ảnh hoặc chọn ảnh khác. Chưa thay đổi ảnh trên đồng hồ.');
+  const next=builder.wrap(13,payload,p.revision+1);asset(next);return next;
+ }
+ async function replace(client,index,image,options={}){
+  const {check=()=>{},write=()=>{},progress=()=>{},readProgress=()=>{},snapshot=()=>{},recovery=null}=options;
+  const parts=await client.partitions();check();if(!album.compact(parts))throw Error('Cài ảnh bốn mùa trước khi thay ảnh riêng.');
+  const part=parts.find(p=>p.id===13);if(!part||part.offset!==target.offset||part.size!==target.size)throw Error('Vùng lưu ảnh đã thay đổi. Chưa gửi ảnh.');
+  if(recovery){asset(recovery);const status=store.parseStatus(await client.status());check();if(status.active){if(status.active!==13)throw Error('Đồng hồ đang xử lý dữ liệu khác. Chưa thay đổi ảnh.');await client.request(5);check();}}
+  const info=await client.inspect(13);check();let old;
+  if(!info.code)old=await client.readPackage(part,(n,total)=>{check();readProgress(n,total);});
+  else if(recovery&&[1,3,4].includes(info.code))old=recovery.slice();
+  else throw Error('Chưa đọc được bốn ảnh đang lưu. Hãy kết nối lại.');
+  check();const previous=asset(old),next=replacement(old,index,image);snapshot(old.slice());let entered=false,written=false;
+  try{
+   await client.request(6,Uint8Array.of(77,73,71,49));entered=true;check();
+   const now=await client.inspect(13);check();
+   if(!info.code&&(now.code||now.crc!==previous.crc||now.length!==previous.payload.length))throw Error('Ảnh đã thay đổi. Hãy đọc lại trước khi lưu.');
+   await put(client,next,parts,check,()=>{written=true;write();},progress);
+   await client.leave();check();entered=false;return next;
+  }catch(e){
+   if(written&&!client.closed){try{check();await client.request(5);await put(client,old,parts,check,write,()=>{});await client.leave();entered=false;e.message+=' Đã khôi phục bộ ảnh trước đó.';}catch(_){e.message+=' Kết nối lại rồi bấm Thử lưu lại, không đóng trang này.';}}
+   throw e;
+  }finally{if(entered&&!client.closed){try{await client.request(5);await client.leave();}catch(_){}}}
+ }
+ const api={asset,unpack,replacement,replace,layout,plan,ensure,readSelection,saveSelection};if(node){module.exports=api;return;}
  const $=id=>document.getElementById(id);let busy=false;
- const supported=()=>typeof appVersion!=='undefined'&&[0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A].includes(appVersion)&&typeof gattServer!=='undefined'&&!!gattServer?.connected;
- function controls(force=false){for(const id of ['season75Mode','season75Install'])$(id).disabled=force||busy||!supported()||!!root.DeviceOperations?.current;for(const id of ['season75Choice','season75Apply','season75Read'])$(id).disabled=force||busy||!supported()||typeof appVersion==='undefined'||appVersion<0x50||!!root.DeviceOperations?.current;$('season75Stop').disabled=!busy;}
+ const supported=()=>typeof appVersion!=='undefined'&&[0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A,0x5B,0x5C].includes(appVersion)&&typeof gattServer!=='undefined'&&!!gattServer?.connected;
+ function controls(force=false){for(const id of ['season75Mode','season75Install'])$(id).disabled=force||busy||!supported()||!!root.DeviceOperations?.current;for(const id of ['season75Choice','season75Apply','season75Read'])$(id).disabled=force||busy||!supported()||typeof appVersion==='undefined'||appVersion<0x50||!!root.DeviceOperations?.current;$('season75Stop').disabled=!busy;root.SeasonUpload75?.controls(force||busy||!!root.DeviceOperations?.current,!supported());}
  function say(text){$('season75Status').textContent=text;root.addLog?.('Đồng hồ bốn mùa: '+text);}
  function png(image,width){
   const c=document.createElement('canvas');c.width=width;c.height=480;const ctx=c.getContext('2d'),rgba=ctx.createImageData(width,480),plane=width*60;
@@ -125,11 +154,15 @@
   if(busy||root.DeviceOperations?.current)return;if(!supported()){say('Hãy cập nhật phần mềm đồng hồ trước.');return;}busy=true;controls();$('season75Progress').value=0;
   try{
    const decode=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
-   const ok=await root.ExternalResourceInstaller.countdownOperation((client,check,write)=>ensure(client,decode(root.Season75Data),decode(root.ArtLandscapeData),backupAndApprove,check,write,(n,total)=>{$('season75Progress').value=n/total;},say));
+   const ok=await root.ExternalResourceInstaller.countdownOperation(async(client,check,write)=>{
+    const parts=await client.partitions();check();
+    if(album.compact(parts)){const i=await client.inspect(13);check();if(!i.code&&i.length>=48&&i.length+32<=target.size){const h=await client.readRange(target.offset+32,48);check();if(!codec.tag(h,'SAB1'))throw Error('Bộ ảnh đang lưu chưa hợp lệ.');h[0]=80;codec.directory(h,800,i.length);return true;}}
+    return ensure(client,decode(root.Season75Data),decode(root.ArtLandscapeData),backupAndApprove,check,write,(n,total)=>{$('season75Progress').value=n/total;},say);
+   });
    if(!ok){say('Đã hủy. Album cũ chưa bị thay đổi.');return;}
    $('season75Progress').value=1;
    if(openAfter&&!await root.sendTimeCommand(11,'Đồng hồ bốn mùa'))throw Error('Đã lưu ảnh nhưng chưa mở được đồng hồ. Hãy kết nối lại rồi chọn Đồng hồ bốn mùa.');
-   say('Đã cài ảnh bốn mùa. Bạn có thể chọn Tự động theo tiết khí hoặc giữ một mùa yêu thích. Mỗi album còn tối đa hai ảnh.');
+   say('Đã mở đồng hồ bốn mùa. Ảnh riêng đã lưu được giữ nguyên. Bạn có thể tự động đổi theo tiết khí hoặc giữ một mùa yêu thích.');
   }catch(e){say('Chưa hoàn tất: '+e.message);root.ConsoleUI?.openLog();}
   finally{busy=false;controls();}
  }

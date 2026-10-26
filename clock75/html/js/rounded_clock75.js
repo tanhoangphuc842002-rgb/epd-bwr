@@ -1,7 +1,7 @@
 (function(root){
  'use strict';
  const $=id=>document.getElementById(id);let busy=false;
- function supported(){return typeof appVersion!=='undefined'&&[0x57,0x58,0x59,0x5A].includes(appVersion)&&typeof gattServer!=='undefined'&&!!gattServer?.connected;}
+ function supported(){return typeof appVersion!=='undefined'&&[0x57,0x58,0x59,0x5A,0x5B,0x5C].includes(appVersion)&&typeof gattServer!=='undefined'&&!!gattServer?.connected;}
  function controls(force=false){const b=$('rounded75Mode');if(b)b.disabled=force||busy||!!root.DeviceOperations?.current||!supported();}
  function say(text){$('rounded75Status').textContent=text;root.addLog?.('Đồng hồ lịch 2: '+text);}
  async function show(){

@@ -172,7 +172,7 @@
   }
   function validateFaceAssets(bytes){
     if(!(bytes instanceof Uint8Array)||bytes.length<64)fail('Dữ liệu mặt đồng hồ chưa đầy đủ');const v=view(bytes);
-    if(v.getUint32(0,true)!==0x31534146||v.getUint16(4,true)!==1||![4,6,9].includes(v.getUint16(6,true))||v.getUint32(8,true)!==bytes.length||v.getUint32(12,true))fail('Dữ liệu mặt đồng hồ không hợp lệ');
+    if(v.getUint32(0,true)!==0x31534146||v.getUint16(4,true)!==1||![4,6,9,10].includes(v.getUint16(6,true))||v.getUint32(8,true)!==bytes.length||v.getUint32(12,true))fail('Dữ liệu mặt đồng hồ không hợp lệ');
     const count=v.getUint16(6,true);let end=16+count*12;for(let i=0;i<count;i++){const p=16+i*12,at=v.getUint32(p+4,true),n=v.getUint32(p+8,true);if(v.getUint16(p,true)!==i+1||v.getUint16(p+2,true)||at!==end||n<8||at+n>bytes.length)fail('Chỉ mục tài nguyên mặt đồng hồ bị lỗi');const b=bytes.subarray(at,at+n);end=at+n;
       if(i<2)timeFontGeometry(b,i+1);
       else if(i===2||i>=4){if(n<23||!b[0]||b[0]===255||b[9]>64||b[10]>64||b.slice(2,9).some(x=>x<1||x>8))fail('Font thứ không hợp lệ');}
