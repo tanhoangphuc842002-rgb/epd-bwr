@@ -94,7 +94,7 @@
  }
  const api={asset,layout,ensure,hasSavedArtwork,keepOrInstall,diagnose,collectReport};if(node){module.exports=api;return;}
  const $=id=>document.getElementById(id);let busy=false,galleryPage=0,pickedId=null;const pageSize=6;
- function supported(){return typeof appVersion!=='undefined'&&[0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59].includes(appVersion)&&typeof gattServer!=='undefined'&&!!gattServer?.connected;}
+ function supported(){return typeof appVersion!=='undefined'&&[0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A].includes(appVersion)&&typeof gattServer!=='undefined'&&!!gattServer?.connected;}
  function controls(force=false){const locked=force||busy||!!root.DeviceOperations?.current,disabled=locked||!supported();$('art75Mode').disabled=disabled;if($('art75Report'))$('art75Report').disabled=disabled;
   for(const id of ['art75Save','art75Open','art75Place','art75SavePlace','art75ReadPlace'])if($(id))$(id).disabled=disabled;
   root.ArtUpload75?.controls(locked,!supported());

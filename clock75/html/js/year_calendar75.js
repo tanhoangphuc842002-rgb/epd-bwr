@@ -1,6 +1,6 @@
 (function(root){
  'use strict';const $=id=>document.getElementById(id);let busy=false;
- function supported(){return typeof appVersion!=='undefined'&&[0x54,0x55,0x56,0x57,0x58,0x59].includes(appVersion)&&typeof gattServer!=='undefined'&&!!gattServer?.connected;}
+ function supported(){return typeof appVersion!=='undefined'&&[0x54,0x55,0x56,0x57,0x58,0x59,0x5A].includes(appVersion)&&typeof gattServer!=='undefined'&&!!gattServer?.connected;}
  function controls(force=false){if($('year75Mode'))$('year75Mode').disabled=force||busy||!!root.DeviceOperations?.current||!supported();}
  function say(text){$('year75Status').textContent=text;root.addLog?.('Lịch năm: '+text);}
  async function show(){
