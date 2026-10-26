@@ -5,6 +5,19 @@ const nodes=new WeakMap(),attrs=new WeakMap(),normalize=s=>String(s).replace(/\s
 const skipTags=new Set(['SCRIPT','STYLE','NOSCRIPT','TEXTAREA','CODE','PRE']);
 let vi={},en={},parts=null,shortParts=null;
 function configure(base,extra){
+ extra={...extra,
+  'Chọn ảnh của tôi':'Choose my own image','Dừng tải':'Stop upload','Tải lại tranh':'Retry image upload',
+  'Đang chờ đồng hồ sẵn sàng và kiểm tra dữ liệu…':'Waiting for the clock and checking its data…',
+  'Đang dừng phiên tải bị ngắt để tải lại ảnh…':'Stopping the interrupted transfer before retrying…',
+  'Ảnh đã lưu đầy đủ; không cần truyền lại.':'The image is already saved; no need to send it again.',
+  'Đang kiểm tra ảnh vừa lưu…':'Checking the saved image…',
+  'Bấm Tải lại tranh để thử lại ảnh đã chọn.':'Choose Retry image upload to retry the selected image.',
+  'Ảnh và cách hiển thị đã lưu đầy đủ. Bạn có thể sử dụng đồng hồ.':'The image and display settings are saved. Your clock is ready.',
+  'Đang kết nối lại đồng hồ để tải lại tranh…':'Reconnecting to retry the image upload…',
+  'Hãy kết nối lại đúng đồng hồ đã chọn ảnh rồi bấm Tải lại tranh. Chưa gửi thay đổi.':'Reconnect to the same clock, then choose Retry image upload. No changes were sent.',
+  'Chưa kết nối đúng đồng hồ. Hãy kết nối lại rồi bấm Tải lại tranh.':'The same clock is not connected. Reconnect, then choose Retry image upload.',
+  'Hãy kết nối lại đúng đồng hồ đã chọn ảnh. Chưa gửi thay đổi.':'Reconnect to the same clock. No changes were sent.'
+ };
  vi={...base};en={};for(const[english,vietnamese]of Object.entries(base))en[normalize(vietnamese)]=english;
  for(const[vietnamese,english]of Object.entries(extra)){en[normalize(vietnamese)]=english;if(!(english in vi))vi[english]=vietnamese;}
  const escape=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
@@ -18,6 +31,7 @@ function navigationCopy(value,lang){
 }
 function translate(text,lang=current()){
  if(typeof text!=='string')return text;
+ if(lang==='en')text=text.replace(/Đã kiểm tra xong \(([\d.]+) giây\)\. Đang lưu ảnh\. Giữ kết nối và không tháo pin\./g,'Checks completed ($1 seconds). Saving the image. Stay connected and keep the battery in place.');
  const key=normalize(text),map=lang==='en'?en:vi;
  let value=map[key];
  if(value===undefined&&lang!=='en')return navigationCopy(text,lang);

@@ -86,7 +86,7 @@
    if(!base&&!app)throw Error('File không chứa dữ liệu cập nhật.');
    const encrypted=manifest.dh_encrypted_ota;
    if(encrypted){
-    if(encrypted.format!=='DHE1'||base||!app||Object.keys(manifest.manifest).length!==1||app.imageData.byteLength>0xd000||app.initData.byteLength>256)throw Error('Gói mã hóa không hợp lệ.');
+    if(encrypted.format!=='DHE1'||base||!app||Object.keys(manifest.manifest).length!==1||app.imageData.byteLength>(encrypted.model_id===0x0751?0x10000:0xd000)||app.initData.byteLength>256)throw Error('Gói mã hóa không hợp lệ.');
     info=await DHOtaVerify(app,encrypted);meta=encrypted;
    }else{
     for(const image of [base,app].filter(Boolean))if(DHOtaInspect(image))throw Error('Gói mã hóa thiếu thông tin xác thực. Đã dừng trước khi gửi.');

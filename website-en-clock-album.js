@@ -1,4 +1,10 @@
 window.EpdWebsiteEnglish=Object.assign(window.EpdWebsiteEnglish||{},{
+ "Đang kiểm tra cập nhật cho đồng hồ 7.5…":"Checking for a 7.5 clock update…",
+ "Đồng hồ 7.5 đã có bản mới nhất trong trang này.":"The 7.5 clock already has the latest software offered by this page.",
+ "Kết nối đồng hồ 2.13 hoặc 2.9 CE/no CE để kiểm tra. Với 7.5 Original-VI, kết nối trong Đồng hồ 7.5 rồi mở mục cập nhật từ đó. Đồng hồ đời cũ vẫn dùng mục chọn file bên dưới.":"Connect a 2.13 or 2.9 CE/non-CE clock to check. For 7.5 Original-VI, connect under Clock 7.5 and open the updater from there. Older clocks can still use the file picker below.",
+ "Bạn có thể xem mẫu trước khi kết nối đồng hồ.":"You can browse the examples before connecting your clock.",
+ "Chỉ xem minh họa. Kết nối đồng hồ tương thích để áp dụng.":"Preview only. Connect a compatible clock to apply this face.",
+ "Chưa tải được hình minh họa. Hãy tải lại trang.":"The preview could not be loaded. Please reload the page.",
  "Đồng hồ và ảnh luân phiên":"Clock with rotating photos",
  "Đồng hồ đang bật chế độ tự đổi ảnh. Chọn Giữ nguyên ảnh hiện tại trong Đồng hồ và ảnh, hoặc Tắt tự đổi ảnh trong Album ảnh trước khi tải ảnh trực tiếp.":"Photo rotation is enabled. Choose Keep current photo under Clock and image, or Stop rotation under Photo album before sending a single image.",
  "Dùng chung 8 ô với Album ảnh. Chọn và chỉnh ảnh ở trên, lưu vào một ô, rồi chọn thời gian đổi ảnh. Đồng hồ vẫn chạy khi không kết nối web.":"Shares eight slots with Photo album. Edit a photo above, save it to a slot, then choose the rotation interval. The clock keeps running without a web connection.",

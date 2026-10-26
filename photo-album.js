@@ -2,10 +2,10 @@
 (()=>{
 'use strict';
 const $=id=>document.getElementById(id),T=window.VNTransport;
-let busy=false,mask=0,consentKey=null;
+let busy=false,mask=0;
 const u32=n=>{const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,n,true);return b;};
-function say(s){$('photo-status').textContent=s;const other=$('clock-album-status');if(other)other.textContent=s;if(typeof addLog==='function')addLog('Album ảnh: '+s);}
-function supported(){return window.VNCountdownSupport?.()&&gattServer?.connected&&((nrf52PanelProfile===0x21&&[128,129,130,131,132,137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243].includes(nrf52FirmwareVersion))||(nrf52PanelProfile===0x29&&[135,136,145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245].includes(nrf52FirmwareVersion)));}
+function say(s){$('photo-status').textContent=s;if(window.ArtClock?.selected())$('clock-image-status').textContent=window.ArtClock.text(s);const other=$('clock-album-status');if(other)other.textContent=s;if(typeof addLog==='function')addLog('Album ảnh: '+s);}
+function supported(){return window.VNCountdownSupport?.()&&gattServer?.connected&&((nrf52PanelProfile===0x21&&[128,129,130,131,132,137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255].includes(nrf52FirmwareVersion))||(nrf52PanelProfile===0x29&&[135,136,145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255].includes(nrf52FirmwareVersion)));}
 function geometry(){return nrf52PanelProfile===0x29?{width:296,photo:0x30000,span:0x6000,step:0x3000,schedule:0x2e000}:{width:250,photo:0x40000,span:0x4000,step:0x2000,schedule:0x3e000};}
 function assertConnection(){if(!supported())throw Error('Đồng hồ này chưa hỗ trợ lưu nhiều ảnh. Bạn vẫn có thể dùng mục tải ảnh thông thường.');}
 function controls(v){busy=v;window.SmallClockAlbum?.controls(v);for(const x of document.querySelectorAll('#photo-album-controls button,#photo-album-controls input,#photo-album-controls select'))x.disabled=v;}
@@ -25,7 +25,7 @@ for(let i=0;i<8;i++){
  row.append(text,time,show,choose);$('photo-slots').append(row);
 }
 async function caps(loadSchedule=true){
- assertConnection();await T.probe();const r=await T.request(16);
+ assertConnection();await (T.probeBasic||T.probe)();const r=await T.request(16);
  if(r.length!==16||r[6]!==1)throw Error('Đồng hồ chưa hỗ trợ album này.');
  mask=r[7];
  for(let i=0;i<8;i++)$('photo-state-'+i).textContent='Ảnh '+(i+1)+': '+(mask&(1<<i)?'đã lưu':'chưa có ảnh');
@@ -40,11 +40,8 @@ async function caps(loadSchedule=true){
  return r;
 }
 async function permitWrite(){
- if(consentKey===T.key())return true;
- say('Đang chuẩn bị sao lưu trước khi dùng vùng lưu ảnh. Có thể mất vài phút.');
- if(!await T.ensureBackup()){say('Đã dừng trước khi ghi. Hãy lưu bản sao lưu rồi thử tiếp.');return false;}
- if(!confirm('Bật lưu nhiều ảnh trên đồng hồ? Dữ liệu có sẵn trong vùng lưu ảnh có thể bị thay thế. Hãy giữ file sao lưu. Danh sách việc và dữ liệu tiếng Việt không bị xóa.'))return false;
- consentKey=T.key();return true;
+ assertConnection();
+ return true;
 }
 function planes(canvas){
  const width=geometry().width,plane=width*16;
@@ -60,7 +57,7 @@ function planes(canvas){
  return b;
 }
 async function upload(begin,body,bytes,onProgress=()=>{}){
- const r=await T.probe();if(r[8])throw Error('Đang có phiên truyền chưa hoàn tất. Kết nối lại và đọc trạng thái.');
+ const r=await (T.probeBasic||T.probe)();if(r[8])throw Error('Đang có phiên truyền chưa hoàn tất. Kết nối lại và đọc trạng thái.');
  await T.request(begin,body);const chunk=r[9]-1;
  for(let pos=0;pos<bytes.length;pos+=chunk){await T.request(18,[pos&255,pos>>8,...bytes.slice(pos,pos+chunk)]);$('photo-progress').value=Math.min(pos+chunk,bytes.length)/bytes.length*100;onProgress($('photo-progress').value);}
  await T.request(19);
@@ -93,7 +90,7 @@ async function saveSchedule(stop=false){
  await upload(20,[...u32(0xc0decafe),...u32(T.crc32(b))],b);
  const r=await caps(false),base=new DataView(r.buffer,r.byteOffset).getUint32(12,true);
  const start=geometry().schedule;if(base!==start&&base!==start+0x1000)throw Error('Không nhận được lịch đã lưu.');
- await verify(base,b,0x31534856);if(!b[1]&&nrf52DisplayMode===14)await sendNrf52Mode(0);await caps(true);$('photo-progress').value=100;
+ await verify(base,b,0x31534856);if(!b[1]&&(nrf52DisplayMode===14||nrf52DisplayMode===15))await sendNrf52Mode(0);await caps(true);$('photo-progress').value=100;
  say(b[1]?'Đã lưu lịch và bật tự đổi ảnh. Bạn có thể ngắt kết nối web. Chuyển sang mode đồng hồ/lịch sẽ tạm dừng album.':'Đã tắt tự đổi ảnh; ảnh hiện tại vẫn giữ trên màn.');
 }
 $('photo-choose').onclick=()=>{$('image_file').click();$('canvas-box').scrollIntoView({behavior:'smooth',block:'center'});};
@@ -123,7 +120,7 @@ window.PhotoAlbumBeforeDirectUpload=async()=>{
  if(busy||window.VNDataBusy?.()||window.EpdDfuBusy?.()){alert('Đồng hồ đang xử lý. Hãy chờ hoàn tất rồi tải ảnh.');return false;}
  try{return await T.run(async()=>{
   const r=await caps(false);
-  if(r[8]&&r[8]!==5){
+  if(r[8]&&r[8]!==5&&r[8]!==6){
    $('photo-cycle-mode').value=String(r[8]>=3?0:r[8]);modeChanged();
    const message='Đồng hồ đang bật chế độ tự đổi ảnh. Chọn Giữ nguyên ảnh hiện tại trong Đồng hồ và ảnh, hoặc Tắt tự đổi ảnh trong Album ảnh trước khi tải ảnh trực tiếp.';
    say(message);alert(message);$('photo-album-controls').scrollIntoView({behavior:'smooth',block:'center'});return false;

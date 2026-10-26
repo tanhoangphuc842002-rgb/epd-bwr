@@ -8,10 +8,10 @@
 if(typeof deviceProtocol==='undefined'||deviceProtocol!==PROTOCOL_NRF52||!gattServer?.connected)return null;
   let id=null;
   if(nrf52PanelProfile===0x21){
-   const ce=[127,128,129,130,131,137,139,141,143,149,151,153,155,159,161,163,165,174,178,179,180,181,185,189,193,197,199,203,205,209,213,217,219,223,227,228,232,236,242],nc=[132,138,140,142,144,150,152,154,156,160,162,164,166,175,182,186,190,194,198,200,204,206,210,214,218,220,224,229,233,237,243];
+   const ce=[127,128,129,130,131,137,139,141,143,149,151,153,155,159,161,163,165,174,178,179,180,181,185,189,193,197,199,203,205,209,213,217,219,223,227,228,232,236,242,246,250,254],nc=[132,138,140,142,144,150,152,154,156,160,162,164,166,175,182,186,190,194,198,200,204,206,210,214,218,220,224,229,233,237,243,247,251,255];
    id=ce.includes(nrf52FirmwareVersion)?'ce213':nc.includes(nrf52FirmwareVersion)?'noce213':null;
   }else if(nrf52PanelProfile===0x29){
-   id=[133,135,145,147,157,167,170,172,176,183,187,191,195,207,211,215,221,225,230,234,238,244].includes(nrf52FirmwareVersion)?'ce290':[136,146,148,158,168,171,173,177,184,188,192,196,208,212,216,222,226,231,235,239,241,245].includes(nrf52FirmwareVersion)?'noce290':null;
+   id=[133,135,145,147,157,167,170,172,176,183,187,191,195,207,211,215,221,225,230,234,238,244,248,252,254].includes(nrf52FirmwareVersion)?'ce290':[136,146,148,158,168,171,173,177,184,188,192,196,208,212,216,222,226,231,235,239,241,245,249,253,255].includes(nrf52FirmwareVersion)?'noce290':null;
   }
   return id?{id,profile:nrf52PanelProfile,device:bleDevice?.id,version:nrf52FirmwareVersion}:null;
  }
@@ -23,7 +23,7 @@ if(typeof deviceProtocol==='undefined'||deviceProtocol!==PROTOCOL_NRF52||!gattSe
  }
  async function prepare(){
   if(busy||window.EpdDfuBusy?.()||window.VNDataBusy?.()||window.countdownOperationBusy)return;
-  const identity=current();if(!identity){say('Kết nối đồng hồ 2.13 hoặc 2.9 CE/no CE để kiểm tra. Đồng hồ khác vẫn dùng mục chọn file bên dưới.');return;}
+  const identity=current();if(!identity){if(!gattServer?.connected&&window.Original75Auto?.identity())return window.Original75Auto.prepare();say('Kết nối đồng hồ 2.13 hoặc 2.9 CE/no CE để kiểm tra. Với 7.5 Original-VI, kết nối trong Đồng hồ 7.5 rồi mở mục cập nhật từ đó. Đồng hồ đời cũ vẫn dùng mục chọn file bên dưới.');return;}
   busy=true;check.disabled=true;pending=null;
   for(const id of ['dfu-file','dfu-start-button','dfu-new-device-button']){const el=document.getElementById(id);if(el)el.disabled=true;}
   try{
@@ -55,5 +55,5 @@ if(typeof deviceProtocol==='undefined'||deviceProtocol!==PROTOCOL_NRF52||!gattSe
   if(c.version!==pending.target){say('Chưa nhận được đúng bản mới từ đồng hồ. Kiểm tra kết nối và thử lại; chưa xác nhận cập nhật thành công.');return;}
   say('Đồng hồ đã chạy đúng phần mềm mới. Nếu màn hình hiện NO DATA, bấm Khôi phục đồng hồ bên dưới; chưa cần cài lại toàn bộ dữ liệu.');pending=null;
  },1500);
- window.EpdAutoUpdate={prepare,current,busy:()=>busy};
+ window.EpdAutoUpdate={prepare,current,busy:()=>busy||!!window.Original75Auto?.busy()};
 })();

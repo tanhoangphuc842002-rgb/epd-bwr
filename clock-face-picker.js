@@ -2,6 +2,7 @@
 (()=>{
 'use strict';
 const $=id=>document.getElementById(id),T=window.VNTransport;
+const previewBase=new URL('face-previews/',document.currentScript?.src||location.href);
 const rows=[
  {name:'Đồng hồ số',description:'Đồng hồ số lớn.',modes:[2,2]},
  {name:'Đồng hồ và lịch tháng',description:'Giờ ở bên phải, lịch tháng ở bên trái. Nếu bạn đang bật Việc cần làm, phần lịch sẽ hiện danh sách đó; có thể tắt trong mục Việc cần làm.',modes:[3,3]},
@@ -11,26 +12,25 @@ const rows=[
  {name:'Đồng hồ lật',description:'Các ô số nền trắng với khe lật, dấu hai chấm đỏ và lịch tháng bên phải. Dùng được cả khi không có ngày đánh dấu.',modes:[11,12]},
  {name:'Đồng hồ',description:'Giờ lớn, dễ xem.',modes:[12,13]}
 ];
-function availableRows(){return rows.slice(0,[205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,242,243,244,241,245].includes(nrf52FirmwareVersion)?7:6);}
-function label(row){return row===rows[0]&&[193,194,195,196,197,198,199,200,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,242,243,244,241,245].includes(nrf52FirmwareVersion)?'Đồng hồ 3D':row.name;}
+function availableRows(){return rows.slice(0,!device()||[205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,242,243,244,241,245,246,247,248,249,250,251,252,253,254,255].includes(nrf52FirmwareVersion)?7:6);}
+function label(row){return row===rows[0]&&(!device()||[193,194,195,196,197,198,199,200,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,242,243,244,241,245,246,247,248,249,250,251,252,253,254,255].includes(nrf52FirmwareVersion))?'Đồng hồ 3D':row.name;}
 let busy=false,versionKey='';
 function device(){
  if(typeof deviceProtocol==='undefined'||deviceProtocol!==PROTOCOL_NRF52||!gattServer?.connected||!nrf52ModelDetected||nrf52ModelId!==2||!epdCharacteristic)return null;
- const big=nrf52PanelProfile===0x29,ok=big?[191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245]:nrf52PanelProfile===0x21?[189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243]:[];
+ const big=nrf52PanelProfile===0x29,ok=big?[191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255]:nrf52PanelProfile===0x21?[189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255]:[];
  if(!ok.includes(nrf52FirmwareVersion))return null;
- return {key:[bleDevice?.id,nrf52PanelProfile,nrf52FirmwareVersion].join('|'),big,id:({189:'ce213',190:'noce213',191:'ce290',192:'noce290',193:'ce213-retro',194:'noce213-retro',195:'ce290-retro',196:'noce290-retro',197:'ce213-retro-up3',198:'noce213-retro-up3',199:'ce213-quotes',200:'noce213-quotes',203:'ce213-quotes-up6',204:'noce213-quotes-up6',205:'ce213-outline',206:'noce213-outline',207:'ce290-outline',208:'noce290-outline',209:'ce213-outline',210:'noce213-outline',211:'ce290-outline',212:'noce290-outline',213:'ce213-month',214:'noce213-month',215:'ce290-month',216:'noce290-month',217:'ce213-month-up3',218:'noce213-month-up3',219:'ce213-month-up3',220:'noce213-month-up3',221:'ce290-month',222:'noce290-month',223:'ce213-month-up3',224:'noce213-month-up3',229:'noce213-month-up3',233:'noce213-month-up3',237:'noce213-month-up3',243:'noce213-month-up3',225:'ce290-month',230:'ce290-month',234:'ce290-month',238:'ce290-month',244:'ce290-month',226:'noce290-month',231:'noce290-month',235:'noce290-month',239:'noce290-month',241:'noce290-month',245:'noce290-month',227:'ce213-month-up3',228:'ce213-month-up3',232:'ce213-month-up3',236:'ce213-month-up3',242:'ce213-month-up3'})[nrf52FirmwareVersion],ch:epdCharacteristic};
+ return {key:[bleDevice?.id,nrf52PanelProfile,nrf52FirmwareVersion].join('|'),big,id:(nrf52FirmwareVersion>=254?(big?(nrf52FirmwareVersion===254?'ce290-month':'noce290-month'):(nrf52FirmwareVersion===254?'ce213-month-up3':'noce213-month-up3')):({189:'ce213',190:'noce213',191:'ce290',192:'noce290',193:'ce213-retro',194:'noce213-retro',195:'ce290-retro',196:'noce290-retro',197:'ce213-retro-up3',198:'noce213-retro-up3',199:'ce213-quotes',200:'noce213-quotes',203:'ce213-quotes-up6',204:'noce213-quotes-up6',205:'ce213-outline',206:'noce213-outline',207:'ce290-outline',208:'noce290-outline',209:'ce213-outline',210:'noce213-outline',211:'ce290-outline',212:'noce290-outline',213:'ce213-month',214:'noce213-month',215:'ce290-month',216:'noce290-month',217:'ce213-month-up3',218:'noce213-month-up3',219:'ce213-month-up3',220:'noce213-month-up3',221:'ce290-month',222:'noce290-month',223:'ce213-month-up3',224:'noce213-month-up3',229:'noce213-month-up3',233:'noce213-month-up3',237:'noce213-month-up3',243:'noce213-month-up3',247:'noce213-month-up3',251:'noce213-month-up3',225:'ce290-month',230:'ce290-month',234:'ce290-month',238:'ce290-month',244:'ce290-month',248:'ce290-month',252:'ce290-month',226:'noce290-month',231:'noce290-month',235:'noce290-month',239:'noce290-month',241:'noce290-month',245:'noce290-month',249:'noce290-month',253:'noce290-month',227:'ce213-month-up3',228:'ce213-month-up3',232:'ce213-month-up3',236:'ce213-month-up3',242:'ce213-month-up3',246:'ce213-month-up3',250:'ce213-month-up3'})[nrf52FirmwareVersion]),ch:epdCharacteristic};
 }
 function unavailable(){
  return typeof gattServer==='undefined'||!gattServer?.connected?'Kết nối đồng hồ để xem những giao diện phù hợp.':'Đồng hồ này vẫn dùng nút chuyển giao diện phía trên. Các mẫu chọn trực tiếp chỉ hiện trên phiên bản có hỗ trợ.';
 }
 function blocked(){return !!(window.VNDataBusy?.()||window.EpdDfuBusy?.()||window.EpdAutoUpdate?.busy?.()||window.countdownOperationBusy||(typeof clockImageUploadBusy!=='undefined'&&clockImageUploadBusy));}
-function preview(){const d=device();if(!d)return;const n=Number($('clock-face-select').value),row=availableRows()[n];if(!row)return;const dir=window.EpdWebsiteI18n?.current()==='en'?'face-previews/en/':'face-previews/';$('clock-face-preview').src=dir+'clock-'+(n+1)+'.png';$('clock-face-preview').alt=label(row)+' — hình minh họa';$('clock-face-description').textContent=row===rows[0]&&label(row)!==row.name?'Giờ lớn với kiểu chữ 3D.':row.description;}
+function preview(){const n=Number($('clock-face-select').value),row=availableRows()[n];if(!row)return;const dir=window.EpdWebsiteI18n?.current()==='en'?'en/':'';const url=new URL(dir+'clock-'+(n+1)+'.png',previewBase);url.searchParams.set('v','6161');$('clock-face-preview-status').textContent='';$('clock-face-preview').src=url.href;$('clock-face-preview').alt=label(row)+' — hình minh họa';$('clock-face-description').textContent=row===rows[0]&&label(row)!==row.name?'Giờ lớn với kiểu chữ 3D.':row.description;}
 function refresh(){
- const d=device();$('clock-face-controls').hidden=!d;
- if(!d){$('clock-face-availability').textContent=unavailable();if(versionKey){versionKey='';$('clock-face-status').textContent='';}return;}
- if(versionKey!==d.key){versionKey=d.key;$('clock-face-select').replaceChildren();availableRows().forEach((r,i)=>{const option=document.createElement('option');option.value=String(i);option.textContent=label(r);$('clock-face-select').append(option);});const current=availableRows().findIndex(r=>r.modes[d.big?1:0]===nrf52DisplayMode);$('clock-face-select').value=String(current<0?0:current);$('clock-face-status').textContent='Chọn mẫu rồi bấm Hiển thị trên đồng hồ.';preview();}
- $('clock-face-availability').textContent='Đã nhận diện đồng hồ '+(d.big?'2.9':'2.13')+' inch. Ảnh là mẫu minh họa dùng chung; ngày giờ thực tế theo đồng hồ.';
- $('clock-face-select').disabled=busy||blocked();$('clock-face-apply').disabled=busy||blocked();
+ const d=device(),key=d?.key||'preview-only';$('clock-face-controls').hidden=false;
+ if(versionKey!==key){versionKey=key;$('clock-face-select').replaceChildren();availableRows().forEach((r,i)=>{const option=document.createElement('option');option.value=String(i);option.textContent=label(r);$('clock-face-select').append(option);});const current=d?availableRows().findIndex(r=>r.modes[d.big?1:0]===nrf52DisplayMode):0;$('clock-face-select').value=String(current<0?0:current);$('clock-face-status').textContent=d?'Chọn mẫu rồi bấm Hiển thị trên đồng hồ.':'Chỉ xem minh họa. Kết nối đồng hồ tương thích để áp dụng.';preview();}
+ $('clock-face-availability').textContent=d?'Đã nhận diện đồng hồ '+(d.big?'2.9':'2.13')+' inch. Ảnh là mẫu minh họa dùng chung; ngày giờ thực tế theo đồng hồ.':typeof gattServer==='undefined'||!gattServer?.connected?'Bạn có thể xem mẫu trước khi kết nối đồng hồ.':unavailable();
+ $('clock-face-select').disabled=busy||blocked();$('clock-face-apply').disabled=!d||busy||blocked();
 }
 async function apply(){
  if(busy||blocked())return;
@@ -50,5 +50,7 @@ async function apply(){
  finally{busy=false;refresh();}
 }
 $('clock-face-select').addEventListener('change',preview);$('clock-face-apply').addEventListener('click',apply);
+$('clock-face-preview').onload=()=>{$('clock-face-preview-status').textContent='';};
+$('clock-face-preview').onerror=()=>{$('clock-face-preview-status').textContent='Chưa tải được hình minh họa. Hãy tải lại trang.';};
 window.ClockFacePicker={refresh,refreshPreview:preview,apply,supported:()=>!!device()};refresh();setInterval(refresh,500);
 })();
