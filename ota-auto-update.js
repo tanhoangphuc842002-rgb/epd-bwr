@@ -8,11 +8,12 @@
 if(typeof deviceProtocol==='undefined'||deviceProtocol!==PROTOCOL_NRF52||!gattServer?.connected)return null;
   let id=null;
   if(nrf52PanelProfile===0x21){
-   const ce=[127,128,129,130,131,137,139,141,143,149,151,153,155,159,161,163,165,174,178,179,180,181,185,189,193,197,199,203,205,209,213,217,219,223,227,228,232,236,242,246,250,254],nc=[132,138,140,142,144,150,152,154,156,160,162,164,166,175,182,186,190,194,198,200,204,206,210,214,218,220,224,229,233,237,243,247,251,255];
+   const ce=[127,128,129,130,131,137,139,141,143,149,151,153,155,159,161,163,165,174,178,179,180,181,185,189,193,197,199,203,205,209,213,217,219,223,227,228,232,236,242,246,250,254,256,257,258,259],nc=[132,138,140,142,144,150,152,154,156,160,162,164,166,175,182,186,190,194,198,200,204,206,210,214,218,220,224,229,233,237,243,247,251,255,256,257,258,259];
    id=ce.includes(nrf52FirmwareVersion)?'ce213':nc.includes(nrf52FirmwareVersion)?'noce213':null;
   }else if(nrf52PanelProfile===0x29){
-   id=[133,135,145,147,157,167,170,172,176,183,187,191,195,207,211,215,221,225,230,234,238,244,248,252,254].includes(nrf52FirmwareVersion)?'ce290':[136,146,148,158,168,171,173,177,184,188,192,196,208,212,216,222,226,231,235,239,241,245,249,253,255].includes(nrf52FirmwareVersion)?'noce290':null;
+   id=[133,135,145,147,157,167,170,172,176,183,187,191,195,207,211,215,221,225,230,234,238,244,248,252,254,256,257,258,259].includes(nrf52FirmwareVersion)?'ce290':[136,146,148,158,168,171,173,177,184,188,192,196,208,212,216,222,226,231,235,239,241,245,249,253,255,256,257,258,259].includes(nrf52FirmwareVersion)?'noce290':null;
   }
+  if([256,257,258,259].includes(nrf52FirmwareVersion))id=nrf52PanelProfile===33?([256,258].includes(nrf52FirmwareVersion)?'ce213':'noce213'):nrf52PanelProfile===41?([256,258].includes(nrf52FirmwareVersion)?'ce290':'noce290'):null;
   return id?{id,profile:nrf52PanelProfile,device:bleDevice?.id,version:nrf52FirmwareVersion}:null;
  }
  const say=s=>{note.textContent=s;};
@@ -32,7 +33,7 @@ if(typeof deviceProtocol==='undefined'||deviceProtocol!==PROTOCOL_NRF52||!gattSe
    if(cat.schema!==1||!Array.isArray(cat.products))throw Error('Danh sách cập nhật không hợp lệ.');
    const matches=cat.products.filter(p=>p.id===identity.id);if(matches.length!==1)throw Error('Chưa có bản tự động cho loại đồng hồ này. Hãy dùng file được cung cấp.');
    const p=matches[0],model={ce213:0x0211,noce213:0x0212,ce290:0x0291,noce290:0x0292}[identity.id];
-   if(p.model!==model||p.resource_profile!==identity.profile||!Number.isInteger(p.version)||p.version<1||p.version>255||!/^updates\/[a-zA-Z0-9_.-]+\.zip$/.test(p.url)||!/^[0-9a-f]{64}$/.test(p.sha256))throw Error('Thông tin gói cập nhật không phù hợp.');
+   if(p.model!==model||p.resource_profile!==identity.profile||!Number.isInteger(p.version)||p.version<1||p.version>4294967295||!/^updates\/[a-zA-Z0-9_.-]+\.zip$/.test(p.url)||!/^[0-9a-f]{64}$/.test(p.sha256))throw Error('Thông tin gói cập nhật không phù hợp.');
    if(identity.version>=p.version){say('Phần mềm đã có bản mới nhất trong trang này. Nếu đồng hồ hiện NO DATA, bấm Khôi phục đồng hồ bên dưới.');return;}
    const bytes=await read(new URL(p.url,base)),digest=new Uint8Array(await crypto.subtle.digest('SHA-256',bytes));
    if([...digest].map(v=>v.toString(16).padStart(2,'0')).join('')!==p.sha256)throw Error('Gói tải xuống chưa đầy đủ hoặc đã bị thay đổi.');

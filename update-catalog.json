@@ -3,42 +3,42 @@
   "products": [
     {
       "id": "ce213",
-      "label": "ce213",
+      "label": "CE 2.13 v20.28.1",
       "model": 529,
-      "version": 254,
-      "release": "v20.27",
-      "url": "updates/DH_CE_213_v20.27_ART_HOURLY_FIX_OTA254_encrypted.zip",
-      "sha256": "c3282adec4205b4795cf59d1cd4bdab2b260f5acc4208f0998b8e64bc68c51a3",
+      "version": 258,
+      "release": "v20.28.1",
+      "url": "updates/DH_CE_213_v20.28.1_ART_HOLD_FIX_OTA258_encrypted.zip",
+      "sha256": "a525e16539dba5ce46a4765346d2a68b89f51c86cf2d2d6e536168d576ae6294",
       "resource_profile": 33
     },
     {
       "id": "noce213",
-      "label": "noce213",
+      "label": "no CE 2.13 v19.20.1",
       "model": 530,
-      "version": 255,
-      "release": "v19.19",
-      "url": "updates/DH_no_CE_213_v19.19_ART_HOURLY_FIX_OTA255_encrypted.zip",
-      "sha256": "b71f78411ac10f18c103f5b44a5009124210c72234c823b6c33415fb7b0d3366",
+      "version": 259,
+      "release": "v19.20.1",
+      "url": "updates/DH_no_CE_213_v19.20.1_ART_HOLD_FIX_OTA259_encrypted.zip",
+      "sha256": "2620cdf80d79134282be2b4f90b691361f6dcfb1d67130b770f669ba3b489e27",
       "resource_profile": 33
     },
     {
       "id": "ce290",
-      "label": "ce290",
+      "label": "CE 2.9 v19.18.1",
       "model": 657,
-      "version": 254,
-      "release": "v19.17",
-      "url": "updates/DH_290_CE_v19.17_ART_HOURLY_FIX_OTA254_encrypted.zip",
-      "sha256": "6e4ba8d14b27bd27bdf6752ee897445f2641b091599c2c5b60cdb3072f277f41",
+      "version": 258,
+      "release": "v19.18.1",
+      "url": "updates/DH_290_CE_v19.18.1_ART_HOLD_FIX_OTA258_encrypted.zip",
+      "sha256": "b75f2057ad0f1c69bbf6ee99427e7914aaa67030d64d7f170f23e707bdd81b35",
       "resource_profile": 41
     },
     {
       "id": "noce290",
-      "label": "noce290",
+      "label": "no CE 2.9 v7.19.1",
       "model": 658,
-      "version": 255,
-      "release": "v7.18",
-      "url": "updates/DH_290_no_CE_v7.18_ART_HOURLY_FIX_OTA255_encrypted.zip",
-      "sha256": "06b348ba01ef141f6c4d44c4764594df7c7f82e637857d748b3370f7afd7d918",
+      "version": 259,
+      "release": "v7.19.1",
+      "url": "updates/DH_290_no_CE_v7.19.1_ART_HOLD_FIX_OTA259_encrypted.zip",
+      "sha256": "b48d0814f9126e07de5ee84f254294bcd1754ca23e3bb737773bbf994b8d3b9c",
       "resource_profile": 41
     }
   ]

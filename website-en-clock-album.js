@@ -1,4 +1,12 @@
 window.EpdWebsiteEnglish=Object.assign(window.EpdWebsiteEnglish||{},{
+ "Vị trí giờ":"Time position",
+ "Áp dụng vị trí":"Apply position",
+ "Xóa ảnh đã chọn":"Clear selected image",
+ "Vùng lưu cách hiển thị không hợp lệ.":"Invalid saved display settings.",
+ "Lưu và hiển thị một bức tranh trước khi đổi vị trí giờ.":"Save and display a painting before changing the time position.",
+ "Đang lưu vị trí giờ…":"Saving the time position…",
+ "Đã lưu vị trí giờ. Chờ đồng hồ làm mới xong.":"Time position saved. Wait for the clock to refresh.",
+ "Đã xóa ảnh đang chọn. Ảnh đã lưu trên đồng hồ vẫn được giữ.":"Selection cleared. Photos saved on the clock are retained.",
  "Đang kiểm tra cập nhật cho đồng hồ 7.5…":"Checking for a 7.5 clock update…",
  "Đồng hồ 7.5 đã có bản mới nhất trong trang này.":"The 7.5 clock already has the latest software offered by this page.",
  "Kết nối đồng hồ 2.13 hoặc 2.9 CE/no CE để kiểm tra. Với 7.5 Original-VI, kết nối trong Đồng hồ 7.5 rồi mở mục cập nhật từ đó. Đồng hồ đời cũ vẫn dùng mục chọn file bên dưới.":"Connect a 2.13 or 2.9 CE/non-CE clock to check. For 7.5 Original-VI, connect under Clock 7.5 and open the updater from there. Older clocks can still use the file picker below.",

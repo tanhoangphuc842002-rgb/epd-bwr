@@ -10,7 +10,7 @@
   $('clock-image-retry').disabled=reconnecting||ownRunning||!!A.busy()||!!T.busy()||clockImageUploadBusy||!!root.EpdDfuBusy?.()||!pending;
  }
  const supported=()=>typeof deviceProtocol!=='undefined'&&deviceProtocol===PROTOCOL_NRF52&&nrf52ModelDetected&&nrf52ModelId===2&&
-  ((nrf52PanelProfile===0x21&&[242,243,246,247,250,251,254,255].includes(nrf52FirmwareVersion))||(nrf52PanelProfile===0x29&&[244,245,248,249,252,253,254,255].includes(nrf52FirmwareVersion)))&&!!gattServer?.connected;
+  ((nrf52PanelProfile===0x21&&[242,243,246,247,250,251,254,255,256,257,258,259].includes(nrf52FirmwareVersion))||(nrf52PanelProfile===0x29&&[244,245,248,249,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion)))&&!!gattServer?.connected;
  function controls(value=false){locked=!!value||!!A.busy()||!!T.busy();for(const e of root.document.querySelectorAll('#clock-album-controls button,#clock-album-controls input,#clock-album-controls select'))e.disabled=locked||!supported();root.ArtClock?.controls();recoveryControls();}
  function status(s){A.say(s);$('clock-image-status').textContent=root.ArtClock?.text(s)||s;}
  function progress(n){$('clock-album-progress').value=n;if(root.ArtClock?.selected())$('clock-image-progress').value=n;}
@@ -19,16 +19,25 @@
   assert();const r=await A.caps(false),slots=[];for(let i=0;i<8;i++)if(r[7]&(1<<i))slots.push(i+1);
   $('clock-album-slots').textContent=slots.length?'Ảnh đã lưu: '+slots.join(', '):'Chưa có ảnh đã lưu.';
   if(loadSettings&&(r[8]===3||r[8]===7))$('clock-album-interval').value=r[9]|r[10]<<8;
+  if(loadSettings&&root.ArtClock?.movable()){
+   const bytes=await savedSchedule(r);root.ArtClock.acceptPosition(bytes?.[19]??1);
+  }
   return r;
+ }
+ async function savedSchedule(r){
+  const base=new DataView(r.buffer,r.byteOffset).getUint32(12,true),start=A.geometry().schedule;
+  if(!base)return null;
+  if(base!==start&&base!==start+0x1000)throw Error('Vùng lưu cách hiển thị không hợp lệ.');
+  const bytes=await T.read(base+16,20);await A.verify(base,bytes,0x31534856);return bytes;
  }
  function slot(){const n=Number($('clock-album-slot').value);if(!Number.isInteger(n)||n<0||n>7)throw Error('Ô ảnh không hợp lệ.');return n;}
  function capture(show){
   assert();const index=slot(),target=getClockImageTarget(),canvas=$('clock-image-canvas');
   if(!clockImageOriginal)throw Error('Chọn và chỉnh một ảnh ở trên trước khi lưu.');
-  if(!target||![148,176,194,250,296].includes(target.width)||canvas.width!==target.width||canvas.height!==128)throw Error('Kích thước ảnh chưa đúng. Chưa ghi dữ liệu.');
+  if(!target||![148,176,194,250,296,256,257,258,259].includes(target.width)||canvas.width!==target.width||canvas.height!==128)throw Error('Kích thước ảnh chưa đúng. Chưa ghi dữ liệu.');
   renderClockImage();const full=root.document.createElement('canvas');full.width=A.geometry().width;full.height=128;
-  const ctx=full.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,full.width,128);ctx.drawImage(canvas,0,0);
-  return {identity:identity(),device:T.key(),index,art:!!root.ArtClock?.selected(),bytes:A.planes(full),show,approved:false};
+  const ctx=full.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,full.width,128);ctx.drawImage(root.ArtClock?.rawCanvas()||canvas,0,0);
+  return {identity:identity(),device:T.key(),index,art:!!root.ArtClock?.selected(),corner:root.ArtClock?.position(),bytes:A.planes(full),show,approved:false};
  }
  async function committedPhoto(intent){
   const geo=A.geometry(),first=geo.photo+intent.index*geo.span;let record=null;
@@ -67,6 +76,7 @@
   if(kind==='cycle'&&(!Number.isInteger(minutes)||minutes<1||minutes>1440))throw Error('Khoảng đổi ảnh từ 1 đến 1440 phút.');
   if(!await A.permitWrite())return false;
   const b=new Uint8Array(20);b.fill(255,4);b[0]=1;b[1]=root.ArtClock?.selected()?(kind==='cycle'?7:6):(kind==='cycle'?3:5);b[2]=(kind==='cycle'?minutes:30)&255;b[3]=(kind==='cycle'?minutes:30)>>8;if(b[1]===5||b[1]===6)b[4]=chosen;
+  if(root.ArtClock?.selected()&&root.ArtClock.movable())b[19]=prepared?.corner??root.ArtClock.position();
   if(prepared?.retry){
    const base=new DataView(r.buffer,r.byteOffset).getUint32(12,true),start=A.geometry().schedule;
    if(base===start||base===start+0x1000){
@@ -88,6 +98,18 @@
   if(base!==start&&base!==start+0x1000)throw Error('Chưa xác nhận được lịch đổi ảnh.');
   await A.verify(base,b,0x31534856);nrf52DisplayMode=root.ArtClock?.selected()?15:14;progress(100);
   status(kind==='cycle'?'Đã bật đồng hồ và ảnh luân phiên. Bạn có thể ngắt kết nối web.':'Đã giữ một ảnh cùng đồng hồ. Giờ vẫn tiếp tục chạy.');
+ }
+ async function applyPosition(){
+  assert();if(!root.ArtClock?.selected()||!root.ArtClock.movable())return;
+  const corner=root.ArtClock.position(),r=await read(),b=await savedSchedule(r);
+  if(!b||![6,7].includes(b[1]))throw Error('Lưu và hiển thị một bức tranh trước khi đổi vị trí giờ.');
+  if(!await A.permitWrite())return;
+  // Change only the corner; keep the slot, interval and album policy intact.
+  b[19]=corner;status('Đang lưu vị trí giờ…');progress(0);
+  await A.upload(20,[...A.u32(0xc0decafe),...A.u32(T.crc32(b))],b,progress);
+  const reply=await read(),base=new DataView(reply.buffer,reply.byteOffset).getUint32(12,true);
+  await A.verify(base,b,0x31534856);nrf52DisplayMode=15;progress(100);
+  status('Đã lưu vị trí giờ. Chờ đồng hồ làm mới xong.');
  }
  const run=fn=>{if(locked)return;if(clockImageUploadBusy){status('Hãy chờ truyền ảnh xong rồi thử lại.');return;}return A.action(async()=>{assert();return fn();});};
  $('clock-album-read').onclick=()=>run(async()=>{await read(true);status('Đã đọc các ô ảnh đã lưu.');});
@@ -121,9 +143,10 @@
   }
   if(!supported()||intent.identity!==identity()){status('Chưa kết nối đúng đồng hồ. Hãy kết nối lại rồi bấm Tải lại tranh.');return;}
   $('art-clock-layout').value=intent.art?'art':'classic';root.updateClockImageAvailability();
+  if(intent.art&&root.ArtClock?.movable())$('art-clock-position').value=String(intent.corner);
   return run(()=>perform(intent,true));
  };
- root.SmallClockAlbum={controls,supported,hasRetry,saveAndShow:()=>start(true)};controls();
+ root.SmallClockAlbum={controls,supported,hasRetry,hasSelection:()=>!!pending,saveAndShow:()=>start(true),loadPosition:()=>run(()=>read(true)),applyPosition:()=>run(applyPosition),discardSelection:()=>{if(!ownRunning&&!locked){pending=null;recoveryControls();}}};controls();
  root.SmallClockBattery={async read(){
   if(!supported())return false;
   const characteristic=epdCharacteristic,device=bleDevice;

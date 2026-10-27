@@ -3,50 +3,69 @@
  'use strict';
  const $=id=>document.getElementById(id),T=root.VNTransport,A=root.PhotoAlbumShared;
  const known=()=>typeof deviceProtocol!=='undefined'&&deviceProtocol===PROTOCOL_NRF52&&nrf52ModelDetected&&nrf52ModelId===2&&!!gattServer?.connected&&
-  (nrf52PanelProfile===33?[246,247,250,251,254,255].includes(nrf52FirmwareVersion):nrf52PanelProfile===41&&[248,249,252,253,254,255].includes(nrf52FirmwareVersion));
- const full=()=>known()&&[250,251,252,253,254,255].includes(nrf52FirmwareVersion);
- const corner=()=>nrf52PanelProfile===41?{x:176,width:120,height:80}:{x:146,width:104,height:72};
+  (nrf52PanelProfile===33?[246,247,250,251,254,255,256,257,258,259].includes(nrf52FirmwareVersion):nrf52PanelProfile===41&&[248,249,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion));
+ const full=()=>known()&&[250,251,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion);
+ const movable=()=>known()&&[256,257,258,259].includes(nrf52FirmwareVersion);
+ const position=()=>{const n=Number($('art-clock-position').value);return Number.isInteger(n)&&n>=0&&n<4?n:1;};
+ const corner=()=>{
+  if(!movable())return nrf52PanelProfile===41?{x:176,y:0,width:120,height:80}:{x:146,y:0,width:104,height:72};
+  const big=nrf52PanelProfile===41,p=position(),width=big?120:104,height=48;
+  return {x:p&1?(big?296:250)-width:0,y:p&2?128-height:0,width,height};
+ };
  const selected=()=>known()&&$('art-clock-layout').value==='art';
  const en=()=>root.EpdWebsiteI18n?.current()==='en';
  const text=s=>root.EpdWebsiteI18n?.translate(s)||s;
  const wording=(vi,english)=>en()?english:vi;
  const busy=()=>!!A.busy()||!!T.busy()||clockImageUploadBusy||!!root.EpdDfuBusy?.();
- let loading=false,imageToken=0,deviceKey='';
+ let loading=false,imageToken=0,deviceKey='',positionDirty=false,positionRead=false;
  const originalTarget=root.getClockImageTarget,originalUpdate=root.updateClockImageAvailability,originalUpload=root.uploadClockImage,originalRender=root.renderClockImage;
  root.getClockImageTarget=function(){
   const t=originalTarget();if(!selected()||!t)return t;
   return {...t,width:full()?(nrf52PanelProfile===41?296:250):(nrf52PanelProfile===41?176:148),height:128,artClock:true,
-   title:wording('Đồng hồ tranh','Art clock'),description:full()?wording('Tranh phủ toàn màn hình; ô trắng góc trên bên phải hiển thị giờ và ngày tháng năm.','Full-screen art with time and date in a white top-right corner.'):wording('Tranh bên trái; giờ, ngày và thứ bên phải. Giờ tự cập nhật mỗi phút.','Art on the left; time, date and weekday on the right. Time updates every minute.')};
+   title:wording('Đồng hồ tranh','Art clock'),description:movable()?wording('Tranh phủ toàn màn hình. Chọn một trong bốn góc để đặt giờ.','Full-screen art. Choose one of four corners for the time.'):full()?wording('Tranh phủ toàn màn hình; ô trắng góc trên bên phải hiển thị giờ và ngày tháng năm.','Full-screen art with time and date in a white top-right corner.'):wording('Tranh bên trái; giờ, ngày và thứ bên phải. Giờ tự cập nhật mỗi phút.','Art on the left; time, date and weekday on the right. Time updates every minute.')};
  };
  function controls(){
   const ok=known(),key=ok?T.key()+'|'+nrf52FirmwareVersion:'';
-  if(key!==deviceKey){deviceKey=key;if(ok&&!root.SmallClockAlbum?.hasRetry())$('art-clock-layout').value=nrf52DisplayMode===15?'art':'classic';}
+  if(key!==deviceKey){deviceKey=key;positionRead=false;positionDirty=false;$('art-clock-position').value='1';if(ok&&!root.SmallClockAlbum?.hasRetry())$('art-clock-layout').value=nrf52DisplayMode===15?'art':'classic';}
   const active=selected(),locked=busy()||loading;
   $('art-clock-controls').hidden=!ok;$('art-clock-gallery').hidden=!active;
+  $('art-clock-position-row').hidden=!active||!movable();
+  $('art-clock-position-label').textContent=wording('Vị trí giờ','Time position');
+  ['Trên bên trái','Trên bên phải','Dưới bên trái','Dưới bên phải'].forEach((vi,i)=>$('art-clock-position').options[i].textContent=wording(vi,['Top left','Top right','Bottom left','Bottom right'][i]));
+  $('art-clock-position').disabled=locked;
+  $('art-clock-position-apply').disabled=locked;
+  $('art-clock-position-apply').textContent=wording('Áp dụng vị trí','Apply position');
+  $('clock-image-clear').disabled=locked||(!clockImageOriginal&&!root.SmallClockAlbum?.hasSelection());
+  $('clock-image-clear').textContent=wording('Xóa ảnh đã chọn','Clear selected image');
   $('art-clock-layout-label').textContent=wording('Cách hiển thị','Layout');
   $('art-clock-layout').options[0].textContent=wording('Đồng hồ và ảnh','Clock and image');
   $('art-clock-layout').options[1].textContent=wording('Đồng hồ tranh','Art clock');
   $('art-clock-help').textContent=wording('Chọn một bức tranh hoặc tải ảnh của bạn, chỉnh khung rồi bấm Tải lên đồng hồ. Tranh đã lưu vẫn dùng được khi ngắt kết nối web.','Choose a painting or upload your own image, adjust the crop, then upload it to the clock. Saved art remains available offline.');
   const width=full()?(nrf52PanelProfile===41?296:250):(nrf52PanelProfile===41?176:148);
-  $('art-clock-dimensions').textContent=wording(`Khung ảnh: ${width} × 128 px. ${full()?'Góc trắng được chừa sẵn cho giờ và ngày. ':''}Dùng chung 8 ô ảnh trong album; thay ảnh ở ô đang chọn sẽ có thông báo xác nhận.`,`Image area: ${width} × 128 px. ${full()?'The white corner is reserved for time and date. ':''}Shares the album's 8 photo slots; replacing an occupied slot asks for confirmation.`);
+  $('art-clock-dimensions').textContent=wording(`Khung ảnh: ${width} × 128 px. ${movable()?'Ô giờ có thể đặt ở bốn góc. ':full()?'Góc trắng được chừa sẵn cho giờ và ngày. ':''}Dùng chung 8 ô ảnh trong album; thay ảnh ở ô đang chọn sẽ có thông báo xác nhận.`,`Image area: ${width} × 128 px. ${movable()?'The time box can be placed in any corner. ':full()?'The white corner is reserved for time and date. ':''}Shares the album's 8 photo slots; replacing an occupied slot asks for confirmation.`);
   $('art-clock-layout').disabled=!ok||locked;
   const names={spring:['Xuân','Spring'],summer:['Hạ','Summer'],autumn:['Thu','Autumn'],winter:['Đông','Winter']};
   for(const b of document.querySelectorAll('[data-art-season]')){
    b.disabled=!ok||locked;const name=names[b.dataset.artSeason][en()?1:0];b.querySelector('span').textContent=name;b.querySelector('img').alt=name;
   }
   // Shared photo actions own this lock, including the ordinary upload button.
-  if(active)$('clock-image-upload-button').disabled=locked;
+  if(active)$('clock-image-upload-button').disabled=locked||!clockImageOriginal;
+  if(active&&movable()&&!positionRead&&!locked&&root.SmallClockAlbum){positionRead=true;setTimeout(()=>{if(deviceKey===key&&!busy())root.SmallClockAlbum.loadPosition();},0);}
  }
  async function ready(){
   if(!selected())return;
   if(!await T.facesReady({readiness:true}))throw Error(wording('Vào Cài đặt đồng hồ và bấm Cài đặt / cập nhật dữ liệu trước khi dùng Đồng hồ tranh.','Open Settings and install/update clock data before using Art clock.'));
  }
- root.renderClockImage=function(){originalRender();if(selected()&&full()){const box=corner(),ctx=$('clock-image-canvas').getContext('2d');ctx.fillStyle='white';ctx.fillRect(box.x,0,box.width,box.height);}};
+ root.renderClockImage=function(){originalRender();if(selected()&&full()&&clockImageOriginal){const box=corner(),ctx=$('clock-image-canvas').getContext('2d');ctx.fillStyle='white';ctx.fillRect(box.x,box.y,box.width,box.height);}};
+ // Store all artwork pixels on movable-clock firmware. Only the preview is
+ // masked; the device paints its box and can restore the previous corner.
+ function rawCanvas(){if(!movable()||!selected())return $('clock-image-canvas');originalRender();const copy=document.createElement('canvas'),src=$('clock-image-canvas');copy.width=src.width;copy.height=src.height;copy.getContext('2d').drawImage(src,0,0);root.renderClockImage();return copy;}
  root.updateClockImageAvailability=function(){controls();originalUpdate();controls();};
  root.uploadClockImage=function(){return selected()?root.SmallClockAlbum.saveAndShow():originalUpload();};
  $('art-clock-layout').onchange=()=>{if(busy())return;imageToken++;root.updateClockImageAvailability();if(clockImageOriginal)clockImageFit(false);};
  async function choose(season){
   if(!selected()||busy()||loading)return;
+  clockImageFileToken++;
   const key=T.key(),token=++imageToken;loading=true;controls();
   try{
    const image=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(Error(wording('Chưa tải được tranh. Hãy tải lại trang.','Could not load art. Reload the page.')));im.src=document.querySelector('[data-art-season="'+season+'"] img').src;});
@@ -60,6 +79,11 @@
   finally{loading=false;controls();}
  }
  for(const b of document.querySelectorAll('[data-art-season]'))b.onclick=()=>choose(b.dataset.artSeason);
- root.ArtClock={known,full,corner,selected,ready,controls,text,choose};controls();
+ function acceptPosition(n){if(!positionDirty){$('art-clock-position').value=String(n<4?n:1);renderClockImage();}positionRead=true;}
+ function invalidateImage(){imageToken++;loading=false;}
+ $('art-clock-position').onchange=()=>{if(busy())return;positionDirty=true;renderClockImage();};
+ $('art-clock-position-apply').onclick=()=>root.SmallClockAlbum.applyPosition();
+ $('clock-image-clear').onclick=()=>root.clearClockImageSelection();
+ root.ArtClock={known,full,movable,position,corner,selected,ready,controls,text,wording,choose,rawCanvas,acceptPosition,invalidateImage};controls();
  $('language-selector')?.addEventListener('change',()=>setTimeout(controls,0));
 })(globalThis);
