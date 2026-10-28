@@ -3,42 +3,42 @@
   "products": [
     {
       "id": "ce213",
-      "label": "CE 2.13 v20.29",
+      "label": "CE 2.13 v20.30",
       "model": 529,
-      "version": 260,
-      "release": "v20.29",
-      "url": "updates/DH_CE_213_v20.29_TODO_FULL_OTA260_encrypted.zip",
-      "sha256": "ef138c710d6c86c18a20629bc3ea11ff93d74f66e834acb880a3bfb03ed5ae13",
+      "version": 262,
+      "release": "v20.30",
+      "url": "updates/DH_CE_213_v20.30_CARTOON_ART_OTA262_encrypted.zip",
+      "sha256": "84deb8db10ccd1438cb0a1a1eca9f7171e863b85194c2f1399e7da2fa5d9663b",
       "resource_profile": 33
     },
     {
       "id": "noce213",
-      "label": "no CE 2.13 v19.21",
+      "label": "no CE 2.13 v19.22",
       "model": 530,
-      "version": 261,
-      "release": "v19.21",
-      "url": "updates/DH_no_CE_213_v19.21_TODO_FULL_OTA261_encrypted.zip",
-      "sha256": "a03a921ce2bdd33ace5faa288ef622da655aca0418b041a967fa280bb1ab8fce",
+      "version": 263,
+      "release": "v19.22",
+      "url": "updates/DH_no_CE_213_v19.22_CARTOON_ART_OTA263_encrypted.zip",
+      "sha256": "de354aed310c9e580c41c8afd7ab212f0209b9cba99d49ef9aa693b9ed07fda8",
       "resource_profile": 33
     },
     {
       "id": "ce290",
-      "label": "CE 2.9 v19.19",
+      "label": "CE 2.9 v19.20",
       "model": 657,
-      "version": 260,
-      "release": "v19.19",
-      "url": "updates/DH_290_CE_v19.19_TODO_FULL_OTA260_encrypted.zip",
-      "sha256": "10b6edaa70ac96416e71b5747a1eeb732000407a970a5e97fadfc0ec614c4494",
+      "version": 262,
+      "release": "v19.20",
+      "url": "updates/DH_290_CE_v19.20_CARTOON_ART_OTA262_encrypted.zip",
+      "sha256": "711db00294d32ed5fd90e5e223cbf86f32aea5bb5cc700e162eb93c0a391fb13",
       "resource_profile": 41
     },
     {
       "id": "noce290",
-      "label": "no CE 2.9 v7.20",
+      "label": "no CE 2.9 v7.21",
       "model": 658,
-      "version": 261,
-      "release": "v7.20",
-      "url": "updates/DH_290_no_CE_v7.20_TODO_FULL_OTA261_encrypted.zip",
-      "sha256": "f3bc520e5c2f03782ca642b797b31a18b88f7896e48b4229e5026307139ce9ad",
+      "version": 263,
+      "release": "v7.21",
+      "url": "updates/DH_290_no_CE_v7.21_CARTOON_ART_OTA263_encrypted.zip",
+      "sha256": "fc477ea39e4bda280c8b8a59bc952c4dde6d7654ad4d7e9c992b958b84fcdfbb",
       "resource_profile": 41
     }
   ]

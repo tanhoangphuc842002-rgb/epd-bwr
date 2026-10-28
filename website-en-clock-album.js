@@ -1,4 +1,6 @@
 window.EpdWebsiteEnglish=Object.assign(window.EpdWebsiteEnglish||{},{
+ "Đồng hồ tranh":"Art clock",
+ "Giờ đỏ phía trên, phút đen phía dưới; tranh ở bên phải.":"Red hours above black minutes, with art on the right.",
  "Vị trí giờ":"Time position",
  "Áp dụng vị trí":"Apply position",
  "Xóa ảnh đã chọn":"Clear selected image",
