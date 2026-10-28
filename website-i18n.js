@@ -6,6 +6,22 @@ const skipTags=new Set(['SCRIPT','STYLE','NOSCRIPT','TEXTAREA','CODE','PRE']);
 let vi={},en={},parts=null,shortParts=null;
 function configure(base,extra){
  extra={...extra,
+ 'Xóa việc':'Remove task','Thêm công việc':'Add task','Giá trị cài đặt chưa hợp lệ.':'Invalid setting.','Ngày giờ chưa hợp lệ.':'Invalid date or time.','Danh sách trên đồng hồ chưa hợp lệ.':'The task list on the clock is invalid.','Nội dung công việc quá dài. Hãy viết ngắn hơn.':'The task text is too long. Please shorten it.','Chỉ lưu tối đa 8 việc.':'You can save up to eight tasks.',
+"Giờ bắt đầu":"Start time","Hạn chót":"Deadline","Luôn hiển thị":"Always show","Số việc hiển thị":"Number of visible tasks","Hiện trước (phút)":"Show before (minutes)","Giữ lại sau hạn (phút)":"Keep after deadline (minutes)","Công việc tự xuất hiện theo giờ đã đặt, chuyển đỏ khi đến giờ bắt đầu và ẩn sau hạn chót. Chọn Luôn hiển thị để giữ công việc trên màn hình. Sau khi sửa, bấm Lưu và mở danh sách.":"Tasks appear on schedule, turn red at the start time and disappear after the deadline window. Choose Always show to keep a task visible. After editing, select Save and show list.","Danh sách đã đầy. Hãy rút ngắn nội dung hoặc giảm số việc.":"The list is full. Shorten the text or use fewer tasks.","Chọn giờ bắt đầu và hạn chót hợp lệ cho công việc.":"Choose a valid start time and deadline for the task.","Bên cạnh đồng hồ chỉ lưu tối đa 4 việc. Giữ Toàn màn hình để lưu đủ danh sách.":"The layout beside the clock saves up to four tasks. Keep Full screen to save the complete list.","Công việc chưa vừa vùng hiển thị. Hãy viết ngắn hơn.":"The task does not fit the display area. Please shorten it.","Độ dài nội dung:":"Text length:","Chữ có dấu chiếm nhiều chỗ hơn.":"Accented letters use more space.","Toàn màn hình: tối đa 8 việc, mỗi việc một dòng vừa khung và tối đa 64 byte nội dung. Nếu danh sách dài, hãy rút ngắn nội dung để lưu đủ các việc. Bên cạnh đồng hồ: tối đa 4 việc, mỗi việc 28 ký tự. Việc quan trọng hiển thị đỏ, việc đã xong có dấu tích.":"Full screen: up to eight tasks, each fitting one line with up to 64 bytes of text. For a long list, shorten the text to fit all tasks. Beside the clock: up to four tasks of 28 characters each. Important tasks are red; completed tasks have a check mark.",
+ 'Cách hiển thị':'Display layout',
+ 'Bên cạnh đồng hồ':'Beside the clock',
+ 'Toàn màn hình':'Full screen',
+ 'Nhập danh sách, đánh dấu việc quan trọng hoặc đã xong. Chọn cách hiển thị rồi bấm Lưu và mở danh sách.':'Enter your tasks and mark important or completed items. Choose a layout, then select Save and show list.',
+ 'Hai cách hiển thị dùng chung danh sách. Chọn Toàn màn hình để dành toàn bộ màn hình cho công việc; đồng hồ cần được cập nhật phần mềm mới.':'Both layouts use the same saved list. Choose Full screen to use the entire display for your tasks. Update your clock software first.',
+ 'Xem trước danh sách theo cách hiển thị đã chọn:':'Preview of the selected list layout:',
+ 'Cập nhật phần mềm đồng hồ trước khi dùng danh sách toàn màn hình.':'Update your clock software before using the full-screen list.',
+ 'Đã lưu và mở danh sách toàn màn hình.':'Saved and opened the full-screen list.',
+ 'Đã lưu danh sách bên cạnh đồng hồ.':'Saved the list beside the clock.',
+ 'Đã mở danh sách toàn màn hình.':'Opened the full-screen list.',
+ 'Đã mở giao diện bên cạnh đồng hồ.':'Opened the layout beside the clock.',
+ 'Chưa mở được danh sách. Kết nối lại rồi bấm Xem trên đồng hồ.':'Could not open the list. Reconnect, then choose Show on clock.',
+ 'Chưa mở được danh sách. Kết nối lại rồi thử tiếp.':'Could not open the list. Reconnect and try again.',
+
   'Chọn ảnh của tôi':'Choose my own image','Dừng tải':'Stop upload','Tải lại tranh':'Retry image upload',
   'Đang chờ đồng hồ sẵn sàng và kiểm tra dữ liệu…':'Waiting for the clock and checking its data…',
   'Đang dừng phiên tải bị ngắt để tải lại ảnh…':'Stopping the interrupted transfer before retrying…',

@@ -8,12 +8,12 @@
 if(typeof deviceProtocol==='undefined'||deviceProtocol!==PROTOCOL_NRF52||!gattServer?.connected)return null;
   let id=null;
   if(nrf52PanelProfile===0x21){
-   const ce=[127,128,129,130,131,137,139,141,143,149,151,153,155,159,161,163,165,174,178,179,180,181,185,189,193,197,199,203,205,209,213,217,219,223,227,228,232,236,242,246,250,254,256,257,258,259],nc=[132,138,140,142,144,150,152,154,156,160,162,164,166,175,182,186,190,194,198,200,204,206,210,214,218,220,224,229,233,237,243,247,251,255,256,257,258,259];
+   const ce=[127,128,129,130,131,137,139,141,143,149,151,153,155,159,161,163,165,174,178,179,180,181,185,189,193,197,199,203,205,209,213,217,219,223,227,228,232,236,242,246,250,254,256,257,258,259,260,261],nc=[132,138,140,142,144,150,152,154,156,160,162,164,166,175,182,186,190,194,198,200,204,206,210,214,218,220,224,229,233,237,243,247,251,255,256,257,258,259,260,261];
    id=ce.includes(nrf52FirmwareVersion)?'ce213':nc.includes(nrf52FirmwareVersion)?'noce213':null;
   }else if(nrf52PanelProfile===0x29){
-   id=[133,135,145,147,157,167,170,172,176,183,187,191,195,207,211,215,221,225,230,234,238,244,248,252,254,256,257,258,259].includes(nrf52FirmwareVersion)?'ce290':[136,146,148,158,168,171,173,177,184,188,192,196,208,212,216,222,226,231,235,239,241,245,249,253,255,256,257,258,259].includes(nrf52FirmwareVersion)?'noce290':null;
+   id=[133,135,145,147,157,167,170,172,176,183,187,191,195,207,211,215,221,225,230,234,238,244,248,252,254,256,257,258,259,260,261].includes(nrf52FirmwareVersion)?'ce290':[136,146,148,158,168,171,173,177,184,188,192,196,208,212,216,222,226,231,235,239,241,245,249,253,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)?'noce290':null;
   }
-  if([256,257,258,259].includes(nrf52FirmwareVersion))id=nrf52PanelProfile===33?([256,258].includes(nrf52FirmwareVersion)?'ce213':'noce213'):nrf52PanelProfile===41?([256,258].includes(nrf52FirmwareVersion)?'ce290':'noce290'):null;
+  if([256,257,258,259,260,261].includes(nrf52FirmwareVersion))id=nrf52PanelProfile===33?([256,258,260].includes(nrf52FirmwareVersion)?'ce213':'noce213'):nrf52PanelProfile===41?([256,258,260].includes(nrf52FirmwareVersion)?'ce290':'noce290'):null;
   return id?{id,profile:nrf52PanelProfile,device:bleDevice?.id,version:nrf52FirmwareVersion}:null;
  }
  const say=s=>{note.textContent=s;};

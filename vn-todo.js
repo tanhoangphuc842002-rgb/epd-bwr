@@ -6,7 +6,7 @@ let defaultBytes=Uint8Array.from(atob(window.VNFontBase64),c=>c.charCodeAt(0)),f
 let packetSeq=0, pending=null, work=false, cap=null, bound=null, backupDevice=null, backup=null, setupWork=false, progressCallback=null;
 const fonts=[];
 let boundDevice=null,resourceLanguage=0,languageOverride=null,languageTask=false,languagePhase='';
-function languageSupported(){return (resourceProfile()===0x21&&[227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259].includes(nrf52FirmwareVersion))||(resourceProfile()===0x29&&[230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion));}
+function languageSupported(){return (resourceProfile()===0x21&&[227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion))||(resourceProfile()===0x29&&[230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion));}
 const operation=window.CreateVNOperation({
  device:()=>bleDevice,
  busy(value,token){setupWork=value&&!!token.setup;progressCallback=value?token.progress:null;setBusy(value);},
@@ -19,12 +19,16 @@ function onTransportDisconnect(event){
 function bindTransportDevice(){if(boundDevice===bleDevice)return;boundDevice?.removeEventListener?.('gattserverdisconnected',onTransportDisconnect);boundDevice=bleDevice;boundDevice?.addEventListener?.('gattserverdisconnected',onTransportDisconnect);}
 function resourceProfile(){
  if(typeof deviceProtocol==='undefined'||deviceProtocol!==PROTOCOL_NRF52||!nrf52ModelDetected||nrf52ModelId!==2||typeof nrf52PanelProfile==='undefined')return 0;
- if(nrf52PanelProfile===0x21&&[127,128,129,130,131,132,137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259].includes(nrf52FirmwareVersion))return 0x21;
- if(nrf52PanelProfile===0x29&&[133,135,136,145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion))return 0x29;
+ if(nrf52PanelProfile===0x21&&[127,128,129,130,131,132,137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion))return 0x21;
+ if(nrf52PanelProfile===0x29&&[133,135,136,145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion))return 0x29;
  return 0;
 }
-function todoWidth(){return resourceProfile()===0x29?([167,168].includes(nrf52FirmwareVersion)?140:194):148;}
-function noDataSetup(){return ([135,136,145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion)&&resourceProfile()===0x29)||([137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21);}
+function fullTodoSupported(){return !!resourceProfile()&&[260,261].includes(nrf52FirmwareVersion);}
+function fullTodo(){return $('vn-layout')?.value==='full';}
+function todoMode(){if(fullTodo()){if(!fullTodoSupported())throw Error('Cập nhật phần mềm đồng hồ trước khi dùng danh sách toàn màn hình.');return 16;}return 3;}
+function todoLayout(){const settings=$('vn-schedule-settings');if(settings)settings.hidden=!fullTodo();document.querySelectorAll('.vn-schedule-fields').forEach(el=>el.hidden=!fullTodo());const opt=$('vn-layout-full');if(opt)opt.disabled=!fullTodoSupported();const label=$('vn-enable-label');if(label)label.hidden=fullTodo();for(let i=4;i<8;i++){const row=$('vn-row-'+i);if(row)row.hidden=!fullTodo()&&!$('vn-text-'+i).value.trim();}}
+function todoWidth(){if(fullTodo())return resourceProfile()===0x29?296:250;return resourceProfile()===0x29?([167,168].includes(nrf52FirmwareVersion)?140:194):148;}
+function noDataSetup(){return ([135,136,145,146,147,148,157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)&&resourceProfile()===0x29)||([137,138,139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21);}
 function titleWidth(){return resourceProfile()===0x29?228:184;}
 function u32(n){const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,n,true);return b;}
 function crc32(b){let c=0xffffffff;for(const v of b){c^=v;for(let i=0;i<8;i++)c=(c>>>1)^((c&1)?0xedb88320:0);}return (c^0xffffffff)>>>0;}
@@ -48,15 +52,22 @@ function draw(ctx,text,x,y,size,color) {
   x+=g.a;
  }
 }
-for(let i=0;i<4;i++) {
- const row=document.createElement('div'); row.style.cssText='display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0';
+for(let i=0;i<8;i++) {
+ const row=document.createElement('div'); row.id='vn-row-'+i;row.style.cssText='display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0';
  const text=document.createElement('input');text.id='vn-text-'+i;text.placeholder='Việc '+(i+1);text.setAttribute('aria-label','Nội dung việc '+(i+1));text.style.flex='1';
  row.append(text);
  for(const [name,label] of [['done','Đã xong'],['red','Quan trọng']]) {const l=document.createElement('label'),box=document.createElement('input');box.type='checkbox';box.id=`vn-${name}-${i}`;l.append(box,label);row.append(l);}
+
+ const schedule=document.createElement('div');schedule.className='vn-schedule-fields';schedule.style.cssText='display:flex;gap:10px;flex-wrap:wrap;width:100%';schedule.hidden=true;
+ for(const [name,label] of [['start','Giờ bắt đầu'],['due','Hạn chót']]){const l=document.createElement('label');l.style.cssText='display:flex;flex:1;min-width:180px;flex-direction:column;align-items:stretch';l.append(label);const input=document.createElement('input');input.type='datetime-local';input.id='vn-'+name+'-'+i;input.step='60';l.append(input);schedule.append(l);}
+ const label=document.createElement('label'),always=document.createElement('input');always.type='checkbox';always.id='vn-always-'+i;always.checked=true;label.append(always,'Luôn hiển thị');schedule.append(label);row.append(schedule);
+ const counter=document.createElement('small');counter.id='vn-count-'+i;counter.style.width='100%';row.append(counter);
  $('vn-items').append(row);
+ const clear=document.createElement('button');clear.type='button';clear.textContent='Xóa việc';clear.className='btn-secondary';clear.style.cssText='width:auto;padding:6px 10px';clear.onclick=()=>{text.value='';$('vn-done-'+i).checked=false;$('vn-red-'+i).checked=false;$('vn-start-'+i).value='';$('vn-due-'+i).value='';$('vn-always-'+i).checked=true;render();};row.append(clear);
 }
+const addTask=document.createElement('button');addTask.type='button';addTask.id='vn-add-task';addTask.textContent='Thêm công việc';addTask.style.cssText='width:auto;margin:8px 0';addTask.onclick=()=>{const max=fullTodo()?8:4;for(let i=0;i<max;i++)if(!$('vn-text-'+i).value.trim()){$('vn-text-'+i).scrollIntoView({block:'center',behavior:'smooth'});$('vn-text-'+i).focus();return;}status('Danh sách đã đầy. Hãy rút ngắn nội dung hoặc giảm số việc.');};$('vn-items').after(addTask);
 function draft() {
- const b=Uint8Array.from(defaultBytes);b.fill(0,0,512);b[0]=1;b[1]=$('vn-enable').checked?1:0;
+ const b=Uint8Array.from(defaultBytes);b.fill(0,0,512);b[0]=fullTodo()?2:1;b[1]=$('vn-enable').checked?1:0;
  function put(text,at,maxChars,maxBytes){text=text.trim().normalize('NFC');const chars=[...text];
   if(chars.length>maxChars)throw Error(`Nội dung tối đa ${maxChars} ký tự.`);
   for(const c of chars)if(!fonts[0].has(c.codePointAt(0)))throw Error('Chưa hỗ trợ ký tự: '+c+'. Dùng chữ tiếng Việt và ký tự thông thường.');
@@ -64,17 +75,23 @@ function draft() {
  }
  const title=$('vn-title').value.trim().normalize('NFC');if(width(title,0)>titleWidth())throw Error('Tiêu đề chưa vừa một dòng. Hãy rút ngắn nội dung.');
  b[3]=put(title,4,24,72);
- let j=0;
- for(let i=0;i<4;i++) {const text=$(`vn-text-${i}`).value.trim().normalize('NFC');if(!text)continue;
-  let x=16,line=0;for(const c of text){const advance=width(c);if(x+advance>todoWidth()-2){line++;x=16;}if(line>1)throw Error('Việc '+(i+1)+' chưa vừa hai dòng. Hãy rút ngắn.');x+=advance;}
-  const at=80+100*j++;b[at]=($(`vn-done-${i}`).checked?1:0)|($(`vn-red-${i}`).checked?2:0);b[at+1]=put(text,at+2,28,96);
- } b[2]=j;return b;
+ const rows=[];
+ for(let i=0;i<8;i++){
+  const text=$('vn-text-'+i).value.trim().normalize('NFC');$('vn-count-'+i).textContent='Độ dài nội dung: '+enc.encode(text).length+'/'+(fullTodo()?64:96)+' byte. Chữ có dấu chiếm nhiều chỗ hơn.';if(!text)continue;
+  for(const c of text)if(!fonts[0].has(c.codePointAt(0)))throw Error('Chưa hỗ trợ ký tự: '+c);
+  if([...text].length>(fullTodo()?64:28))throw Error('Nội dung công việc quá dài.');
+  let x=16,line=0;for(const c of text){const advance=width(c);if(x+advance>todoWidth()-2){line++;x=16;}if(line>(fullTodo()?0:1))throw Error('Công việc chưa vừa vùng hiển thị. Hãy viết ngắn hơn.');x+=advance;}
+  rows.push({text,flags:($('vn-done-'+i).checked?1:0)|($('vn-red-'+i).checked?2:0),always:$('vn-always-'+i).checked,start:$('vn-start-'+i).value,due:$('vn-due-'+i).value});
+ }
+ return TodoScheduleCodec.write(b,rows,{full:fullTodo(),max:$('vn-show-count').value,lead:$('vn-lead').value,keep:$('vn-keep').value});
 }
-function render(){try{selectFont();const b=draft(),canvas=$('vn-preview'),w=todoWidth();if(canvas.width!==w){canvas.width=w;canvas.style.width=(w*3)+'px';}const ctx=canvas.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,w,128);draw(ctx,'Việc cần làm',5,0,1,'#ad1520');ctx.fillStyle='black';ctx.fillRect(0,18,w,1);
- for(let i=0;i<b[2];i++){const at=80+100*i,text=dec.decode(b.slice(at+2,at+2+b[at+1]));let x=16,y=21+i*26;
-  ctx.strokeStyle='black';ctx.strokeRect(3.5,y+3.5,7,7);if(b[at]&1){ctx.beginPath();ctx.moveTo(4,y+7);ctx.lineTo(6,y+9);ctx.lineTo(10,y+4);ctx.stroke();}
-  for(const c of text){if(x+width(c)>w-2){x=16;y+=13;}draw(ctx,c,x,y,0,b[at]&2?'#ad1520':'black');x+=width(c);}
- }if(!b[2])draw(ctx,'Chưa có việc',6,28,0,'black');
+function render(){try{todoLayout();selectFont();const b=draft(),canvas=$('vn-preview'),w=todoWidth();if(canvas.width!==w){canvas.width=w;canvas.style.width=(w*3)+'px';}const ctx=canvas.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,w,128);draw(ctx,'Việc cần làm',5,0,1,'#ad1520');ctx.fillStyle='black';ctx.fillRect(0,18,w,1);
+ const now=new Date(),civil=Date.UTC(now.getFullYear(),now.getMonth(),now.getDate(),now.getHours(),now.getMinutes())/1000;
+ const rows=TodoScheduleCodec.visible(TodoScheduleCodec.decode(b),civil);
+ for(let i=0;i<rows.length;i++){const row=rows[i],text=row.text;let x=16,y=21+i*(b[0]===2?13:26);
+ ctx.strokeStyle='black';ctx.strokeRect(3.5,y+3.5,7,7);if(row.flags&1){ctx.beginPath();ctx.moveTo(4,y+7);ctx.lineTo(6,y+9);ctx.lineTo(10,y+4);ctx.stroke();}
+ for(const c of text){if(x+width(c)>w-2){x=16;y+=13;}draw(ctx,c,x,y,0,row.red?'#ad1520':'black');x+=width(c);}
+ }if(!rows.length)draw(ctx,'Chưa có việc',6,28,0,'black');
  $('vn-status').textContent='Nội dung vừa vùng hiển thị. Chưa lưu thay đổi.';
  }catch(e){status(e.message);}}
 function status(s){$('vn-status').textContent=s;}
@@ -139,7 +156,7 @@ async function read(a,n){const result=new Uint8Array(n),fast=cap[6]>=3&&n>=4096;
  result.set(bytes,pos);pos+=bytes.length;progress(pos/n*100);
  if(setupWork&&n===0x80000){const percent=Math.floor(pos/n*100);if(percent!==lastPercent){lastPercent=percent;$('vn-setup-status').textContent='Đang đọc bản sao lưu: '+percent+'%. Giữ trang mở và đồng hồ ở gần.';}}
  }return result;}
-function setBusy(v){work=v;for(const el of document.querySelectorAll('#clock-language-controls button,#clock-language-controls select,#vn-controls button,#vn-controls input,#vn-setup-controls button,#vn-setup-controls input,#date-mark-controls button,#date-mark-controls input,#daily-quote-controls button,#daily-quote-controls input,#daily-quote-controls textarea,#daily-quote-controls select'))el.disabled=['date-mark-recover','daily-quote-recover'].includes(el.id)?false:v;}
+function setBusy(v){work=v;for(const el of document.querySelectorAll('#clock-language-controls button,#clock-language-controls select,#vn-controls button,#vn-controls input,#vn-controls select,#vn-setup-controls button,#vn-setup-controls input,#date-mark-controls button,#date-mark-controls input,#daily-quote-controls button,#daily-quote-controls input,#daily-quote-controls textarea,#daily-quote-controls select'))el.disabled=['date-mark-recover','daily-quote-recover'].includes(el.id)?false:v;}
 async function runWork(fn,onProgress,setup=false){
  if(work||window.EpdDfuBusy?.()||window.EpdDesigner?.busy||window.countdownOperationBusy)throw Error('Đang có thao tác khác. Chờ hoàn tất rồi thử lại.');
  return operation.run(fn,{setup,progress:onProgress});
@@ -150,7 +167,9 @@ async function action(fn,setup=false){if(work)return;
 async function loadConfig(){const r=await probe();if(!r[7]){status('Chưa cài dữ liệu. Bấm Đi tới Cài đặt đồng hồ, rồi bấm Cài đặt đồng hồ.');return;}
  const base=new DataView(r.buffer,r.byteOffset).getUint32(10,true),b=await read(base+16,512);
  $('vn-enable').checked=!!b[1];$('vn-title').value=dec.decode(b.slice(4,4+b[3]));
- for(let i=0;i<4;i++){const at=80+i*100;$(`vn-text-${i}`).value=i<b[2]?dec.decode(b.slice(at+2,at+2+b[at+1])):'';$(`vn-done-${i}`).checked=!!(b[at]&1);$(`vn-red-${i}`).checked=!!(b[at]&2);}
+ const list=TodoScheduleCodec.decode(b);if(b[0]===2){$('vn-show-count').value=list.max;$('vn-lead').value=list.lead;$('vn-keep').value=list.keep;}
+ for(let i=0;i<8;i++){const row=list.rows[i];$('vn-text-'+i).value=row?.text||'';$('vn-done-'+i).checked=!!(row?.flags&1);$('vn-red-'+i).checked=!!(row?.flags&2);$('vn-always-'+i).checked=row?.always??true;$('vn-start-'+i).value=TodoScheduleCodec.date(row?.start);$('vn-due-'+i).value=TodoScheduleCodec.date(row?.due);}
+
  render();status('Đã đọc nội dung lưu trong đồng hồ.');
 }
 async function uploadBytes(bytes) {
@@ -170,7 +189,7 @@ async function fontMatches(){
 }
 async function uploadConfig(bytes,deferRedraw=false,preserveCalendar=true){
  if(!await fontMatches())throw Error('Cần cài đặt đồng hồ ở mục Cập nhật phần mềm trước.');
- if(preserveCalendar&&[139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21){
+ if(preserveCalendar&&[139,140,141,142,143,144,149,150,151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)&&(resourceProfile()===0x21||fullTodoSupported())){
   const base=new DataView(cap.buffer,cap.byteOffset).getUint32(10,true);
   bytes.set(await read(base+16+480,32),480);
  }
@@ -254,7 +273,7 @@ $('vn-go-connect').onclick=()=>navigate('tab-settings');
 /* Task navigation stays in its own tab. */
 $('vn-setup-check').onclick=()=>action(async()=>{await probe();if(cap[8])throw Error('Có lần cài đặt chưa hoàn tất. Mở Trợ giúp cài đặt để thử lại.');setupStatus(!cap[7]?'Chưa cài đặt. Bấm Cài đặt đồng hồ để bắt đầu.':eventSupport()&&!await bundleMatches(clockBundle())?'Có dữ liệu mới. Bấm Cài đặt đồng hồ để cập nhật.':'Dữ liệu đã sẵn sàng. Bạn có thể sử dụng đồng hồ.');},true);
 $('vn-install').onclick=()=>action(()=>installUnified(false),true);
-function recoverySupported(){return (resourceProfile()===0x21&&[219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259].includes(nrf52FirmwareVersion))||(resourceProfile()===0x29&&[221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion));}
+function recoverySupported(){return (resourceProfile()===0x21&&[219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion))||(resourceProfile()===0x29&&[221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion));}
 async function recoverClock(){
  connection();
  if(!recoverySupported())throw Error('Đồng hồ cần bản phần mềm có hỗ trợ khôi phục. Bấm Kiểm tra bản cập nhật trước.');
@@ -306,14 +325,14 @@ $('vn-reinstall').onclick=()=>action(async()=>{
  if(!confirm('Cài lại dữ liệu tiếng Việt? Nội dung đang lưu được giữ lại. Không tháo pin trong khi cài.'))return;
  await installUnified(true);
 },true);
-$('vn-save').onclick=()=>action(async()=>{const bytes=draft();await probe();
+$('vn-save').onclick=()=>action(async()=>{const mode=todoMode(),bytes=draft();await probe();
  requireReady();
  if(!confirm('Lưu danh sách vào đồng hồ? Giữ kết nối cho đến khi có thông báo hoàn tất.'))return;
  status('Đang lưu; không dùng mục khác hoặc tháo pin.');let began=false;
- try {began=true;await uploadConfig(bytes,true);began=false;await loadConfig();await sendNrf52Mode(3);status('Đã lưu danh sách. Đồng hồ đang mở giao diện việc cần làm.');
+ try {began=true;await uploadConfig(bytes,true);began=false;await loadConfig();await sendNrf52Mode(mode);status(mode===16?'Đã lưu và mở danh sách toàn màn hình.':'Đã lưu danh sách bên cạnh đồng hồ.');
  }catch(e){if(began)status('Chưa hoàn tất. Bản đã lưu trước vẫn được giữ; kết nối lại để đọc trạng thái.');throw e;}
 });
-$('vn-face2').onclick=()=>action(async()=>{await probe();requireReady();await sendNrf52Mode(3);status('Đồng hồ đang mở danh sách việc cần làm.');});
+$('vn-face2').onclick=()=>action(async()=>{const mode=todoMode();await probe();requireReady();await sendNrf52Mode(mode);status(mode===16?'Đã mở danh sách toàn màn hình.':'Đã mở giao diện bên cạnh đồng hồ.');});
 $('vn-controls').addEventListener('input',render);
 function ownControls(target){return document.getElementById('clock-image-recovery')?.contains(target)||$('vn-controls').contains(target)||$('vn-setup-controls').contains(target)||document.getElementById('photo-album-controls')?.contains(target)||document.getElementById('clock-album-controls')?.contains(target)||document.getElementById('calendar213-controls')?.contains(target)||document.getElementById('date-mark-controls')?.contains(target)||document.getElementById('daily-quote-controls')?.contains(target);}
 document.addEventListener('click',e=>{if(work&&!ownControls(e.target)){e.preventDefault();e.stopImmediatePropagation();(setupWork?setupStatus:status)('Đang truyền dữ liệu. Chờ hoàn tất trước khi dùng mục khác.');}},true);
@@ -355,26 +374,26 @@ window.startVNCountdown=async(date,title)=>{
   await window.startNrf52Countdown(request);
  });}catch(e){window.updateCountdownStatus?.(e.message,true);status(e.message);if(typeof addLog==='function')addLog('Đếm ngược tiếng Việt: '+e.message);}
 };
-function eventSupport(){const p=resourceProfile();return (p===0x21&&[151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259].includes(nrf52FirmwareVersion))||(p===0x29&&[157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion));}
+function eventSupport(){const p=resourceProfile();return (p===0x21&&[151,152,153,154,155,156,159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion))||(p===0x29&&[157,158,167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion));}
 function clockBundle(){
- if([256,257,258,259].includes(nrf52FirmwareVersion)){
+ if([256,257,258,259,260,261].includes(nrf52FirmwareVersion)){
   const b=window.RoundedClockBundles?.[resourceProfile()]?.[resourceLanguage];
   if(!b)throw Error('Thiếu bộ dữ liệu đồng hồ. Hãy tải lại trang.');
   return window.DailyQuotes.defaults(Uint8Array.from(b));
  }
 
- if([246,247,248,249,250,251,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion)){
+ if([246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)){
   const b=window.ArtClockBundles?.[resourceProfile()]?.[resourceLanguage];
   if(!b)throw Error('Thiếu bộ dữ liệu đồng hồ. Hãy tải lại trang.');
   return window.DailyQuotes.defaults(Uint8Array.from(b));
  }
  if(languageSupported()){const b=(resourceProfile()===0x29?window.ClockLanguage290Bundles:window.ClockLanguageBundles)?.[resourceLanguage];if(!b)throw Error('Thiếu bộ dữ liệu ngôn ngữ. Hãy tải lại trang.');return window.DailyQuotes.defaults(Uint8Array.from(b));}
- const modern=resourceProfile()===0x21&&[159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259].includes(nrf52FirmwareVersion);
- const b=Uint8Array.from(([213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259].includes(nrf52FirmwareVersion)?window.CalendarMonth213Bytes:[215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion)?window.CalendarMonth290Bytes:[205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259].includes(nrf52FirmwareVersion)?window.Outline213Bytes:[207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion)?window.Outline290Bytes:[205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259].includes(nrf52FirmwareVersion)?window.Serif213Bytes:[207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion)?window.Serif290Bytes:resourceProfile()===0x21&&[193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259].includes(nrf52FirmwareVersion)?window.Face1Retro213Bytes:resourceProfile()===0x29&&[195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion)?window.Face1Retro290Bytes:resourceProfile()===0x21&&[181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259].includes(nrf52FirmwareVersion)?window.Face6White213Bytes:resourceProfile()===0x29&&[183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion)?window.Face6White290Bytes:resourceProfile()===0x29&&[183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion)?window.Face6Clock290Bytes:resourceProfile()===0x21&&[179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259].includes(nrf52FirmwareVersion)?window.Face6DarkTopBytes:resourceProfile()===0x21&&[178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259].includes(nrf52FirmwareVersion)?window.Face6FlipBytes:resourceProfile()===0x29&&[172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion)?window.Sans290Bold42Bytes:resourceProfile()===0x29&&[170,171].includes(nrf52FirmwareVersion)?window.Sans290ClassicBytes:resourceProfile()===0x29&&[167,168].includes(nrf52FirmwareVersion)?window.Sans290Bytes:[165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21?window.Face4SansBytes:[163,164].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21?window.Face23SansBytes:[161,162].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21?window.Face5SansBytes:modern?window.Face5ClockBytes:resourceProfile()===0x29?window.EventClock290Bytes:window.EventClockBytes)||[]),prefix=defaultBytes.length;
- if(b.length<prefix+8||b.length>([213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,242,243,244,241,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion)?65520:61440))throw Error('Bộ cài đặt chưa đầy đủ. Hãy tải lại trang.');
+ const modern=resourceProfile()===0x21&&[159,160,161,162,163,164,165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion);
+ const b=Uint8Array.from(([213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)?window.CalendarMonth213Bytes:[215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)?window.CalendarMonth290Bytes:[205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)?window.Outline213Bytes:[207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)?window.Outline290Bytes:[205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)?window.Serif213Bytes:[207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)?window.Serif290Bytes:resourceProfile()===0x21&&[193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)?window.Face1Retro213Bytes:resourceProfile()===0x29&&[195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)?window.Face1Retro290Bytes:resourceProfile()===0x21&&[181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)?window.Face6White213Bytes:resourceProfile()===0x29&&[183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)?window.Face6White290Bytes:resourceProfile()===0x29&&[183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)?window.Face6Clock290Bytes:resourceProfile()===0x21&&[179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)?window.Face6DarkTopBytes:resourceProfile()===0x21&&[178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)?window.Face6FlipBytes:resourceProfile()===0x29&&[172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)?window.Sans290Bold42Bytes:resourceProfile()===0x29&&[170,171].includes(nrf52FirmwareVersion)?window.Sans290ClassicBytes:resourceProfile()===0x29&&[167,168].includes(nrf52FirmwareVersion)?window.Sans290Bytes:[165,166,174,175,178,179,180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21?window.Face4SansBytes:[163,164].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21?window.Face23SansBytes:[161,162].includes(nrf52FirmwareVersion)&&resourceProfile()===0x21?window.Face5SansBytes:modern?window.Face5ClockBytes:resourceProfile()===0x29?window.EventClock290Bytes:window.EventClockBytes)||[]),prefix=defaultBytes.length;
+ if(b.length<prefix+8||b.length>([213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,242,243,244,241,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)?65520:61440))throw Error('Bộ cài đặt chưa đầy đủ. Hãy tải lại trang.');
  const v=new DataView(b.buffer);let at=prefix;
  if(crc32(b.subarray(512,prefix))!==crc32(defaultBytes.subarray(512)))throw Error('Bộ dữ liệu hiển thị chưa khớp. Hãy tải lại trang rồi thử Cài đặt đồng hồ.');
- if(modern||(resourceProfile()===0x29&&[167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion)))for(let slot=2;slot<(modern?4:[183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion)?8:7);slot++){
+ if(modern||(resourceProfile()===0x29&&[167,168,170,171,172,173,176,177,183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)))for(let slot=2;slot<(modern?4:[183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)?8:7);slot++){
   if(at+16>b.length||v.getUint8(at)!==slot)throw Error('Bộ dữ liệu giao diện chưa đầy đủ. Hãy tải lại trang rồi cài đặt lại đồng hồ.');
   const bytes=v.getUint32(at+4,true);if(bytes<16||bytes>b.length-at)throw Error('Bộ dữ liệu giao diện chưa hợp lệ. Hãy tải lại trang rồi cài đặt lại đồng hồ.');at+=bytes;
  }
@@ -384,19 +403,19 @@ function clockBundle(){
 }
 function bankAddress(){const a=new DataView(cap.buffer,cap.byteOffset).getUint32(10,true);if(a!==0x60000&&a!==0x70000)throw Error('Chưa xác nhận được vùng dữ liệu của đồng hồ.');return a;}
 function marksTail(bytes){
- if(!((resourceProfile()===0x21&&[180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259].includes(nrf52FirmwareVersion))||(resourceProfile()===0x29&&[183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion)))||bytes.length<256)return null;
+ if(!((resourceProfile()===0x21&&[180,181,182,185,186,189,190,193,194,197,198,199,200,203,204,205,206,209,210,213,214,217,218,219,220,223,224,227,228,229,232,233,236,237,242,243,246,247,250,251,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion))||(resourceProfile()===0x29&&[183,184,187,188,191,192,195,196,207,208,211,212,215,216,221,222,225,226,230,231,234,235,238,239,244,241,245,248,249,252,253,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)))||bytes.length<256)return null;
  const tail=bytes.slice(-256),v=new DataView(tail.buffer);return v.getUint32(0,true)===0x314b4d44&&tail[4]===1&&tail[5]<=3?tail:null;
 }
 async function bundleMatches(bytes){
  if(!cap[7])return false;const base=bankAddress(),h=await read(base,16),v=new DataView(h.buffer);
  if(window.DailyQuotes?.supported()){
   const size=v.getUint32(8,true),prefix=window.DailyQuotes.locate(bytes).prefix;
-  if(v.getUint32(0,true)!==0x31544e56||size<prefix+16||size>([213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,242,243,244,241,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion)?65520:61440))return false;
+  if(v.getUint32(0,true)!==0x31544e56||size<prefix+16||size>([213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,242,243,244,241,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)?65520:61440))return false;
   const q=await request(14);if(q.length!==10||!new DataView(q.buffer,q.byteOffset).getUint32(6,true))return false;
   const n=prefix-512,r=await request(8,[...u32(base+528),n&255,n>>8]);
   return r.length===10&&new DataView(r.buffer,r.byteOffset).getUint32(6,true)===crc32(bytes.subarray(512,prefix));
  }
- const size=v.getUint32(8,true);if(v.getUint32(0,true)!==0x31544e56||(size!==bytes.length&&!([180,181,182,185,186,189,190,193,194,183,184,187,188,191,192,195,196,197,198,199,200,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,242,243,244,241,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion)&&size===bytes.length+256)))return false;
+ const size=v.getUint32(8,true);if(v.getUint32(0,true)!==0x31544e56||(size!==bytes.length&&!([180,181,182,185,186,189,190,193,194,183,184,187,188,191,192,195,196,197,198,199,200,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,242,243,244,241,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)&&size===bytes.length+256)))return false;
  if(size!==bytes.length&&!marksTail(await read(base+16+size-256,256)))return false;
  const expected=crc32(bytes.subarray(512));
  if(cap[6]>=3){const n=bytes.length-512,r=await request(8,[...u32(base+528),n&255,n>>8]);if(r.length!==10)throw Error('Chưa nhận đủ kết quả kiểm tra.');return new DataView(r.buffer,r.byteOffset).getUint32(6,true)===expected;}
@@ -410,7 +429,7 @@ async function installUnified(force=false){
  let old=null,base=0,header=null,blank=false;
  if(cap[7]){
   base=bankAddress();header=await read(base,16);const v=new DataView(header.buffer),size=v.getUint32(8,true);
-  if(v.getUint32(0,true)!==0x31544e56||size<544||size>([213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,242,243,244,241,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259].includes(nrf52FirmwareVersion)?65520:61440))throw Error('Dữ liệu cũ chưa hợp lệ. Chưa ghi dữ liệu mới.');
+  if(v.getUint32(0,true)!==0x31544e56||size<544||size>([213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,242,243,244,241,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261].includes(nrf52FirmwareVersion)?65520:61440))throw Error('Dữ liệu cũ chưa hợp lệ. Chưa ghi dữ liệu mới.');
   setupStatus('Đang sao lưu nội dung hiện có. Ảnh trong album không bị thay đổi.');old=await read(base+16,size);
   if(crc32(old)!==v.getUint32(12,true)||deviceKey()!==key)throw Error('Chưa kiểm tra được dữ liệu cũ. Chưa ghi dữ liệu mới.');
   const saved=new Uint8Array(16+size);saved.set(header);saved.set(old,16);const name='dong-ho-sao-luu-'+Date.now()+'.bin';download(saved,name);
@@ -459,5 +478,5 @@ $('clock-language-apply').onclick=()=>action(async()=>{
  finally {languageTask=false;languageOverride=null;try{await probe();$('clock-language-select').value=String(resourceLanguage);}catch(_){}languageControls();}
 },true);
 setInterval(languageControls,1000);languageControls();
-window.VNTrial={width,draw,crc32,draft,fonts,request,unpackRead,resourceProfile};render();
+window.VNTrial={width,draw,crc32,draft,fonts,request,unpackRead,resourceProfile,fullTodoSupported,todoMode,todoWidth};setInterval(todoLayout,1000);render();
 })();

@@ -3,42 +3,42 @@
   "products": [
     {
       "id": "ce213",
-      "label": "CE 2.13 v20.28.1",
+      "label": "CE 2.13 v20.29",
       "model": 529,
-      "version": 258,
-      "release": "v20.28.1",
-      "url": "updates/DH_CE_213_v20.28.1_ART_HOLD_FIX_OTA258_encrypted.zip",
-      "sha256": "a525e16539dba5ce46a4765346d2a68b89f51c86cf2d2d6e536168d576ae6294",
+      "version": 260,
+      "release": "v20.29",
+      "url": "updates/DH_CE_213_v20.29_TODO_FULL_OTA260_encrypted.zip",
+      "sha256": "ef138c710d6c86c18a20629bc3ea11ff93d74f66e834acb880a3bfb03ed5ae13",
       "resource_profile": 33
     },
     {
       "id": "noce213",
-      "label": "no CE 2.13 v19.20.1",
+      "label": "no CE 2.13 v19.21",
       "model": 530,
-      "version": 259,
-      "release": "v19.20.1",
-      "url": "updates/DH_no_CE_213_v19.20.1_ART_HOLD_FIX_OTA259_encrypted.zip",
-      "sha256": "2620cdf80d79134282be2b4f90b691361f6dcfb1d67130b770f669ba3b489e27",
+      "version": 261,
+      "release": "v19.21",
+      "url": "updates/DH_no_CE_213_v19.21_TODO_FULL_OTA261_encrypted.zip",
+      "sha256": "a03a921ce2bdd33ace5faa288ef622da655aca0418b041a967fa280bb1ab8fce",
       "resource_profile": 33
     },
     {
       "id": "ce290",
-      "label": "CE 2.9 v19.18.1",
+      "label": "CE 2.9 v19.19",
       "model": 657,
-      "version": 258,
-      "release": "v19.18.1",
-      "url": "updates/DH_290_CE_v19.18.1_ART_HOLD_FIX_OTA258_encrypted.zip",
-      "sha256": "b75f2057ad0f1c69bbf6ee99427e7914aaa67030d64d7f170f23e707bdd81b35",
+      "version": 260,
+      "release": "v19.19",
+      "url": "updates/DH_290_CE_v19.19_TODO_FULL_OTA260_encrypted.zip",
+      "sha256": "10b6edaa70ac96416e71b5747a1eeb732000407a970a5e97fadfc0ec614c4494",
       "resource_profile": 41
     },
     {
       "id": "noce290",
-      "label": "no CE 2.9 v7.19.1",
+      "label": "no CE 2.9 v7.20",
       "model": 658,
-      "version": 259,
-      "release": "v7.19.1",
-      "url": "updates/DH_290_no_CE_v7.19.1_ART_HOLD_FIX_OTA259_encrypted.zip",
-      "sha256": "b48d0814f9126e07de5ee84f254294bcd1754ca23e3bb737773bbf994b8d3b9c",
+      "version": 261,
+      "release": "v7.20",
+      "url": "updates/DH_290_no_CE_v7.20_TODO_FULL_OTA261_encrypted.zip",
+      "sha256": "f3bc520e5c2f03782ca642b797b31a18b88f7896e48b4229e5026307139ce9ad",
       "resource_profile": 41
     }
   ]
