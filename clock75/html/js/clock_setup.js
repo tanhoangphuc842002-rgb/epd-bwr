@@ -19,7 +19,7 @@
   async function install() {
     if (preparing || installer().busy() || root.DeviceOperations?.current) return;
     preparing = true; family().disabled = true; installer().controls();
-    const auto=$('externalResourceAutoOffline'),withArt=typeof appVersion!=='undefined'&&[0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A,0x5B,0x5C].includes(appVersion),offline=!!auto?.checked;
+    const auto=$('externalResourceAutoOffline'),withArt=typeof appVersion!=='undefined'&&[0x4A,0x4B,0x4C,0x4D,0x4E,0x4F,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5A,0x5B,0x5C,0x5D,0x5E].includes(appVersion),offline=!!auto?.checked;
     if(withArt&&auto)auto.checked=false;
     try {
       message('Đang chuẩn bị bộ cài đồng hồ. Giữ kết nối Bluetooth và không đóng trang.');

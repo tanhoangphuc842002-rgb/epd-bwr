@@ -167,7 +167,7 @@
       if(!w||w>(index?112:80)||!h||h>(index?160:120)||!a||a>(index?128:100)||x<0||x>24||x+w>a||y< -128||y>32||bytes.slice(at+9,at+12).some(n=>n)||v.getUint32(at,true)!==next||n>bytes.length-148-next)fail('Kích thước chữ số giờ không hợp lệ');
       next+=n;if(i<10){if(i&&a!==advance)fail('Các chữ số phải có cùng bước tiến');advance=a;top=Math.min(top,y);bottom=Math.max(bottom,y+h);}else{span=4*advance+a;if(h>bottom-top)fail('Dấu hai chấm quá cao');}
     }
-    if(next!==bytes.length-148||bottom<=top||bottom-top>(index?164:150)||(index<2&&span>(index?472:384))||(index===2&&2*advance>244)||(index===3&&span>408))fail('Bộ số giờ vượt khung');
+    if(next!==bytes.length-148||bottom<=top||bottom-top>(index?164:150)||(index<2&&span>(index?472:384))||(index===2&&2*advance>244)||(index===3&&span>408)||(index===4&&span>344))fail('Bộ số giờ vượt khung');
     return {span,height:bottom-top,top};
   }
   function validateFaceAssets(bytes){
@@ -267,9 +267,14 @@
     if (count >= 4) fonts.customKey = v.getUint32(68, true);
     if(bytes.length>=end+12&&v.getUint32(bytes.length-12,true)===0x31444e52){
       const at=v.getUint32(bytes.length-8,true),n=v.getUint32(bytes.length-4,true);
-      if(at!==end||n!==bytes.length-12-at)fail('Dữ liệu chữ số bo tròn chưa hợp lệ');
+      if(at<end||n!==bytes.length-12-at)fail('Dữ liệu chữ số bo tròn chưa hợp lệ');
+      if(at>end){
+        const footer=at-12;
+        if(footer<end||v.getUint32(footer,true)!==0x31544744||v.getUint32(footer+4,true)!==end||v.getUint32(footer+8,true)!==footer-end)fail('Bộ số đồng hồ lịch 3 chưa hợp lệ');
+        fonts.digital=bytes.slice(end,footer);timeFontGeometry(fonts.digital,4);
+      }
       fonts.rounded=bytes.slice(at,at+n);timeFontGeometry(fonts.rounded,3);
-    }
+    }else if(bytes.length!==end)fail('Phần bổ sung bộ số bị thiếu hoặc sai định dạng');
     return fonts;
   }
   function encodeFonts(fonts) {
@@ -279,15 +284,18 @@
     fonts.forEach(validateFont);
     const directorySize = 8 + fonts.length * 16;
     if(fonts.rounded)timeFontGeometry(fonts.rounded,3);
+    if(fonts.digital){if(!fonts.rounded)fail("Thiếu bộ số nền");timeFontGeometry(fonts.digital,4);}
     const baseSize=directorySize+fonts.reduce((n,b)=>n+b.length,0);
-    const bytes = new Uint8Array(baseSize+(fonts.rounded?fonts.rounded.length+12:0)), v = view(bytes);
+    const digitalSize=fonts.digital?fonts.digital.length+12:0;
+    const bytes = new Uint8Array(baseSize+digitalSize+(fonts.rounded?fonts.rounded.length+12:0)), v = view(bytes);
     v.setUint32(0, 0x314b5046, true); v.setUint16(4, 1, true); v.setUint16(6, fonts.length, true);
     let offset = directorySize;
     fonts.forEach((b, i) => {
       [offset, b.length, store.crc32(b), i === 3 ? fonts.customKey : 0].forEach((n, j) => v.setUint32(8 + i * 16 + j * 4, n, true));
       bytes.set(b, offset); offset += b.length;
     });
-    if(fonts.rounded){bytes.set(fonts.rounded,baseSize);v.setUint32(bytes.length-12,0x31444e52,true);v.setUint32(bytes.length-8,baseSize,true);v.setUint32(bytes.length-4,fonts.rounded.length,true);}
+    if(fonts.digital){bytes.set(fonts.digital,baseSize);const f=baseSize+fonts.digital.length;v.setUint32(f,0x31544744,true);v.setUint32(f+4,baseSize,true);v.setUint32(f+8,fonts.digital.length,true);}
+    if(fonts.rounded){const at=baseSize+digitalSize;bytes.set(fonts.rounded,at);v.setUint32(bytes.length-12,0x31444e52,true);v.setUint32(bytes.length-8,at,true);v.setUint32(bytes.length-4,fonts.rounded.length,true);}
     return bytes;
   }
   function fontKey(family, sourceSlot) {

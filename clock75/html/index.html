@@ -8,7 +8,7 @@
 	<title>Bộ điều khiển đồng hồ 7.5</title>
 	<link rel="shortcut icon" type="image/png" href="favicon.png">
 	<meta name="theme-color" content="#2563eb">
-	<link rel="stylesheet" href="css/main.css?v=61.84">
+	<link rel="stylesheet" href="css/main.css?v=61.88.1">
 	<link rel="stylesheet" href="css/photo-clock.css?v=61.80">
 	<link rel="stylesheet" href="css/album75.css?v=5.20.1-approtect75">
 </head>
@@ -106,6 +106,7 @@
 					<button id="year75Mode" type="button" class="primary" onclick="YearCalendar75.show()" data-device-operation disabled>Lịch năm</button>
 					<button id="clockmodebutton" type="button" class="primary" onclick="syncTime(2)">Đồng hồ + Lịch </button>
 					<button id="rounded75Mode" type="button" class="primary" onclick="RoundedClock75.show()" data-device-operation disabled>Đồng hồ lịch 2</button>
+<button id="digital75Mode" type="button" class="primary" onclick="DigitalCalendar75.show()" data-device-operation disabled>Đồng hồ lịch 3</button>
 					<button id="countdown75ModeButton" type="button" class="primary" onclick="Countdown75.show()" disabled>Đồng hồ đếm ngược</button>
 					<button id="photoclockmodebutton" type="button" class="primary" onclick="PhotoClock.show()" disabled>Đồng hồ+ảnh</button>
 					<button id="season75Mode" type="button" class="primary" onclick="Season75.install()" disabled>Đồng hồ bốn mùa</button>
@@ -123,7 +124,8 @@
 				</div>
 			</div>
 			<p id="countdown75QuickStatus" class="photo-quick-status" role="status" aria-live="polite"></p>
-			<p id="rounded75Status" class="photo-quick-status" role="status" aria-live="polite"></p>
+			<p id="digital75Status" class="photo-quick-status" role="status" aria-live="polite"></p>
+<p id="rounded75Status" class="photo-quick-status" role="status" aria-live="polite"></p>
 			<p id="year75Status" class="photo-quick-status" role="status" aria-live="polite"></p>
 			<a class="photo-editor-link" href="#countdownWorkspace">Đặt ngày kết thúc đếm ngược</a>
 			<p id="photoClockQuickStatus" class="photo-quick-status" role="status" aria-live="polite"></p>
@@ -579,34 +581,34 @@
 	<script type="text/javascript" src="js/calendar_annotations.js?v=original-vi-5.9-public"></script>
 	<script type="text/javascript" src="js/resource_store.js?v=61.74.1-approtect75"></script>
 	<script src="js/resource_archive.js?v=20261004a"></script>
-	<script type="text/javascript" src="js/resource_builder.js?v=61.84"></script>
+	<script type="text/javascript" src="js/resource_builder.js?v=61.88.1"></script>
 	<script src="js/font_builder.js?v=original-vi-5.2-font20"></script>
-	<script src="js/font_sync.js?v=61.84"></script>
+	<script src="js/font_sync.js?v=61.88.1"></script>
 	<script src="js/todo_sync.js?v=20261005h"></script>
-	<script src="resources/bundled-projects.js?v=61.84"></script>
+	<script src="resources/bundled-projects.js?v=61.88.1"></script>
 	<script type="text/javascript" src="js/resource_installer.js?v=61.76.1-boot-fix"></script>
 	<script src="js/todo_calendar.js?v=original-vi-5.9.6"></script>
 	<script type="text/javascript" src="js/resource_editor.js?v=original-vi-5.3-countdown"></script>
-	<script src="js/clock_setup.js?v=61.84"></script>
+	<script src="js/clock_setup.js?v=61.88.1"></script>
 	<script src="js/countdown75.js?v=61.75-custom-art-vi"></script>
 	<script src="../../clock-image-processing.js?v=5.9.7"></script>
 	<script src="js/photo_editor.js?v=original-vi-5.9.7"></script>
-	<script src="js/photo_clock.js?v=61.84"></script>
+	<script src="js/photo_clock.js?v=61.88.1"></script>
 	<script type="text/javascript" src="js/console_ui.js?v=5.20.1c-approtect75"></script>
 	<script src="js/image_transfer_ui.js?v=5.9.6"></script>
-	<script type="text/javascript" src="js/main.js?v=61.84-61.84"></script>
+	<script type="text/javascript" src="js/main.js?v=61.88.1-61.88.1"></script>
 	<script src="js/image75_editor.js?v=original-vi-5.9.6"></script>
 	<script src="js/photo_codec75.js?v=original-vi-5.11"></script>
-	<script src="js/album75.js?v=61.84"></script>
-	<script src="js/year_calendar75.js?v=61.84"></script>
-<script src="js/quote75.js?v=61.84"></script>
+	<script src="js/album75.js?v=61.88.1"></script>
+	<script src="js/year_calendar75.js?v=61.88.1"></script>
+<script src="js/quote75.js?v=61.88.1"></script>
 <script src="resources/art-landscape-data.js?v=5.17"></script>
 <script src="resources/art-gallery-data.js?v=61.75"></script>
-<script src="js/art_clock75.js?v=61.84"></script>
- <script src="js/art_upload75.js?v=61.84"></script>
+<script src="js/art_clock75.js?v=61.88.1"></script>
+ <script src="js/art_upload75.js?v=61.88.1"></script>
 <script src="resources/season-data.js?v=5.20.1-approtect75"></script>
-<script src="js/season75.js?v=61.84"></script><script src="js/season_upload75.js?v=61.84"></script><script src="js/annotation_layout75.js?v=61.84"></script>
-<script src="js/rounded_clock75.js?v=61.84"></script>
-<script src="../../jszip.min.js?v=61.84"></script><script src="../../crc32.min.js?v=61.84"></script><script src="../../secure-dfu.js?v=61.84"></script><script src="../../secure-dfu-package.js?v=61.84"></script><script src="../../ota-verifier.js?v=61.84"></script><script src="../../ota-dual-update.js?v=61.84"></script><script src="../../ota-original75.js?v=61.84"></script><script src="js/software75.js?v=61.84"></script></body>
+<script src="js/season75.js?v=61.88.1"></script><script src="js/season_upload75.js?v=61.88.1"></script><script src="js/annotation_layout75.js?v=61.88.1"></script>
+<script src="js/rounded_clock75.js?v=61.88.1"></script>
+<script src="../../jszip.min.js?v=61.88.1"></script><script src="../../crc32.min.js?v=61.88.1"></script><script src="../../secure-dfu.js?v=61.88.1"></script><script src="../../secure-dfu-package.js?v=61.88.1"></script><script src="../../ota-verifier.js?v=61.88.1"></script><script src="../../ota-dual-update.js?v=61.88.1"></script><script src="../../ota-original75.js?v=61.88.1"></script><script src="js/software75.js?v=61.88.1"></script></body>
 
 </html>
