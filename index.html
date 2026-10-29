@@ -995,7 +995,7 @@
         </select>
     </div>
 
-    <script src="website-en-1.js?v=4219267872ee"></script>
+    <script src="website-en-1.js?v=b50a9c962073"></script>
     <script src="website-en-2.js?v=b760b298af3a"></script>
     <script src="website-en-3.js?v=4b7f1ef2c398"></script>
     <script src="website-en-clock-album.js?v=7b2ce96d26ab"></script>
@@ -1986,6 +1986,13 @@
           #tab-image .quick-tool-buttons{gap:6px}
           #tab-image .quick-tool-options{gap:8px}
           #tab-image .quick-tool-options button{max-width:100%;white-space:normal}
+          #tab-image .image-color-options{padding:10px;border:1px solid #d8dde5;border-radius:8px;background:#f8fafc}
+          #tab-image .image-color-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:10px}
+          #tab-image .image-color-grid label{min-width:0;font-size:13px}
+          #tab-image .image-color-grid input[type=range]{display:block;box-sizing:border-box;width:100%;margin:12px 0 0;padding:0}
+          #tab-image .image-color-grid output{float:right;font-variant-numeric:tabular-nums}
+          @media(max-width:700px){#tab-image .image-color-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+          @media(max-width:380px){#tab-image .image-color-grid{grid-template-columns:minmax(0,1fr)}}
           #tab-image .image-adjustments{box-sizing:border-box;min-width:0;padding:12px}
           #tab-image .image-adjustments .button-group{gap:8px;align-items:center}
           @media(max-width:480px){
@@ -2046,9 +2053,7 @@
             </select>
         </div>
 
-        <div class="button-group">
-            Threshold (B&W mode):<input type="range" max="255" min="10" value="125" id="threshold">
-        </div>
+
            Rotation:<span id="rotationValue">0 deg</span><input type="range" id="rotationSlider" min="0" max="360" value="0" oninput="updateRotation(this.value)">
         <label>Scale: <span id="scaleValue">100%</span></label>
         <input type="range" id="scaleSlider" min="10" max="500" value="100" oninput="updateScale(this.value)">
@@ -2163,33 +2168,17 @@
 
        
         <div class="image-adjustments">
-            <h3>Image Adjustment</h3>
-            <div class="adjustment-row">
-                <label for="brightness">Brightness:</label>  
-                <span class="adjustment-value" id="brightnessValue">0</span>
-                <input type="range" id="brightness" min="-100" max="100" value="0">
-              
+            <details open class="image-color-options"><summary>Image Adjustment</summary>
+            <div class="image-color-grid">
+                <label for="brightness">Brightness <output id="brightnessValue">0</output><input type="range" id="brightness" min="-100" max="100" value="0"></label>
+                <label for="contrast">Contrast <output id="contrastValue">0</output><input type="range" id="contrast" min="-100" max="100" value="0"></label>
+                <label for="image-red-threshold">Ngưỡng đỏ <output id="image-red-value">120</output><input type="range" id="image-red-threshold" min="80" max="240" value="120"></label>
+                <label for="threshold">Ngưỡng đen/trắng <output id="image-bw-value">128</output><input type="range" id="threshold" min="50" max="220" value="128"></label>
             </div>
-            <div class="adjustment-row">
-                <label for="contrast">Contrast:</label>
-                 <span class="adjustment-value" id="contrastValue">100</span>
-                <input type="range" id="contrast" min="0" max="200" value="100">
-               
-            </div>
-            <div class="adjustment-row">
-                <label for="saturation">Saturation:</label>
-                 <span class="adjustment-value" id="saturationValue">100</span>
-                <input type="range" id="saturation" min="0" max="200" value="100">
-               
-            </div>
-            <div class="adjustment-row">
-                <label for="diffusion">Diffusion Strength:</label>
-                 <span class="adjustment-value" id="diffusionValue">50</span>
-                <input type="range" id="diffusion" min="0" max="100" value="50">
-               
-            </div>
+            </details>
+            <input id="saturation" type="hidden" value="100"><input id="diffusion" type="hidden" value="100">
             <div class="button-group">
-                <button onclick="update_image()">ApplyImage Adjustment</button>
+                <button type="button" id="image-adjust-reset">Đặt lại màu ảnh</button>
                 <button onclick="upload_image()" style="font-weight: bold">Upload to Screen Now</button>
             </div>
             <div class="button-group" id="nrf52-upload-progress-wrap">
@@ -2380,41 +2369,18 @@ document.querySelectorAll('.tab-button[data-tab]').forEach(function(btn) {
     </script>
     <script>
         function applyImageAdjustments(canvas) {
-            const brightness = parseInt(document.getElementById('brightness').value);
-            const contrast = parseInt(document.getElementById('contrast').value);
-            const saturation = parseInt(document.getElementById('saturation').value);
-            const diffusion = parseInt(document.getElementById('diffusion').value) / 100; 
+            const brightness = Number(document.getElementById('brightness').value) * 2.55;
+            const contrast = Number(document.getElementById('contrast').value);
+            const factor = 259 * (contrast + 255) / (255 * (259 - contrast));
             const ctx = canvas.getContext('2d');
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imageData.data;
-            if (brightness !== 0) {
-                const brightnessFactor = brightness / 100;
-                for (let i = 0; i < data.length; i += 4) {
-                    data[i] = clamp(data[i] + 255 * brightnessFactor, 0, 255);
-                    data[i + 1] = clamp(data[i + 1] + 255 * brightnessFactor, 0, 255);
-                    data[i + 2] = clamp(data[i + 2] + 255 * brightnessFactor, 0, 255);
-                }
-            }
-            if (contrast !== 100) {
-                const contrastFactor = contrast / 100;
-                const contrastAdjust = (1 - contrastFactor) * 128;
-                for (let i = 0; i < data.length; i += 4) {
-                    data[i] = clamp(data[i] * contrastFactor + contrastAdjust, 0, 255);
-                    data[i + 1] = clamp(data[i + 1] * contrastFactor + contrastAdjust, 0, 255);
-                    data[i + 2] = clamp(data[i + 2] * contrastFactor + contrastAdjust, 0, 255);
-                }
-            }
-            if (saturation !== 100) {
-                const saturationFactor = saturation / 100;
-                for (let i = 0; i < data.length; i += 4) {
-                    const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-                    data[i] = clamp(gray + (data[i] - gray) * saturationFactor, 0, 255);
-                    data[i + 1] = clamp(gray + (data[i + 1] - gray) * saturationFactor, 0, 255);
-                    data[i + 2] = clamp(gray + (data[i + 2] - gray) * saturationFactor, 0, 255);
-                }
+            for (let i = 0; i < data.length; i += 4) {
+                const alpha = data[i + 3] / 255;
+                for (let c = 0; c < 3; c++) data[i+c] = clamp(factor * (data[i+c] * alpha + 255 * (1-alpha) - 128) + 128 + brightness, 0, 255);
+                data[i+3] = 255;
             }
             ctx.putImageData(imageData, 0, 0);
-            return diffusion;
         }
         function clamp(value, min, max) {
             return Math.min(Math.max(value, min), max);
@@ -2626,13 +2592,14 @@ document.querySelectorAll('.tab-button[data-tab]').forEach(function(btn) {
             data[idx + 2] = clamp(data[idx + 2] + err * factor, 0, 255);
         }
         function applyBWRNoneDithering(ctx, width, height, threshold, diffusion = 1.0) {
+            const redThreshold = Number(document.getElementById("image-red-threshold").value);
             const imageData = ctx.getImageData(0, 0, width, height);
             const data = imageData.data;
             for (let i = 0; i < data.length; i += 4) {
                 const r = data[i];
                 const g = data[i + 1];
                 const b = data[i + 2];
-                if (r > g * 1.5 && r > b * 1.5 && r > threshold) {
+                if (r > g * 1.5 && r > b * 1.5 && r > redThreshold) {
                     data[i] = 255;
                     data[i + 1] = 0;
                     data[i + 2] = 0;
@@ -2645,6 +2612,7 @@ document.querySelectorAll('.tab-button[data-tab]').forEach(function(btn) {
             ctx.putImageData(imageData, 0, 0);
         }
         function applyBWRFloydSteinbergDithering(ctx, width, height, threshold, diffusion = 1.0) {
+            const redThreshold = Number(document.getElementById("image-red-threshold").value);
             const imageData = ctx.getImageData(0, 0, width, height);
             const data = imageData.data;
             for (let y = 0; y < height; y++) {
@@ -2653,7 +2621,7 @@ document.querySelectorAll('.tab-button[data-tab]').forEach(function(btn) {
                     const oldR = data[idx];
                     const oldG = data[idx + 1];
                     const oldB = data[idx + 2];
-                    if (oldR > oldG * 1.5 && oldR > oldB * 1.5 && oldR > threshold) {
+                    if (oldR > oldG * 1.5 && oldR > oldB * 1.5 && oldR > redThreshold) {
                         data[idx] = 255;
                         data[idx + 1] = 0;
                         data[idx + 2] = 0;
@@ -2682,6 +2650,7 @@ document.querySelectorAll('.tab-button[data-tab]').forEach(function(btn) {
             ctx.putImageData(imageData, 0, 0);
         }
         function applyBWRAtkinsonDithering(ctx, width, height, threshold, diffusion = 1.0) {
+            const redThreshold = Number(document.getElementById("image-red-threshold").value);
             const imageData = ctx.getImageData(0, 0, width, height);
             const data = imageData.data;
             for (let y = 0; y < height; y++) {
@@ -2690,7 +2659,7 @@ document.querySelectorAll('.tab-button[data-tab]').forEach(function(btn) {
                     const oldR = data[idx];
                     const oldG = data[idx + 1];
                     const oldB = data[idx + 2];
-                    if (oldR > oldG * 1.5 && oldR > oldB * 1.5 && oldR > threshold) {
+                    if (oldR > oldG * 1.5 && oldR > oldB * 1.5 && oldR > redThreshold) {
                         data[idx] = 255;
                         data[idx + 1] = 0;
                         data[idx + 2] = 0;
@@ -2725,6 +2694,7 @@ document.querySelectorAll('.tab-button[data-tab]').forEach(function(btn) {
             ctx.putImageData(imageData, 0, 0);
         }
         function applyBWRBayerDithering(ctx, width, height, threshold, diffusion = 1.0) {
+            const redThreshold = Number(document.getElementById("image-red-threshold").value);
             const bayerThresholdMap = [
                 [15, 135, 45, 165],
                 [195,75,225,105,207,211,215,221,230],
@@ -2742,7 +2712,7 @@ document.querySelectorAll('.tab-button[data-tab]').forEach(function(btn) {
                 const mapValue = bayerThresholdMap[x % 4][y % 4];
                 const adjustedThreshold = threshold * (1 + (mapValue - 128) / 128 * diffusion);
                 const finalThreshold = clamp(adjustedThreshold, 0, 255);
-                if (r > g * 1.5 && r > b * 1.5 && r > finalThreshold) {
+                if (r > g * 1.5 && r > b * 1.5 && r > redThreshold) {
                     data[i] = 255;
                     data[i + 1] = 0;
                     data[i + 2] = 0;
@@ -2755,6 +2725,7 @@ document.querySelectorAll('.tab-button[data-tab]').forEach(function(btn) {
             ctx.putImageData(imageData, 0, 0);
         }
         function applyBWRStuckiDithering(ctx, width, height, threshold, diffusion = 1.0) {
+            const redThreshold = Number(document.getElementById("image-red-threshold").value);
             const imageData = ctx.getImageData(0, 0, width, height);
             const data = imageData.data;
             for (let y = 0; y < height; y++) {
@@ -2763,7 +2734,7 @@ document.querySelectorAll('.tab-button[data-tab]').forEach(function(btn) {
                     const oldR = data[idx];
                     const oldG = data[idx + 1];
                     const oldB = data[idx + 2];
-                    if (oldR > oldG * 1.5 && oldR > oldB * 1.5 && oldR > threshold) {
+                    if (oldR > oldG * 1.5 && oldR > oldB * 1.5 && oldR > redThreshold) {
                         data[idx] = 255;
                         data[idx + 1] = 0;
                         data[idx + 2] = 0;
@@ -2816,6 +2787,7 @@ document.querySelectorAll('.tab-button[data-tab]').forEach(function(btn) {
             ctx.putImageData(imageData, 0, 0);
         }
         function applyBWRJarvisJudiceNinkeDithering(ctx, width, height, threshold, diffusion = 1.0) {
+            const redThreshold = Number(document.getElementById("image-red-threshold").value);
             const imageData = ctx.getImageData(0, 0, width, height);
             const data = imageData.data;
             for (let y = 0; y < height; y++) {
@@ -2824,7 +2796,7 @@ document.querySelectorAll('.tab-button[data-tab]').forEach(function(btn) {
                     const oldR = data[idx];
                     const oldG = data[idx + 1];
                     const oldB = data[idx + 2];
-                    if (oldR > oldG * 1.5 && oldR > oldB * 1.5 && oldR > threshold) {
+                    if (oldR > oldG * 1.5 && oldR > oldB * 1.5 && oldR > redThreshold) {
                         data[idx] = 255;
                         data[idx + 1] = 0;
                         data[idx + 2] = 0;
@@ -2891,6 +2863,13 @@ document.querySelectorAll('.tab-button[data-tab]').forEach(function(btn) {
             [255, 255, 255, 255],
         ]
         function dithering(ctx, width, height, threshold, type) {
+            if (type === 'bwr_floydsteinberg' || type === 'bwr_none') {
+                const imageData = ctx.getImageData(0, 0, width, height);
+                imageData.data.set(EpdClockImageProcessing.process(imageData.data, width, height,
+                    {redThreshold:Number(document.getElementById('image-red-threshold').value), bwThreshold:threshold}, type !== 'bwr_none', false));
+                ctx.putImageData(imageData, 0, 0);
+                return;
+            }
             const diffusion = parseInt(document.getElementById('diffusion').value) / 100;
             if (type.startsWith('bwr_')) {
                 const bwrType = type.replace('bwr_', '');
@@ -4600,6 +4579,7 @@ document.querySelectorAll('.tab-button[data-tab]').forEach(function(btn) {
         }
         async function upload_image() {
             if (window.countdownOperationBusy) return;
+            flushImageAdjustmentPreview();
             const canvas = document.getElementById('canvas');
             const startTime = new Date().getTime();
             let screenValue = document.getElementById('screen-size')?.value;
@@ -6963,17 +6943,33 @@ document.querySelectorAll('.tab-button[data-tab]').forEach(function(btn) {
         });
     </script>
      <script>
-        document.getElementById('brightness').addEventListener('input', function() {
-            document.getElementById('brightnessValue').textContent = this.value;
-        });
-        document.getElementById('contrast').addEventListener('input', function() {
-            document.getElementById('contrastValue').textContent = this.value;
-        });
-        document.getElementById('saturation').addEventListener('input', function() {
-            document.getElementById('saturationValue').textContent = this.value;
-        });
-        document.getElementById('diffusion').addEventListener('input', function() {
-            document.getElementById('diffusionValue').textContent = this.value;
+        let imageAdjustmentFrame = 0;
+        function refreshImageAdjustmentValues() {
+            for (const [input,output] of [['brightness','brightnessValue'],['contrast','contrastValue'],['image-red-threshold','image-red-value'],['threshold','image-bw-value']])
+                document.getElementById(output).textContent = document.getElementById(input).value;
+        }
+        function queueImageAdjustmentPreview() {
+            refreshImageAdjustmentValues();
+            if (imageAdjustmentFrame) cancelAnimationFrame(imageAdjustmentFrame);
+            imageAdjustmentFrame = requestAnimationFrame(() => {
+                imageAdjustmentFrame = 0;
+                if (currentImage) redrawQuickEditorCanvas();
+            });
+        }
+        function flushImageAdjustmentPreview() {
+            if (!imageAdjustmentFrame) return;
+            cancelAnimationFrame(imageAdjustmentFrame);
+            imageAdjustmentFrame = 0;
+            if (currentImage) redrawQuickEditorCanvas();
+        }
+        for (const id of ['brightness','contrast','image-red-threshold','threshold']) {
+            document.getElementById(id).addEventListener('input', queueImageAdjustmentPreview);
+            document.getElementById(id).addEventListener('change', flushImageAdjustmentPreview);
+        }
+        document.getElementById('dithering').addEventListener('change', queueImageAdjustmentPreview);
+        document.getElementById('image-adjust-reset').addEventListener('click', () => {
+            for (const [id,value] of [['brightness',0],['contrast',0],['image-red-threshold',120],['threshold',128]]) document.getElementById(id).value=value;
+            queueImageAdjustmentPreview();
         });
     </script>
     

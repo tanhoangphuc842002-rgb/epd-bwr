@@ -67,6 +67,7 @@ window.EpdWebsiteEnglish=Object.assign(window.EpdWebsiteEnglish||{},{
   "Đặt lại ảnh": "Reset image",
   "Độ sáng": "Brightness",
   "Tương phản": "Contrast",
+  "Đặt lại màu ảnh": "Reset image colors",
   "Ngưỡng đỏ": "Red threshold",
   "Ngưỡng đen/trắng": "Black/white threshold",
   "Công cụ chỉnh sửa ảnh đồng hồ": "Clock image editor",
