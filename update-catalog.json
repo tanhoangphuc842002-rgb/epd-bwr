@@ -3,42 +3,42 @@
   "products": [
     {
       "id": "ce213",
-      "label": "CE 2.13 v20.30",
+      "label": "CE 2.13 v20.39",
       "model": 529,
-      "version": 262,
-      "release": "v20.30",
-      "url": "updates/DH_CE_213_v20.30_CARTOON_ART_OTA262_encrypted.zip",
-      "sha256": "84deb8db10ccd1438cb0a1a1eca9f7171e863b85194c2f1399e7da2fa5d9663b",
+      "version": 282,
+      "release": "v20.39",
+      "url": "updates/DH_CE_213_v20.39_PORTRAIT_CALENDAR_COLORS_OTA282_encrypted.zip",
+      "sha256": "8a89bb440e5d97a65818efaf261b130682589b49344271ff43c68bfe0b653298",
       "resource_profile": 33
     },
     {
       "id": "noce213",
-      "label": "no CE 2.13 v19.22",
+      "label": "no CE 2.13 v19.23",
       "model": 530,
-      "version": 263,
-      "release": "v19.22",
-      "url": "updates/DH_no_CE_213_v19.22_CARTOON_ART_OTA263_encrypted.zip",
-      "sha256": "de354aed310c9e580c41c8afd7ab212f0209b9cba99d49ef9aa693b9ed07fda8",
+      "version": 279,
+      "release": "v19.23",
+      "url": "updates/DH_no_CE_213_v19.23_PORTRAIT_CALENDAR_OTA279_encrypted.zip",
+      "sha256": "680bc8057d13b6abed65c18941a387e5517153838d4f7a65a397c1f8f79caef8",
       "resource_profile": 33
     },
     {
       "id": "ce290",
-      "label": "CE 2.9 v19.20",
+      "label": "CE 2.9 v19.22",
       "model": 657,
-      "version": 262,
-      "release": "v19.20",
-      "url": "updates/DH_290_CE_v19.20_CARTOON_ART_OTA262_encrypted.zip",
-      "sha256": "711db00294d32ed5fd90e5e223cbf86f32aea5bb5cc700e162eb93c0a391fb13",
+      "version": 283,
+      "release": "v19.22",
+      "url": "updates/DH_290_CE_v19.22_PORTRAIT_FRAME_WIDER_OTA283_encrypted.zip",
+      "sha256": "474bb4d5b18617c8b684b709cb1045da811dc0c6390a29b580fc4e7e201d5fad",
       "resource_profile": 41
     },
     {
       "id": "noce290",
-      "label": "no CE 2.9 v7.21",
+      "label": "no CE 2.9 v7.23",
       "model": 658,
-      "version": 263,
-      "release": "v7.21",
-      "url": "updates/DH_290_no_CE_v7.21_CARTOON_ART_OTA263_encrypted.zip",
-      "sha256": "fc477ea39e4bda280c8b8a59bc952c4dde6d7654ad4d7e9c992b958b84fcdfbb",
+      "version": 284,
+      "release": "v7.23",
+      "url": "updates/DH_290_no_CE_v7.23_PORTRAIT_FRAME_WIDER_OTA284_encrypted.zip",
+      "sha256": "85c34476148f4478ecca97fa346128d24a6e6ca52167b0469ce6e843e252a9c6",
       "resource_profile": 41
     }
   ]
